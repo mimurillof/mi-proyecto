@@ -1,0 +1,117 @@
+.total-holding-card-container {
+  background-color: white; /* Fondo blanco */
+  color: #1f2937; /* Color de texto oscuro principal */
+  padding: 1rem; /* Padding estándar */
+  border-radius: 0.5rem; /* Bordes redondeados estándar */
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1); /* Sombra estándar */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  height: 100%; /* Asegura que ocupe la altura del contenedor padre */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; /* Fuente del sistema */
+}
+
+.holding-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 1rem; /* Espacio debajo del header */
+}
+
+.holding-title {
+  font-size: 0.875rem; /* 14px */
+  color: #6b7280; /* Color gris para el título */
+  font-weight: 500;
+}
+
+.holding-header-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.holding-time-button {
+  background-color: #f3f4f6; /* Fondo gris claro */
+  border: 1px solid #d1d5db; /* Borde gris */
+  color: #374151; /* Texto gris oscuro */
+  border-radius: 9999px; /* Redondeado */
+  padding: 0.2rem 0.6rem; /* Padding ajustado */
+  font-size: 0.75rem; /* 12px */
+  font-weight: 500;
+  margin-right: 0.25rem; /* Espacio pequeño a la derecha */
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+.holding-time-button:hover {
+    background-color: #e5e7eb;
+}
+
+
+.holding-dropdown-button {
+  background-color: transparent;
+  border: 1px solid #d1d5db; /* Borde gris */
+  color: #6b7280; /* Icono gris */
+  border-radius: 50%; /* Circular */
+  padding: 0.2rem; /* Padding pequeño */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+.holding-dropdown-button:hover {
+    background-color: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+
+.holding-total-amount {
+  font-size: 1.875rem; /* 30px */
+  font-weight: 600; /* Más grueso */
+  margin-bottom: 0.5rem; /* Espacio debajo del total */
+  width: 100%;
+  text-align: left;
+  color: #111827; /* Color casi negro */
+}
+
+.holding-return-info {
+  color: #6b7280; /* Color grisáceo para "Return" y valor absoluto */
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem; /* 14px */
+  width: 100%;
+  text-align: left;
+  flex-wrap: wrap; /* Permite que los elementos pasen a la siguiente línea si no caben */
+  gap: 0.3rem; /* Espacio entre elementos */
+}
+
+.holding-check-icon {
+  /* El color se aplica con clase Tailwind en el TSX */
+  /* margin: 0 0.25rem; */ /* Espacio alrededor del icono */
+  flex-shrink: 0; /* Evita que el icono se encoja */
+}
+
+.holding-return-percentage {
+  /* El color se aplica con clase Tailwind en el TSX */
+  font-weight: 500;
+  /* margin-right: 0.4rem; */ /* Espacio a la derecha del porcentaje */
+}
+
+.holding-return-absolute {
+   /* Hereda el color de .holding-return-info */
+   font-weight: 500;
+}
+
+/* Responsive (opcional, ajustar si es necesario) */
+@media (max-width: 600px) {
+  .total-holding-card-container {
+    padding: 0.75rem;
+  }
+  .holding-total-amount {
+    font-size: 1.5rem; /* 24px */
+  }
+  .holding-return-info {
+    font-size: 0.875rem; /* 14px */
+  }
+}

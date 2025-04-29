@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplicación Principal</title> <!-- Título General -->
+    <link rel="stylesheet" href="../style.css">
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo-details">
+            <!-- ... detalles del logo ... -->
+            <i class='bx bx-menu' id="btn" ></i>
+        </div>
+        <ul class="nav-list">
+            <li>
+                <i class='bx bx-search' ></i>
+                <input type="text" placeholder="Search...">
+                <span class="tooltip">Search</span>
+            </li>
+            <li>
+                <!-- Cambiado href a #, añadido data-target -->
+                <a href="#" data-target="inicio">
+                    <i class='bx bx-home'></i>
+                    <span class="links_name">Inicio</span>
+                </a>
+                <span class="tooltip">Inicio</span>
+            </li>
+            <li>
+                <!-- Cambiado href a #, añadido data-target -->
+                <a href="#" data-target="dashboard">
+                    <i class='bx bx-grid-alt'></i>
+                    <span class="links_name">Dashboard</span>
+                </a>
+                <span class="tooltip">Dashboard</span>
+            </li>
+            <li>
+                 <!-- Cambiado href a #, añadido data-target -->
+                <a href="#" data-target="reportes">
+                    <i class='bx bx-file'></i>
+                    <span class="links_name">Reportes</span>
+                </a>
+                <span class="tooltip">Reportes</span>
+            </li>
+            <li>
+                 <!-- Cambiado href a #, añadido data-target -->
+                <a href="#" data-target="portafolio">
+                    <i class='bx bx-briefcase'></i>
+                    <span class="links_name">Portafolio</span>
+                </a>
+                <span class="tooltip">Portafolio</span>
+            </li>
+            <li>
+                 <!-- Cambiado href a #, añadido data-target -->
+                <a href="#" data-target="mercado">
+                    <i class='bx bx-store'></i>
+                    <span class="links_name">Mercado</span>
+                </a>
+                <span class="tooltip">Mercado</span>
+            </li>
+            <li>
+                 <!-- Cambiado href a #, añadido data-target -->
+                <a href="#" data-target="ai_agent">
+                    <i class='bx bx-bot'></i>
+                    <span class="links_name">AI Agent</span>
+                </a>
+                <span class="tooltip">AI Agent</span>
+            </li>
+            <!-- ... otros elementos li si existen ... -->
+            <li class="profile">
+                <!-- ... detalles del perfil ... -->
+                <i class='bx bx-log-out' id="log_out" ></i>
+            </li>
+        </ul>
+    </div>
+
+    <section class="home-section">
+        <!-- Contenedor para la sección de INICIO -->
+        <div class="content-section" data-section="inicio">
+            <div class="text">Inicio</div>
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Bienvenido al Sistema</h2>
+                            </div>
+                            <div class="card-body">
+                                <p>Esta es la página principal del sistema de gestión SENA. Desde aquí puedes acceder a todas las funcionalidades.</p>
+                                <div class="stats-container">
+                                    <div class="stat-box">
+                                        <i class='bx bx-user'></i>
+                                        <h3>125</h3>
+                                        <p>Usuarios activos</p>
+                                    </div>
+                                    <div class="stat-box">
+                                        <i class='bx bx-task'></i>
+                                        <h3>54</h3>
+                                        <p>Tareas pendientes</p>
+                                    </div>
+                                    <div class="stat-box">
+                                        <i class='bx bx-calendar'></i>
+                                        <h3>12</h3>
+                                        <p>Eventos próximos</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor para la sección de DASHBOARD -->
+        <div class="content-section" data-section="dashboard">
+            <div class="text">Dashboard</div>
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Estadísticas Generales</h2>
+                                <div class="filter-options">
+                                    <button class="btn btn-sm">Diario</button>
+                                    <button class="btn btn-sm">Semanal</button>
+                                    <button class="btn btn-sm btn-primary">
+                                        <i class='bx bx-filter'></i> Filtrar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <!-- Aquí puedes añadir un gráfico con Chart.js o similar -->
+                                    <div class="placeholder-chart"></div>
+                                </div>
+                                <div class="metrics">
+                                    <div class="metric-item">
+                                        <h4>Usuarios Totales</h4>
+                                        <p class="metric-value">2,543</p>
+                                        <p class="metric-change positive">↑ 12.5%</p>
+                                    </div>
+                                    <div class="metric-item">
+                                        <h4>Ingresos</h4>
+                                        <p class="metric-value">$15,245</p>
+                                        <p class="metric-change positive">↑ 8.3%</p>
+                                    </div>
+                                    <div class="metric-item">
+                                        <h4>Proyectos</h4>
+                                        <p class="metric-value">42</p>
+                                        <p class="metric-change negative">↓ 3.1%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor para la sección de REPORTES -->
+        <div class="content-section" data-section="reportes">
+            <div class="text">Reportes</div>
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Generación de Reportes</h2>
+                                <div class="report-actions">
+                                    <button class="btn btn-primary"><i class='bx bx-export'></i> Exportar</button>
+                                    <button class="btn btn-secondary"><i class='bx bx-printer'></i> Imprimir</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="filter-bar">
+                                    <div class="form-group">
+                                        <label>Fecha inicio:</label>
+                                        <input type="date" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Fecha fin:</label>
+                                        <input type="date" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tipo de reporte:</label>
+                                        <select class="form-control">
+                                            <option>Ventas</option>
+                                            <option>Usuarios</option>
+                                            <option>Actividad</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn btn-primary">Aplicar</button>
+                                </div>
+                                <div class="reports-table-container">
+                                    <table class="reports-table">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Nombre</th>
+                                                <th>Tipo</th>
+                                                <th>Fecha</th>
+                                                <th>Estado</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>001</td>
+                                                <td>Reporte Mensual</td>
+                                                <td>Ventas</td>
+                                                <td>01/05/2023</td>
+                                                <td><span class="badge bg-success">Completado</span></td>
+                                                <td><button class="btn btn-sm btn-info">Ver</button></td>
+                                            </tr>
+                                            <tr>
+                                                <td>002</td>
+                                                <td>Reporte Trimestral</td>
+                                                <td>Actividad</td>
+                                                <td>15/04/2023</td>
+                                                <td><span class="badge bg-warning">Pendiente</span></td>
+                                                <td><button class="btn btn-sm btn-info">Ver</button></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor para la sección de PORTAFOLIO -->
+        <div class="content-section" data-section="portafolio">
+            <div class="text">Portafolio</div>
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <div class="portfolio-header">
+                            <h2>Nuestros Proyectos</h2>
+                            <div class="portfolio-filters">
+                                <button class="filter-btn active" data-filter="all">Todos</button>
+                                <button class="filter-btn" data-filter="web">Web</button>
+                                <button class="filter-btn" data-filter="app">Apps</button>
+                                <button class="filter-btn" data-filter="design">Diseño</button>
+                            </div>
+                        </div>
+                        <div class="portfolio-gallery">
+                            <div class="portfolio-item" data-category="web">
+                                <img src="https://via.placeholder.com/300x200" alt="Proyecto Web">
+                                <div class="portfolio-overlay">
+                                    <h3>Diseño Web Responsivo</h3>
+                                    <p>Desarrollo Frontend</p>
+                                    <a href="#" class="btn btn-light">Ver detalles</a>
+                                </div>
+                            </div>
+                            <div class="portfolio-item" data-category="app">
+                                <img src="https://via.placeholder.com/300x200" alt="Aplicación Móvil">
+                                <div class="portfolio-overlay">
+                                    <h3>App de Gestión</h3>
+                                    <p>Desarrollo Móvil</p>
+                                    <a href="#" class="btn btn-light">Ver detalles</a>
+                                </div>
+                            </div>
+                            <div class="portfolio-item" data-category="design">
+                                <img src="https://via.placeholder.com/300x200" alt="Diseño Gráfico">
+                                <div class="portfolio-overlay">
+                                    <h3>Branding Corporativo</h3>
+                                    <p>Diseño Gráfico</p>
+                                    <a href="#" class="btn btn-light">Ver detalles</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor para la sección de MERCADO -->
+        <div class="content-section" data-section="mercado">
+            <div class="text">Mercado</div>
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <div class="market-header">
+                            <h2>Marketplace</h2>
+                            <div class="market-search">
+                                <input type="text" placeholder="Buscar productos...">
+                                <button><i class='bx bx-search'></i></button>
+                            </div>
+                        </div>
+                        <div class="categories-list">
+                            <div class="category-item">
+                                <i class='bx bx-laptop'></i>
+                                <span>Tecnología</span>
+                            </div>
+                            <div class="category-item">
+                                <i class='bx bx-book'></i>
+                                <span>Libros</span>
+                            </div>
+                            <div class="category-item">
+                                <i class='bx bx-home'></i>
+                                <span>Hogar</span>
+                            </div>
+                            <div class="category-item">
+                                <i class='bx bx-mobile'></i>
+                                <span>Móviles</span>
+                            </div>
+                        </div>
+                        <div class="products-grid">
+                            <div class="product-card">
+                                <div class="product-badge">Nuevo</div>
+                                <img src="https://via.placeholder.com/200x200" alt="Producto">
+                                <div class="product-info">
+                                    <h3>Laptop Pro</h3>
+                                    <div class="product-price">$1,299.99</div>
+                                    <div class="product-rating">
+                                        <i class='bx bxs-star'></i>
+                                        <i class='bx bxs-star'></i>
+                                        <i class='bx bxs-star'></i>
+                                        <i class='bx bxs-star'></i>
+                                        <i class='bx bxs-star-half'></i>
+                                        <span>(45)</span>
+                                    </div>
+                                    <button class="btn btn-primary">Añadir al carrito</button>
+                                </div>
+                            </div>
+                            <div class="product-card">
+                                <img src="https://via.placeholder.com/200x200" alt="Producto">
+                                <div class="product-info">
+                                    <h3>Smartphone X</h3>
+                                    <div class="product-price">$799.99</div>
+                                    <div class="product-rating">
+                                        <i class='bx bxs-star'></i>
+                                        <i class='bx bxs-star'></i>
+                                        <i class='bx bxs-star'></i>
+                                        <i class='bx bxs-star'></i>
+                                        <i class='bx bx-star'></i>
+                                        <span>(32)</span>
+                                    </div>
+                                    <button class="btn btn-primary">Añadir al carrito</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor para la sección de AI AGENT -->
+        <div class="content-section" data-section="ai_agent">
+            <div class="text">AI Agent</div>
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <div class="ai-assistant">
+                            <div class="ai-header">
+                                <h2><i class='bx bx-bot'></i> Asistente Virtual</h2>
+                                <div class="ai-controls">
+                                    <button class="btn btn-sm"><i class='bx bx-refresh'></i></button>
+                                    <button class="btn btn-sm"><i class='bx bx-cog'></i></button>
+                                </div>
+                            </div>
+                            <div class="chat-container">
+                                <div class="chat-messages">
+                                    <div class="message bot">
+                                        <div class="message-content">Hola, soy tu asistente virtual. ¿En qué puedo ayudarte hoy?</div>
+                                        <div class="message-time">10:30 AM</div>
+                                    </div>
+                                    <div class="message user">
+                                        <div class="message-content">Necesito información sobre los cursos disponibles</div>
+                                        <div class="message-time">10:31 AM</div>
+                                    </div>
+                                    <div class="message bot">
+                                        <div class="message-content">Claro, tenemos cursos en las áreas de programación, diseño, marketing digital y administración. ¿Cuál te interesa más?</div>
+                                        <div class="message-time">10:31 AM</div>
+                                    </div>
+                                </div>
+                                <div class="chat-input">
+                                    <input type="text" placeholder="Escribe tu mensaje...">
+                                    <button class="send-btn"><i class='bx bx-send'></i></button>
+                                </div>
+                            </div>
+                            <div class="ai-features">
+                                <div class="feature-card">
+                                    <i class='bx bx-question-mark'></i>
+                                    <h4>Preguntas frecuentes</h4>
+                                </div>
+                                <div class="feature-card">
+                                    <i class='bx bx-calendar'></i>
+                                    <h4>Programar cita</h4>
+                                </div>
+                                <div class="feature-card">
+                                    <i class='bx bx-file'></i>
+                                    <h4>Documentación</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // --- Selectores DOM ---
+        // Asegúrate de que estos selectores coincidan exactamente con tu HTML
+        let sidebar = document.querySelector(".sidebar");
+        let closeBtn = document.querySelector("#btn");
+        let searchBtn = document.querySelector(".bx-search"); // Verifica si este elemento existe y tiene la clase correcta
+        const navLinks = document.querySelectorAll(".sidebar .nav-list li a[data-target]"); // Enlaces con data-target
+        const contentSections = document.querySelectorAll(".home-section .content-section"); // Divs de contenido con data-section
+        const navListItems = document.querySelectorAll(".sidebar .nav-list li"); // Todos los <li> de la lista
+
+        // --- Función para Mostrar Sección ---
+        function showSection(targetId) {
+            console.log("Intentando mostrar sección:", targetId); // Mensaje para depuración
+
+            // 1. Ocultar todas las secciones
+            contentSections.forEach(section => {
+                section.classList.remove('active-section');
+            });
+
+            // 2. Quitar clase 'active' de todos los items <li> de navegación
+            navListItems.forEach(item => {
+                // Solo afecta a los <li> que contienen un enlace de navegación principal
+                if (item.querySelector('a[data-target]')) {
+                    item.classList.remove('active');
+                }
+            });
+
+            // 3. Mostrar la sección objetivo
+            const targetSection = document.querySelector(`.content-section[data-section="${targetId}"]`);
+            if (targetSection) {
+                targetSection.classList.add('active-section');
+                console.log("Sección encontrada y activada:", targetId); // Confirmación
+            } else {
+                console.error("Error: No se encontró la sección con data-section:", targetId); // Error si no se encuentra
+            }
+
+            // 4. Añadir clase 'active' al <li> del enlace correspondiente
+            const activeLink = document.querySelector(`.sidebar .nav-list li a[data-target="${targetId}"]`);
+            if (activeLink && activeLink.parentElement.tagName === 'LI') {
+                activeLink.parentElement.classList.add('active');
+                console.log("Enlace activado en la barra lateral para:", targetId); // Confirmación
+            } else {
+                 console.warn("Advertencia: No se encontró el enlace o el LI padre para:", targetId); // Advertencia si no se encuentra
+            }
+        }
+
+        // --- Event Listeners ---
+
+        // Click en enlaces de navegación
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault(); // Evita que el navegador siga el href="#"
+                const targetId = this.getAttribute('data-target');
+                showSection(targetId);
+            });
+        });
+
+        // Click en botón de menú (abrir/cerrar sidebar)
+        if (closeBtn) {
+            closeBtn.addEventListener("click", ()=>{
+                sidebar.classList.toggle("open");
+                menuBtnChange();
+            });
+        } else {
+            console.error("Error: Botón de menú (#btn) no encontrado.");
+        }
+
+
+        // Click en botón de búsqueda (opcional, para abrir sidebar)
+        if (searchBtn) {
+            searchBtn.addEventListener("click", function(){
+                if(!sidebar.classList.contains("open")){
+                    sidebar.classList.add("open");
+                    menuBtnChange();
+                }
+                // Considera enfocar el input: document.querySelector('.sidebar input[type="text"]').focus();
+            });
+        } // No es un error si no existe, puede ser opcional
+
+        // --- Funciones Auxiliares ---
+        function menuBtnChange() {
+            if (!closeBtn) return; // Salir si no existe el botón
+            if(sidebar.classList.contains("open")){
+                closeBtn.classList.replace("bx-menu", "bx-menu-alt-right");
+            } else {
+                closeBtn.classList.replace("bx-menu-alt-right","bx-menu");
+            }
+        }
+
+        // --- Inicialización ---
+        // Mostrar la sección 'inicio' por defecto al cargar la página
+        document.addEventListener("DOMContentLoaded", function() {
+            console.log("DOM cargado. Mostrando sección inicial 'inicio'.");
+            
+            // Forzar la activación de la sección de inicio
+            showSection('inicio');
+            
+            // Asegurarse de que el elemento de la barra lateral correspondiente a 'inicio' esté activo
+            document.querySelectorAll(".sidebar .nav-list li").forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const inicioLink = document.querySelector(".sidebar .nav-list li a[data-target='inicio']");
+            if (inicioLink && inicioLink.parentElement) {
+                inicioLink.parentElement.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

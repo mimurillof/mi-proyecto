@@ -1,0 +1,200 @@
+/* Estilos base para el contenedor Watchlist */
+.watchlistContainer {
+    background-color: transparent; /* Adaptado para contenedor padre blanco */
+    padding: 15px 5px 15px 15px; /* Ajustar padding si es necesario */
+    border-radius: 16px; /* Heredado del diseño original */
+    width: 100%;
+    height: 100%; /* Ocupar altura del contenedor padre */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Para controlar el scroll de la lista */
+}
+
+.headerRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-right: 15px; /* Compensar padding del contenedor */
+}
+
+.watchlistTitle {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #1F2937; /* Texto oscuro para fondo claro */
+}
+
+/* Estilos Tabs */
+.filterTabs .MuiTabs-indicator {
+    display: none; /* Ocultar indicador */
+}
+
+.filterTabs .MuiTab-root {
+    color: #6B7280; /* Gris medio */
+    border: 1px solid #D1D5DB; /* Gris claro */
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: none;
+    border-radius: 20px;
+    margin: 0 4px;
+    min-height: 30px;
+    min-width: auto;
+    opacity: 1;
+}
+
+.filterTabs .MuiTab-root:hover {
+    background-color: #F3F4F6; /* Gris muy claro */
+    border-color: #9CA3AF; /* Gris medio */
+    color: #1F2937; /* Texto oscuro */
+}
+
+.filterTabs .MuiTab-root.Mui-selected {
+    background-color: #007AFF; /* Azul brillante */
+    color: #FFFFFF; /* Texto blanco */
+    border-color: #007AFF;
+}
+
+/* Estilos Lista */
+.watchlistScrollableList {
+    flex-grow: 1; /* Ocupar espacio restante */
+    overflow-y: auto; /* Habilitar scroll vertical */
+    padding-right: 10px; /* Espacio para la barra de scroll */
+    /* Estilización básica de la barra de scroll (Webkit) - Sin anidamiento */
+}
+
+/* Estilos específicos para el scrollbar dentro de .watchlistScrollableList */
+.watchlistScrollableList::-webkit-scrollbar {
+    width: 6px;
+}
+.watchlistScrollableList::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+.watchlistScrollableList::-webkit-scrollbar-thumb {
+    background: #D1D5DB;
+    border-radius: 3px;
+}
+.watchlistScrollableList::-webkit-scrollbar-thumb:hover {
+    background: #9CA3AF;
+}
+
+.MuiList-root {
+    padding: 0;
+}
+
+.MuiListItem-root {
+    padding: 10px 0;
+    border-bottom: 1px solid #E5E7EB; /* Gris claro */
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    align-items: center;
+}
+.MuiListItem-root:last-child {
+    border-bottom: none;
+}
+
+.MuiListItemIcon-root {
+    min-width: auto;
+    color: #6B7280; /* Gris medio */
+    font-size: 1.8rem;
+    background-color: #F3F4F6; /* Gris muy claro */
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.MuiListItemIcon-root img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+.MuiListItemText-root {
+    margin: 0;
+}
+
+.MuiListItemText-primary {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1F2937; /* Texto oscuro */
+    line-height: 1.3;
+}
+
+/* Asegurar que el color secundario se aplique correctamente */
+.MuiListItemText-secondary,
+.MuiListItemText-root .MuiTypography-colorTextSecondary {
+    font-size: 0.8rem;
+    color: #6B7280 !important; /* Gris medio */
+    line-height: 1.3;
+}
+
+.priceChangeContainer {
+    text-align: right;
+}
+
+.itemPrice {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1F2937; /* Texto oscuro */
+    display: block;
+    margin-bottom: 2px;
+}
+
+.itemChange {
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+.itemChange .material-icons {
+    font-size: 1rem;
+    margin-right: 2px;
+}
+
+.itemChangePositive {
+    color: #10B981; /* Verde (Tailwind green-500) */
+}
+
+.itemChangeNegative {
+    color: #EF4444; /* Rojo (Tailwind red-500) */
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .watchlistContainer {
+        padding: 10px 5px 10px 10px;
+    }
+    .headerRow {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding-right: 10px;
+    }
+    .filterTabs .MuiTabs-flexContainer {
+        justify-content: space-around;
+    }
+     .filterTabs .MuiTab-root {
+         margin: 0 2px;
+         padding: 4px 8px;
+         font-size: 0.7rem;
+     }
+    .MuiListItemText-primary, .itemPrice {
+        font-size: 0.9rem;
+    }
+    .MuiListItemText-secondary, .itemChange {
+        font-size: 0.75rem;
+    }
+    .MuiListItemIcon-root {
+        width: 32px;
+        height: 32px;
+        font-size: 1.5rem;
+    }
+    .watchlistScrollableList {
+        padding-right: 5px; /* Menos padding en móvil */
+    }
+}

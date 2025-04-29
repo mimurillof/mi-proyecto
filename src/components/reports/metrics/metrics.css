@@ -1,0 +1,15 @@
+.carousel-arrow {
+    background-color: rgba(209, 213, 219, 0.7); /* bg-gray-300 con opacidad */
+    border-radius: 50%;
+    padding: 0.5rem;
+    transition: background-color 0.2s;
+}
+.carousel-arrow:hover:not(:disabled) {
+    background-color: rgba(156, 163, 175, 0.9); /* bg-gray-400 con opacidad */
+}
+.carousel-arrow:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Asegúrate de que Tailwind procese este archivo o impórtalo globalmente */

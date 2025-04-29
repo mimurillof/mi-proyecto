@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<!-- Resto de la estructura HTML inicial (head, etc.) si la tienes -->
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portafolio</title>
+    <link rel="stylesheet" href="../style.css"> <!-- Asegúrate que la ruta al CSS es correcta -->
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'> <!-- O tu versión de boxicons -->
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo-details">
+            <!-- ... detalles del logo ... -->
+            <i class='bx bx-menu' id="btn" ></i>
+        </div>
+        <ul class="nav-list">
+            <li>
+                <i class='bx bx-search' ></i>
+                <input type="text" placeholder="Search...">
+                <span class="tooltip">Search</span>
+            </li>
+            <li>
+                <a href="inicio.html">
+                    <i class='bx bx-home'></i>
+                    <span class="links_name">Inicio</span>
+                </a>
+                <span class="tooltip">Inicio</span>
+            </li>
+            <li>
+                <a href="dashboard.html">
+                    <i class='bx bx-grid-alt'></i>
+                    <span class="links_name">Dashboard</span>
+                </a>
+                <span class="tooltip">Dashboard</span>
+            </li>
+            <li>
+                <a href="reportes.html">
+                    <i class='bx bx-file'></i>
+                    <span class="links_name">Reportes</span>
+                </a>
+                <span class="tooltip">Reportes</span>
+            </li>
+            <li>
+                <a href="portafolio.html">
+                    <i class='bx bx-briefcase'></i>
+                    <span class="links_name">Portafolio</span>
+                </a>
+                <span class="tooltip">Portafolio</span>
+            </li>
+            <li>
+                <a href="mercado.html">
+                    <i class='bx bx-store'></i>
+                    <span class="links_name">Mercado</span>
+                </a>
+                <span class="tooltip">Mercado</span>
+            </li>
+            <li>
+                <a href="ai_agent.html">
+                    <i class='bx bx-bot'></i>
+                    <span class="links_name">AI Agent</span>
+                </a>
+                <span class="tooltip">AI Agent</span>
+            </li>
+            <!-- ... otros elementos li si existen ... -->
+            <li class="profile">
+                <div class="profile-details">
+                  <!-- <img src="profile.jpg" alt="profileImg"> -->
+                  <div class="name_job">
+                    <div class="name">Prem Shahi</div>
+                    <div class="job">Web designer</div>
+                  </div>
+                </div>
+                <i class='bx bx-log-out' id="log_out" ></i>
+            </li>
+        </ul>
+    </div>
+    <section class="home-section">
+        <div class="text">Contenido de Portafolio</div> <!-- Contenido específico -->
+        <!-- Aquí va el contenido principal de la sección Portafolio -->
+    </section>
+
+    <script>
+        let sidebar = document.querySelector(".sidebar");
+        let closeBtn = document.querySelector("#btn");
+        let searchBtn = document.querySelector(".bx-search"); // Asumiendo que tienes un icono de búsqueda
+
+        closeBtn.addEventListener("click", ()=>{
+            sidebar.classList.toggle("open");
+            menuBtnChange(); // Llama a la función para cambiar el icono del menú
+        });
+
+        // Opcional: Abrir con el botón de búsqueda si la barra está cerrada
+        if (searchBtn) {
+            searchBtn.addEventListener("click", function(){
+                if(!sidebar.classList.contains("open")){
+                    sidebar.classList.add("open");
+                    menuBtnChange();
+                }
+            });
+        }
+
+        // Función para cambiar el icono del menú
+        function menuBtnChange() {
+            if(sidebar.classList.contains("open")){
+                closeBtn.classList.replace("bx-menu", "bx-menu-alt-right"); // Reemplaza el icono
+            } else {
+                closeBtn.classList.replace("bx-menu-alt-right","bx-menu"); // Reemplaza el icono
+            }
+        }
+
+        // Script para añadir la clase 'active'
+        document.addEventListener("DOMContentLoaded", function() {
+            const currentPage = window.location.pathname.split("/").pop() || "inicio.html"; // Default a inicio si es raíz
+            const navLinks = document.querySelectorAll(".sidebar .nav-list li a");
+
+            navLinks.forEach(link => {
+                // Asegurarse de que el enlace no sea nulo y tenga href
+                if (link && link.getAttribute("href")) {
+                    const linkPage = link.getAttribute("href").split("/").pop();
+                    // Comprobar si el padre es un LI antes de añadir la clase
+                    if (link.parentElement && link.parentElement.tagName === 'LI' && linkPage === currentPage) {
+                        link.parentElement.classList.add("active");
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

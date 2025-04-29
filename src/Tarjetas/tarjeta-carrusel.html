@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarjeta con Carrusel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700;800&display=swap');
+
+        *,
+        *::before,
+        *::after {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        html {
+          font-size: 62.5%;
+        }
+
+        body {
+          display: grid;
+          place-content: center;
+          color: hsl(270, 10%, 80%);
+          font-family: 'Open Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background: #000000;
+          min-height: 100vh;
+          padding: 3rem;
+          overflow-x: hidden;
+        }
+
+        /* Estilos específicos para la tarjeta */
+        .main__card {
+          color: hsla(0, 0%, 100%, .8);
+          flex-shrink: 0;
+          width: 21rem;
+          border-radius: 0; /* Forma cuadrada */
+          text-align: right;
+          padding: 2.2rem;
+          box-shadow: 0 2px 12px hsla(var(--hue), 50%, 60%, .2), 0 4px 32px hsla(var(--hue), 50%, 60%, .2);
+          position: relative;
+          overflow: hidden;
+          cursor: pointer;
+        }
+
+        .main__card-image-container {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          z-index: -1;
+        }
+
+        .main__card-image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .main__card-heading {
+          font-size: 2rem;
+          font-weight: normal;
+        }
+
+        .main__card-heading-sub {
+          margin-top: .4rem;
+          font-size: 1.2rem;
+        }
+
+        .main__card-heading-type {
+          margin-top: 2.8rem;
+        }
+
+        /* Estilos para los indicadores del carrusel */
+        .custom-carousel-indicators {
+          position: absolute;
+          bottom: 10px;
+          left: 0;
+          right: 0;
+          z-index: 2;
+          display: flex;
+          justify-content: center;
+          padding: 0;
+          margin: 0 auto;
+        }
+
+        .custom-carousel-indicators button {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background-color: rgba(255, 255, 255, 0.5);
+          border: none;
+          margin: 0 4px;
+          padding: 0;
+          cursor: pointer;
+        }
+
+        .custom-carousel-indicators button.active {
+          background-color: rgba(255, 255, 255, 0.9);
+        }
+    </style>
+</head>
+<body>
+    <!-- CARD CON CARRUSEL -->
+    <div class="main__card" style="--hue: 25">
+        <div class="main__card-image-container">
+            <!-- Bootstrap Carousel -->
+            <div id="carouselCard1" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="image_fx.jpg" class="d-block w-100 h-100 object-fit-cover main__card-image" alt="Imagen 1">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="Captura de pantalla 2025-04-11 102451.png" class="d-block w-100 h-100 object-fit-cover main__card-image" alt="Imagen 2">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="Captura de pantalla 2025-04-11 102521.png" class="d-block w-100 h-100 object-fit-cover main__card-image" alt="Imagen 3">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="Captura de pantalla 2025-04-11 102543.png" class="d-block w-100 h-100 object-fit-cover main__card-image" alt="Imagen 4">
+                    </div>
+                </div>
+                <!-- Indicadores de navegación (bullets/dots) -->
+                <div class="carousel-indicators custom-carousel-indicators">
+                    <button type="button" data-bs-target="#carouselCard1" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                    <button type="button" data-bs-target="#carouselCard1" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                    <button type="button" data-bs-target="#carouselCard1" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                    <button type="button" data-bs-target="#carouselCard1" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                </div>
+            </div>
+            <!-- End Bootstrap Carousel -->
+        </div>
+        <h3 class="main__card-heading">Daman-e-Koh</h3>
+        <p class="main__card-heading-sub">Pakistan</p>
+        <p class="main__card-heading-type">Visit</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        // Array con los textos para cada imagen del carrusel
+        const textos = [
+            { titulo: "Titulo 1", subtitulo: "Subtitulo 1", fuente: "Fuente 1" },
+            { titulo: "Titulo 2", subtitulo: "Subtitulo 2", fuente: "Fuente 2" },
+            { titulo: "Titulo 3", subtitulo: "Subtitulo 3", fuente: "Fuente 3" },
+            { titulo: "Titulo 4", subtitulo: "Subtitulo 4", fuente: "Fuente 4" }
+        ];
+
+        // Obtener el carrusel
+        const carrusel = document.getElementById('carouselCard1');
+        
+        // Obtener los elementos de texto de la tarjeta
+        const cardHeading = document.querySelector('.main__card-heading');
+        const cardSubHeading = document.querySelector('.main__card-heading-sub');
+        const cardType = document.querySelector('.main__card-heading-type');
+        
+        // Establecer los textos iniciales (para la primera imagen)
+        cardHeading.textContent = textos[0].titulo;
+        cardSubHeading.textContent = textos[0].subtitulo;
+        cardType.textContent = textos[0].fuente;
+        
+        // Escuchar el evento de cambio de diapositiva
+        carrusel.addEventListener('slide.bs.carousel', function (event) {
+            // Obtener el índice de la nueva diapositiva
+            const slideIndex = event.to;
+            
+            // Actualizar los textos según la diapositiva actual
+            cardHeading.textContent = textos[slideIndex].titulo;
+            cardSubHeading.textContent = textos[slideIndex].subtitulo;
+            cardType.textContent = textos[slideIndex].fuente;
+        });
+    </script>
+</body>
+</html>

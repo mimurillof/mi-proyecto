@@ -1,0 +1,129 @@
+/* Estilos adaptados de Tarjeta de sentimiento.html */
+
+.market-fng-gauge__meter-container {
+    text-size-adjust: 100%;
+    font-family: cnn_sans_display, helveticaneue, Helvetica, Arial, Utkal, sans-serif;
+    text-align: left;
+    box-sizing: border-box; /* Changed from inherit */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizelegibility;
+    margin: 0 auto 20px;
+    position: relative;
+    width: 338px; /* Consider making this responsive if needed */
+    max-width: 100%; /* Ensure it doesn't overflow small containers */
+    margin-bottom: 0;
+    height: auto; /* Adjust height as needle is removed */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.market-fng-gauge__meter {
+    text-size-adjust: 100%;
+    font-family: cnn_sans_display, helveticaneue, Helvetica, Arial, Utkal, sans-serif;
+    text-align: left;
+    box-sizing: border-box; /* Changed from inherit */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizelegibility;
+    position: relative;
+    width: 100%;
+    height: 173px; /* Keep original SVG height */
+}
+
+.market-fng-gauge__dial {
+    text-size-adjust: 100%;
+    font-family: cnn_sans_display, helveticaneue, Helvetica, Arial, Utkal, sans-serif;
+    text-align: left;
+    box-sizing: border-box; /* Changed from inherit */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizelegibility;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#fear-and-greed-dial {
+    text-size-adjust: 100%;
+    font-family: cnn_sans_display, helveticaneue, Helvetica, Arial, Utkal, sans-serif;
+    text-align: left;
+    box-sizing: border-box; /* Changed from inherit */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizelegibility;
+    enable-background: new 0 0 338 173;
+    display: block;
+    overflow: visible; /* Ensure elements outside viewBox might be visible if needed */
+}
+
+.dial-area {
+    fill: #e6e6e6; /* primitive-color-neutral-300 */
+    stroke: #ffffff; /* primitive-color-neutral-100 */
+    stroke-width: 1px; /* Slightly thinner stroke */
+    transition: fill 0.3s ease-in-out, stroke 0.3s ease-in-out, stroke-width 0.3s ease-in-out;
+}
+
+/* Active segment colors */
+#extreme-fear.active { fill: #d50000; stroke: #ff7979; stroke-width: 2px; } /* Red */
+#fear.active { fill: #ff7c00; stroke: #ff9360; stroke-width: 2px; } /* Orange */
+#neutral.active { fill: #f0b100; stroke: #ffc248; stroke-width: 2px; } /* Yellow */
+#greed.active { fill: #4bc88a; stroke: #58e59e; stroke-width: 2px; } /* Light Green */
+#extreme-greed.active { fill: #2b7a53; stroke: #4bc88a; stroke-width: 2px; } /* Darker Green */
+
+.dial-area-letter {
+    fill: #6e6e6e; /* primitive-color-neutral-500 */
+    font-size: 11px;
+    font-weight: bold; /* Use numeric value like 700 */
+    text-transform: uppercase;
+    transition: fill 0.3s ease-in-out;
+}
+ /* Active text color */
+.dial-area-letter.active {
+    fill: #ffffff; /* primitive-color-neutral-100 */
+    font-weight: 700; /* Bold */
+}
+
+.dial-area-number-text {
+    fill: #6e6e6e; /* primitive-color-neutral-500 */
+    font-size: 12px;
+    font-weight: bold; /* Use numeric value like 700 */
+}
+
+.dots {
+    fill: #b1b1b1; /* primitive-color-neutral-400 */
+}
+
+/* Styles for sentiment value display */
+.sentiment-display {
+    text-align: center;
+    margin-top: -45px; /* Pull up slightly towards the gauge center */
+    position: relative;
+    z-index: 5; /* Ensure it's above SVG elements if needed */
+}
+.sentiment-value {
+    font-size: 32px; /* primitive-type-font-size-32 */
+    font-weight: 700; /* primitive-type-font-weight-style-bold */
+    color: #0c0c0c; /* primitive-color-neutral-800 - Changed to dark for visibility on white bg */
+    line-height: 32px; /* primitive-type-line-height-32 */
+}
+.sentiment-label {
+    font-size: 14px; /* primitive-type-font-size-14 */
+    font-weight: 500; /* primitive-type-font-weight-style-medium */
+    color: #b1b1b1; /* primitive-color-neutral-400 */
+    text-transform: uppercase;
+    letter-spacing: 0.5px; /* primitive-type-letter-spacing-50 */
+    margin-top: 4px; /* primitive-space-04 */
+}
+/* Style label based on active sentiment */
+.sentiment-display[data-sentiment="extreme-fear"] .sentiment-label { color: #d50000; }
+.sentiment-display[data-sentiment="fear"] .sentiment-label { color: #ff7c00; }
+.sentiment-display[data-sentiment="neutral"] .sentiment-label { color: #f0b100; }
+.sentiment-display[data-sentiment="greed"] .sentiment-label { color: #4bc88a; }
+.sentiment-display[data-sentiment="extreme-greed"] .sentiment-label { color: #2b7a53; }
+
+/* Ensure SVG scales nicely within its container */
+.market-fng-gauge__dial svg {
+    width: 100%;
+    height: auto;
+    display: block;
+}

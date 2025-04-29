@@ -1,0 +1,201 @@
+/* Contenedor principal del componente del portafolio */
+.portfolio-container {
+    width: 100%;
+    height: 100%; /* Asegura que ocupe la altura del contenedor padre */
+    display: flex;
+    flex-direction: column;
+    background-color: white; /* Fondo blanco */
+    border-radius: 0.5rem; /* Igual que otros contenedores */
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1); /* Sombra estándar */
+    padding: 1rem; /* Padding estándar */
+    color: #1f2937; /* Color de texto oscuro */
+    overflow: hidden; /* Evita que el contenido interno se desborde visualmente */
+}
+
+/* Encabezado del portafolio */
+.portfolio-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem; /* Espacio reducido */
+    flex-shrink: 0; /* Evita que el encabezado se encoja */
+}
+
+.portfolio-title {
+    font-size: 1rem; /* Tamaño de fuente estándar */
+    font-weight: 600;
+    color: #1f2937; /* Color de texto oscuro */
+}
+
+.portfolio-buttons-container {
+    display: flex;
+    gap: 0.5rem; /* Espacio reducido */
+}
+
+.portfolio-action-button {
+    background-color: #f3f4f6; /* Fondo gris claro */
+    border: 1px solid #d1d5db; /* Borde gris */
+    border-radius: 9999px; /* Completamente redondeado */
+    padding: 0.3rem 0.8rem; /* Padding ajustado */
+    color: #374151; /* Color de texto gris oscuro */
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    font-size: 0.8rem; /* Tamaño de fuente reducido */
+    font-weight: 500;
+}
+.portfolio-action-button.icon-only {
+    padding: 0.4rem; /* Padding cuadrado para botón de icono */
+}
+
+.portfolio-action-button:hover {
+    background-color: #e5e7eb; /* Gris un poco más oscuro al pasar el ratón */
+    border-color: #9ca3af;
+}
+
+/* Contenedor del carrusel */
+.carousel-container {
+    position: relative;
+    width: 100%;
+    flex-grow: 1; /* Permite que el carrusel ocupe el espacio restante */
+    display: flex; /* Necesario para alinear botones */
+    align-items: center; /* Centra verticalmente los botones */
+    min-height: 120px; /* Altura mínima para evitar colapso */
+}
+
+/* El carrusel en sí */
+.cards-carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+    padding: 5px 0; /* Padding vertical pequeño */
+    gap: 0.75rem; /* Espacio entre tarjetas */
+    width: 100%; /* Ocupa todo el ancho disponible */
+    align-items: stretch; /* Asegura que las tarjetas tengan la misma altura si varía */
+}
+
+.cards-carousel::-webkit-scrollbar {
+    display: none; /* Chrome, Safari y Opera */
+}
+
+/* Tarjeta individual */
+.stock-card {
+    flex: 0 0 auto; /* No crece, no se encoge, tamaño base automático */
+    min-width: 130px; /* Ancho mínimo */
+    width: 130px; /* Ancho fijo */
+    height: 100%; /* Ocupa la altura del carrusel */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0.75rem; /* Padding interno */
+    border-radius: 0.5rem; /* Bordes redondeados */
+    background-color: #f9fafb; /* Fondo muy claro, casi blanco */
+    border: 1px solid #e5e7eb; /* Borde gris claro */
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.stock-card:hover {
+    border-color: #d1d5db; /* Borde más oscuro al pasar el ratón */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Contenido de la tarjeta */
+.stock-price {
+    font-size: 1rem; /* Tamaño de precio */
+    font-weight: 600;
+    margin-bottom: 0.1rem;
+    color: #111827; /* Negro casi puro */
+    letter-spacing: -0.025em;
+}
+
+.stock-change {
+    font-size: 0.75rem; /* Tamaño de cambio */
+    font-weight: 500;
+    margin-bottom: auto; /* Empuja el resto hacia abajo */
+}
+
+.stock-change.positive {
+    color: #10b981; /* Verde */
+}
+
+.stock-change.negative {
+    color: #ef4444; /* Rojo */
+}
+
+.stock-info {
+    margin-top: auto; /* Empuja hacia abajo */
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.stock-logo-symbol-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.stock-logo {
+    width: 28px; /* Tamaño del logo */
+    height: 28px;
+    margin-bottom: 0.2rem;
+    object-fit: contain; /* Asegura que el logo se vea bien */
+    /* Eliminamos el filtro invertido para tema claro */
+    opacity: 1; 
+}
+
+.stock-symbol {
+    font-size: 0.75rem; /* Tamaño del símbolo */
+    font-weight: 500;
+    color: #4b5563; /* Gris oscuro */
+}
+
+.stock-units {
+    font-size: 0.65rem; /* Tamaño muy pequeño */
+    color: #9ca3af; /* Gris medio */
+    text-transform: uppercase;
+}
+
+/* Botones de scroll del carrusel */
+.carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px; /* Tamaño botón */
+    height: 28px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.8); /* Fondo blanco semi-transparente */
+    border: 1px solid #e5e7eb;
+    color: #4b5563; /* Color icono gris */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.2s ease-in-out;
+}
+
+.carousel-button:hover {
+    background-color: white;
+    border-color: #d1d5db;
+    color: #1f2937; /* Icono más oscuro */
+    transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-button.left {
+    left: -10px; /* Posición ajustada */
+}
+
+.carousel-button.right {
+    right: -10px; /* Posición ajustada */
+}
+
+/* Responsive (opcional, ajustar si es necesario) */
+/* @media (max-width: 768px) { ... } */

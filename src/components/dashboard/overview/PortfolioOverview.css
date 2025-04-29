@@ -1,0 +1,169 @@
+.portfolio-overview-container {
+  background-color: white; /* Fondo blanco */
+  color: #1f2937; /* Texto oscuro */
+  padding: 1rem; /* Padding estándar */
+  border-radius: 0.5rem; /* Bordes redondeados */
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1); /* Sombra */
+  width: 100%;
+  height: 100%; /* Ocupar altura del contenedor padre */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Evitar desbordamiento visual */
+}
+
+.overview-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem; /* Espacio debajo del header */
+  flex-shrink: 0; /* Evitar que se encoja */
+}
+
+.overview-title {
+  font-size: 1.125rem; /* 18px */
+  font-weight: 600;
+  color: #111827; /* Casi negro */
+}
+
+.overview-filter-buttons {
+  display: flex;
+  gap: 0.5rem; /* Espacio entre botones */
+}
+
+.overview-filter-button {
+  color: #4b5563; /* Texto gris */
+  background-color: #f3f4f6; /* Fondo gris claro */
+  border: 1px solid #d1d5db; /* Borde gris */
+  padding: 0.3rem 0.9rem; /* Padding */
+  font-size: 0.8rem; /* Tamaño fuente */
+  font-weight: 500;
+  text-transform: none;
+  border-radius: 9999px; /* Redondeado */
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  min-width: 70px; /* Ancho mínimo */
+  text-align: center;
+}
+
+.overview-filter-button:hover {
+  background-color: #e5e7eb;
+  border-color: #9ca3af;
+  color: #1f2937;
+}
+
+.overview-filter-button.selected {
+  background-color: #3b82f6; /* Azul */
+  color: white;
+  border-color: #3b82f6;
+}
+.overview-filter-button.selected:hover {
+  background-color: #2563eb; /* Azul más oscuro */
+  border-color: #2563eb;
+}
+
+.overview-table-container {
+  flex-grow: 1; /* Ocupar espacio restante */
+  overflow-x: auto; /* Scroll horizontal si la tabla es muy ancha */
+  overflow-y: auto; /* Scroll vertical si hay muchas filas */
+  -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+}
+
+.overview-table {
+  width: 100%;
+  min-width: 600px; /* Ancho mínimo para evitar compresión excesiva */
+  border-collapse: collapse; /* Bordes colapsados */
+}
+
+.overview-table th,
+.overview-table td {
+  padding: 0.6rem 1rem; /* Padding celdas */
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb; /* Línea divisoria gris claro */
+  white-space: nowrap; /* Evitar que el texto se rompa */
+}
+
+.overview-table th {
+  color: #6b7280; /* Color cabecera gris */
+  font-weight: 500;
+  font-size: 0.75rem; /* 12px */
+  text-transform: uppercase;
+  background-color: #f9fafb; /* Fondo muy claro para cabecera */
+}
+
+.overview-table td {
+  color: #374151; /* Color cuerpo gris oscuro */
+  font-size: 0.875rem; /* 14px */
+  vertical-align: middle;
+}
+
+.overview-table tbody tr:last-child td {
+  border-bottom: none; /* Sin borde en la última fila */
+}
+
+.stock-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem; /* Espacio entre icono y texto */
+}
+
+.stock-icon {
+  color: #4b5563; /* Color icono gris */
+  flex-shrink: 0; /* Evitar que el icono se encoja */
+}
+
+.change-cell-positive {
+  color: #10b981; /* Verde */
+  font-weight: 500;
+}
+
+.change-cell-negative {
+  color: #ef4444; /* Rojo */
+  font-weight: 500;
+}
+
+.mini-chart-cell {
+  width: 80px;
+  height: 30px;
+  margin: 0 auto; /* Centrar el div si la celda es más ancha */
+}
+
+/* Estilos para el brillo del gráfico */
+.mini-chart-cell canvas {
+  filter: none;
+  transition: filter 0.2s ease-in-out;
+}
+.mini-chart-cell.positive canvas {
+  filter: drop-shadow(0 0 2px rgba(16, 185, 129, 0.7)); /* Brillo verde */
+}
+.mini-chart-cell.negative canvas {
+  filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.7)); /* Brillo rojo */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .overview-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  .overview-filter-buttons {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .portfolio-overview-container {
+    padding: 0.75rem;
+  }
+  .overview-table th,
+  .overview-table td {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  .stock-icon {
+    width: 16px;
+    height: 16px;
+  }
+  .mini-chart-cell {
+    width: 60px;
+    height: 25px;
+  }
+}

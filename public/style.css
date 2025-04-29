@@ -1,0 +1,547 @@
+/* ...existing code... */
+
+.sidebar{
+    position: fixed; /* Cambiado de relative a fixed para mantenerlo en su lugar al hacer scroll */
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 78px;
+    background: #11101d;
+    padding: 6px 14px;
+    z-index: 99;
+    transition: all 0.5s ease;
+}
+.sidebar.open{
+    width: 250px;
+}
+.sidebar .logo-details{
+    height: 60px;
+    display: flex;
+    align-items: center;
+    position: relative; /* Cambiado de fixed a relative para que se mueva con la barra */
+}
+
+/* ...existing code... */
+
+.sidebar .nav-list{
+    margin-top: 20px;
+    height: calc(100% - 80px); /* Ajustar altura para considerar el logo y el perfil si existe */
+    /* Eliminar overflow: auto; si no es necesario o manejarlo con cuidado */
+    /* overflow: auto; */ /* Puede causar problemas si no se maneja bien el alto */
+    padding-left: 0; /* Asegurar que no haya padding por defecto */
+}
+
+/* ...existing code... */
+
+.sidebar li{
+    position: relative;
+    margin: 8px 0;
+    list-style: none;
+}
+
+/* Modificar estilos para el enlace dentro del li para asegurar posicionamiento relativo */
+.sidebar li a{
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    border-radius: 12px;
+    position: relative;
+    transition: all 0.4s ease;
+    white-space: nowrap;
+    height: 50px;
+    line-height: 50px;
+    color: #FFF;
+    /* Añadir padding para espacio entre el indicador y el contenido */
+    padding: 0 15px;
+}
+
+/* Modificar los estilos para el indicador azul para que se aplique al li.active directamente */
+.sidebar li.active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: #0d6efd;
+    border-radius: 0 4px 4px 0;
+    transition: all 0.4s ease;
+}
+
+/* Opcional: Ajustar el estilo del enlace cuando está activo */
+.sidebar li.active a {
+    color: #FFF;
+    background: #1d1b31;
+}
+
+/* ...existing code... */
+
+.sidebar li .tooltip{
+    position: absolute;
+    top: -20px;
+    left: calc(100% + 15px);
+    z-index: 3;
+    background: #fff;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 15px;
+    font-weight: 400;
+    opacity: 0;
+    white-space: nowrap;
+    pointer-events: none;
+    transition: 0s; /* La transición se maneja en el hover */
+}
+.sidebar li:hover .tooltip{
+    opacity: 1;
+    pointer-events: auto;
+    transition: all 0.4s ease;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.sidebar.open li .tooltip{
+    display: none; /* Ocultar tooltips cuando la barra está abierta */
+}
+
+/* ...existing code... */
+
+.sidebar input{
+    font-size: 15px;
+    color: #FFF;
+    font-weight: 400;
+    outline: none;
+    height: 100%; /* Asegurar que ocupe toda la altura del contenedor */
+    width: 100%; /* Asegurar que ocupe todo el ancho del contenedor */
+    border: none;
+    border-radius: 12px;
+    transition: all 0.5s ease;
+    background: #1d1b31;
+    padding-left: 50px; /* Añadir padding para que el texto no quede debajo del icono */
+}
+.sidebar.open input{
+    padding: 0 20px 0 50px; /* Ajustar padding cuando está abierto */
+    /* width: 100%; */ /* No es necesario si ya está al 100% */
+}
+.sidebar .bx-search{
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    font-size: 22px;
+    background: #1d1b31;
+    color: #FFF;
+    /* Añadir z-index si es necesario para que esté sobre el input */
+    z-index: 2;
+    /* Ajustar para que el icono quede dentro del área del input */
+    height: 50px;
+    width: 50px;
+    text-align: center;
+    line-height: 50px;
+    border-radius: 12px; /* Coincidir con el borde del input */
+    transition: all 0.5s ease; /* Añadir transición */
+}
+
+/* Mover el icono de búsqueda cuando la barra está cerrada */
+.sidebar:not(.open) .bx-search:hover {
+    background: #FFF;
+    color: #1d1b31;
+}
+
+/* ...existing code... */
+
+.sidebar .profile{
+    position: fixed; /* Cambiado a fixed para mantenerlo abajo */
+    left: 0;
+    bottom: 0; /* Fijar en la parte inferior */
+    width: 78px; /* Ancho inicial */
+    height: 60px;
+    padding: 10px 14px;
+    background: #1d1b31;
+    transition: all 0.5s ease;
+    overflow: hidden; /* Ocultar contenido que desborda */
+    z-index: 100; /* Asegurar que esté sobre otros elementos */
+}
+.sidebar.open .profile{
+    width: 250px; /* Ancho cuando está abierto */
+}
+.sidebar .profile .profile-details{
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap; /* Evitar que los elementos se envuelvan */
+    opacity: 0; /* Oculto por defecto */
+    pointer-events: none; /* No interactuable por defecto */
+    transition: opacity 0.3s ease; /* Transición suave para la opacidad */
+}
+.sidebar.open .profile .profile-details{
+    opacity: 1; /* Visible cuando está abierto */
+    pointer-events: auto; /* Interactuable cuando está abierto */
+}
+
+/* ...existing code... */
+
+.sidebar .profile #log_out{
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    background: #1d1b31; /* Fondo consistente */
+    width: 100%; /* Ocupar todo el ancho disponible */
+    height: 60px; /* Altura consistente */
+    line-height: 60px; /* Centrar verticalmente */
+    border-radius: 0px; /* Sin bordes redondeados */
+    transition: all 0.5s ease;
+    text-align: center; /* Centrar el icono */
+    /* Ajustar posición del icono cuando la barra está cerrada */
+    left: auto; /* Resetear left */
+    width: 50px; /* Ancho específico para el icono */
+}
+.sidebar.open .profile #log_out{
+    width: 50px; /* Mantener ancho del icono */
+    background: none; /* Sin fondo cuando está abierto */
+    right: 10px; /* Posicionar a la derecha con margen */
+    left: auto; /* Asegurar que no esté fijado a la izquierda */
+}
+
+/* ...existing code... */
+
+.home-section{
+    position: relative;
+    background: #E4E9F7;
+    min-height: 100vh; /* Usar min-height en lugar de height */
+    top: 0;
+    left: 78px;
+    width: calc(100% - 78px);
+    transition: all 0.5s ease;
+    z-index: 2; /* Asegurar que esté debajo de la barra lateral */
+}
+.sidebar.open ~ .home-section{
+    left: 250px;
+    width: calc(100% - 250px);
+}
+
+/* ...existing code... */
+
+/* Estilos para las secciones de contenido */
+.home-section .content-section {
+    display: none; /* Ocultar todas las secciones por defecto */
+    padding: 20px; /* Añadir algo de padding si es necesario */
+}
+
+.home-section .content-section.active-section {
+    display: block; /* Mostrar solo la sección activa */
+}
+
+/* Estilos generales para todas las secciones */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -15px;
+}
+
+.col {
+    flex: 1;
+    padding: 0 15px;
+}
+
+.card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    background: #e9ecef;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: #0d6efd;
+    color: white;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 0.875rem;
+}
+
+/* Estilos específicos para sección Inicio */
+.stats-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.stat-box {
+    flex: 1;
+    min-width: 120px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.stat-box i {
+    font-size: 24px;
+    color: #0d6efd;
+    margin-bottom: 10px;
+}
+
+.stat-box h3 {
+    font-size: 24px;
+    margin: 10px 0;
+}
+
+/* Estilos específicos para Dashboard */
+.placeholder-chart {
+    height: 300px;
+    background: linear-gradient(to bottom, #f1f3f5, #e9ecef);
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.metrics {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.metric-item {
+    flex: 1;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.metric-value {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 10px 0 5px;
+}
+
+.metric-change {
+    font-size: 14px;
+}
+
+.positive {
+    color: #28a745;
+}
+
+.negative {
+    color: #dc3545;
+}
+
+/* Estilos para Portfolio */
+.portfolio-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.portfolio-filters {
+    display: flex;
+    gap: 10px;
+}
+
+.filter-btn {
+    background: #e9ecef;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.filter-btn.active {
+    background: #0d6efd;
+    color: white;
+}
+
+.portfolio-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.portfolio-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.portfolio-item img {
+    width: 100%;
+    display: block;
+}
+
+.portfolio-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+.portfolio-item:hover .portfolio-overlay {
+    opacity: 1;
+}
+
+/* Estilos para AI Agent */
+.ai-assistant {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.ai-header {
+    padding: 15px 20px;
+    background: #0d6efd;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-container {
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.message {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.message.bot .message-content {
+    background: #f1f3f5;
+    align-self: flex-start;
+}
+
+.message.user .message-content {
+    background: #0d6efd;
+    color: white;
+    align-self: flex-end;
+}
+
+.message-content {
+    padding: 10px 15px;
+    border-radius: 18px;
+    max-width: 80%;
+}
+
+.message-time {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 5px;
+}
+
+.chat-input {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #eee;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 20px;
+    margin-right: 10px;
+}
+
+.send-btn {
+    background: #0d6efd;
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.ai-features {
+    display: flex;
+    padding: 15px;
+    gap: 15px;
+}
+
+.feature-card {
+    flex: 1;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.feature-card:hover {
+    background: #e9ecef;
+}
+
+.feature-card i {
+    font-size: 24px;
+    color: #0d6efd;
+    margin-bottom: 10px;
+}
+
+/* ...existing code... */

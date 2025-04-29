@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="../style.css">
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+<!-- ... código HTML ... -->
+<div class="sidebar">
+    <!-- ... logo ... -->
+    <ul class="nav-list">
+        <li><a href="inicio.html">...</a></li>
+        <li><a href="dashboard.html">...</a></li>
+        <li><a href="reportes.html">...</a></li>
+        <li><a href="portafolio.html">...</a></li>
+        <li><a href="mercado.html">...</a></li>
+        <li><a href="ai_agent.html">...</a></li>
+        <!-- ... otros elementos li con href actualizados ... -->
+    </ul>
+    <!-- ... perfil ... -->
+</div>
+<section class="home-section">
+    <div class="text">Contenido de Dashboard</div> <!-- Contenido específico -->
+</section>
+<!-- ... más código HTML ... -->
+<script>
+    // Script existente para la barra lateral si lo tienes
+    // ...
+
+    // Script para añadir la clase 'active' (igual que en inicio.html)
+    document.addEventListener("DOMContentLoaded", function() {
+        const currentPage = window.location.pathname.split("/").pop();
+        const navLinks = document.querySelectorAll(".sidebar .nav-list li a");
+        navLinks.forEach(link => {
+            const linkPage = link.getAttribute("href").split("/").pop();
+            if (linkPage === currentPage) {
+                link.parentElement.classList.add("active");
+            }
+        });
+    });
+</script>
+</body>
+</html>
