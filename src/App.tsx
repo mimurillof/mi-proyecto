@@ -21,6 +21,7 @@ import iconoBarCollapse from './images/icons/Bar Collapse.svg';
 import SentimentCard from './components/SentimentCard';
 import DashboardGrid from './components/dashboard/DashboardGrid';
 import ReportsPage from './pages/ReportsPage'; // <-- Importar ReportsPage
+import PortfolioLayout from './components/portfolio/PortfolioLayout';
 
 function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -365,7 +366,11 @@ function App() {
             <ReportsPage />
           )}
 
-          {activeItem !== 'inicio' && activeItem !== 'portafolio' && activeItem !== 'reportes' && (
+          {activeItem === 'cartera' && (
+            <PortfolioLayout />
+          )}
+
+          {activeItem !== 'inicio' && activeItem !== 'portafolio' && activeItem !== 'reportes' && activeItem !== 'cartera' && (
             <div className="flex justify-center items-center h-full text-gray-600">
               <div className="text-center">
                 <h2 className="text-2xl font-bold mb-2">{activeItem.charAt(0).toUpperCase() + activeItem.slice(1)}</h2>
