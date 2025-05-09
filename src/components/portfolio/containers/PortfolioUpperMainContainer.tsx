@@ -1,11 +1,13 @@
 import React from 'react';
+import FinancialPortfolioChart from '../ui/FinancialPortfolioChart'; // Asegúrate que la ruta sea correcta
 
 const PortfolioUpperMainContainer: React.FC = () => {
   return (
-    <div className="bg-gray-200 p-4 rounded shadow">
-      {/* Contenido para Gráfico interactivo del portafolio */}
-      <h2 className="text-lg font-semibold">Gráfico interactivo del portafolio</h2>
-      <p>Contenido del contenedor principal superior...</p>
+    <div 
+      className="bg-transparent dark:bg-transparent p-0 flex flex-col" // Ajustado para que el contenedor hijo maneje el fondo y padding
+      style={{ width: '759px', height: '538px' }} // Dimensiones del HTML original
+    >
+      <FinancialPortfolioChart />
     </div>
   );
 };

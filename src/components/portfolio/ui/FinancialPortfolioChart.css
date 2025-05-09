@@ -1,0 +1,94 @@
+.chart-container {
+    position: relative;
+    width: 100%;
+    flex-grow: 1; /* Hace que este div ocupe el espacio vertical disponible */
+    min-height: 200px; /* Altura mínima para el gráfico, evita que colapse */
+}
+
+/* Estilo para el loader */
+.loader {
+    border: 5px solid #4A5568; /* Dark grey */
+    border-top: 5px solid #3B82F6; /* Blue */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    display: none; /* Oculto por defecto */
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Estilos para botones activos/inactivos (no usados directamente si se usa la lógica de clases de Tailwind en React) */
+/* Se mantienen por si se necesitan para elementos no controlados directamente por clases dinámicas */
+.control-btn {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem; /* rounded-md */
+    font-weight: 600; /* semibold */
+    font-size: 0.875rem; /* text-sm */
+    transition: background-color 0.2s, color 0.2s;
+}
+.control-btn-active {
+    background-color: #3B82F6; /* bg-blue-600 */
+    color: white;
+}
+.control-btn-inactive {
+    background-color: #374151; /* bg-gray-700 */
+    color: #D1D5DB; /* text-gray-300 */
+}
+.control-btn-inactive:hover {
+    background-color: #4B5563; /* bg-gray-600 */
+}
+
+/* Estilos para botones de icono de tipo de gráfico */
+.chart-icon-btn svg {
+    width: 1.5rem; /* w-6 */
+    height: 1.5rem; /* h-6 */
+    fill: #9CA3AF; /* text-gray-400 por defecto para inactivo */
+    transition: fill 0.2s;
+}
+.chart-icon-btn:hover svg {
+    fill: #E5E7EB; /* text-gray-200 */
+}
+.chart-icon-btn.active svg {
+    fill: #3B82F6; /* text-blue-500 para activo */
+}
+
+/* Estilos para botones de rango de tiempo */
+.time-range-btn-style {
+    padding: 0.25rem 0.5rem;
+    font-weight: 500;
+    color: #9CA3AF; /* text-gray-400 */
+    border-radius: 0.25rem; /* rounded-sm */
+    transition: background-color 0.2s, color 0.2s;
+}
+.time-range-btn-style:hover {
+    color: #E5E7EB; /* text-gray-200 */
+    background-color: #374151; /* bg-gray-700 */
+}
+.time-range-btn-active {
+    color: #3B82F6 !important; /* text-blue-500 */
+    font-weight: 700 !important; /* bold */
+    background-color: rgba(59, 130, 246, 0.1) !important; /* subtle blue background */
+}
+
+/* Estilos para el desplegable de rango de fechas personalizado */
+.date-range-dropdown-panel {
+    position: absolute;
+    background-color: #1F2937; /* bg-gray-800 */
+    border: 1px solid #374151; /* border-gray-700 */
+    border-radius: 0.375rem; /* rounded-md */
+    padding: 1rem; /* p-4 */
+    margin-top: 0.5rem; /* mt-2 */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    z-index: 20;
+    width: auto; 
+    min-width: 280px;
+}
