@@ -3,7 +3,7 @@ import PortfolioSummary from '../ui/PortfolioSummary'; // Asegúrate que la ruta
 
 const PortfolioUpperLeftContainer: React.FC = () => {
   return (
-    <div className="bg-transparent dark:bg-transparent p-0 rounded shadow h-full"> {/* Ajustado para que el hijo controle su fondo y padding, y ocupe toda la altura */}
+    <div className="bg-transparent dark:bg-transparent p-0 rounded shadow flex flex-col flex-grow w-full min-h-0"> {/* Ajustado para responsividad */}
       <PortfolioSummary />
     </div>
   );

@@ -1,11 +1,10 @@
 import React from 'react';
+import AssetDetailChart from '../ui/AssetDetailChart'; // Asegúrate que la ruta sea correcta
 
 const PortfolioBottomContainer: React.FC = () => {
   return (
-    <div className="bg-gray-200 p-4 rounded shadow">
-      {/* Contenido para el contenedor inferior */}
-      <h2 className="text-lg font-semibold">Contenedor Inferior</h2>
-      <p>Contenido del contenedor inferior...</p>
+    <div className="bg-transparent dark:bg-transparent p-0 rounded shadow flex flex-col flex-grow w-full min-h-0"> {/* Ajustado para responsividad */}
+      <AssetDetailChart />
     </div>
   );
 };

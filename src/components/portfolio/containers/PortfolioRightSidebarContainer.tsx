@@ -3,7 +3,7 @@ import AlertsNotificationsCenter from '../ui/AlertsNotificationsCenter'; // Aseg
 
 const PortfolioRightSidebarContainer: React.FC = () => {
   return (
-    <div className="bg-transparent dark:bg-transparent p-0 rounded shadow h-full"> {/* Ajustado para que el hijo controle su fondo/padding y ocupe toda la altura */}
+    <div className="bg-transparent dark:bg-transparent p-0 rounded shadow flex flex-col flex-grow w-full min-h-0"> {/* Ajustado para responsividad */}
       <AlertsNotificationsCenter />
     </div>
   );

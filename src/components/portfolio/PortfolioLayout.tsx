@@ -11,17 +11,24 @@ const PortfolioLayout: React.FC = () => {
       <div className="col-span-12 md:col-span-3 row-span-1">
         <PortfolioUpperLeftContainer />
       </div>
-      <div className="col-span-12 md:col-span-6 row-span-1">
+      {/* Columna Central - Contiene UpperMain y Bottom apilados verticalmente */}
+      <div className="col-span-12 md:col-span-6 row-span-2 flex flex-col gap-4">
         <PortfolioUpperMainContainer />
+        <PortfolioBottomContainer />
       </div>
       <div className="col-span-12 md:col-span-3 row-span-2">
         <PortfolioRightSidebarContainer />
       </div>
       
       {/* Fila Inferior */}
-      <div className="col-span-12 md:col-span-9 row-span-1">
+      {/* Espacio vacío opcional debajo de PortfolioUpperLeftContainer si se desea mantener la estructura de 12 columnas explícitamente */}
+      {/* <div className="hidden md:block md:col-span-3"></div> */}
+      
+      {/* PortfolioBottomContainer ahora está agrupado arriba, por lo que esta celda se elimina */}
+      {/* <div className="col-span-12 md:col-start-4 md:col-span-6 row-span-1">
         <PortfolioBottomContainer />
-      </div>
+      </div> */}
+      {/* PortfolioRightSidebarContainer ya ocupa su espacio en esta "fila" visualmente debido a row-span-2 */}
     </div>
   );
 };

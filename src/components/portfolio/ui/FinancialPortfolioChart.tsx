@@ -259,7 +259,7 @@ const FinancialPortfolioChart: React.FC = () => {
                 </div>
             </div>
 
-            <div className="chart-container bg-slate-800 p-1 md:p-2 rounded-md shadow-inner">
+            <div className="chart-container bg-slate-800 p-1 md:p-2 rounded-md shadow-inner flex-grow min-h-0">
                 <div ref={loadingIndicatorRef} className="loader"></div>
                 <canvas ref={chartRef}></canvas>
             </div>

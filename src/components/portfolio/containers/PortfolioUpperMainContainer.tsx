@@ -4,8 +4,7 @@ import FinancialPortfolioChart from '../ui/FinancialPortfolioChart'; // Asegúra
 const PortfolioUpperMainContainer: React.FC = () => {
   return (
     <div 
-      className="bg-transparent dark:bg-transparent p-0 flex flex-col" // Ajustado para que el contenedor hijo maneje el fondo y padding
-      style={{ width: '759px', height: '538px' }} // Dimensiones del HTML original
+      className="bg-transparent dark:bg-transparent p-0 flex flex-col flex-grow w-full min-h-0" // Ajustado para responsividad
     >
       <FinancialPortfolioChart />
     </div>
