@@ -1,5 +1,6 @@
 import React from 'react';
-import TradingViewHeatmapWidget from '../components/market/TradingViewHeatmapWidget'; // <-- Importar el widget
+import TradingViewHeatmapWidget from '../components/market/TradingViewHeatmapWidget';
+import TradingViewCryptoHeatmapWidget from '../components/market/TradingViewCryptoHeatmapWidget'; // <-- Importar el nuevo widget
 
 const MarketPage: React.FC = () => {
   return (
@@ -10,9 +11,9 @@ const MarketPage: React.FC = () => {
           {/* Contenedor Superior Izquierdo (aprox. 800x503) */}
           <TradingViewHeatmapWidget />
         </div>
-        <div className="md:col-span-2 bg-gray-200 rounded-lg shadow p-4 flex items-center justify-center min-h-[300px] md:min-h-[400px] lg:min-h-[503px]">
+        <div className="md:col-span-2 bg-gray-200 rounded-lg shadow p-0 flex items-center justify-center min-h-[300px] md:min-h-[400px] lg:min-h-[503px] overflow-hidden">
           {/* Contenedor Superior Derecho (aprox. 625x503) */}
-          <p className="text-sm text-gray-600">Contenedor Superior Derecho</p>
+          <TradingViewCryptoHeatmapWidget />
         </div>
         
         {/* Fila Inferior */}
