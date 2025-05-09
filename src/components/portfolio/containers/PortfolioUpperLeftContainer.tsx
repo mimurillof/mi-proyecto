@@ -1,11 +1,10 @@
 import React from 'react';
+import PortfolioSummary from '../ui/PortfolioSummary'; // Asegúrate que la ruta sea correcta
 
 const PortfolioUpperLeftContainer: React.FC = () => {
   return (
-    <div className="bg-gray-200 p-4 rounded shadow">
-      {/* Contenido para Lista de activos y Porcentaje de asignación */}
-      <h2 className="text-lg font-semibold">Lista de activos y Porcentaje de asignación</h2>
-      <p>Contenido del contenedor superior izquierdo...</p>
+    <div className="bg-transparent dark:bg-transparent p-0 rounded shadow h-full"> {/* Ajustado para que el hijo controle su fondo y padding, y ocupe toda la altura */}
+      <PortfolioSummary />
     </div>
   );
 };

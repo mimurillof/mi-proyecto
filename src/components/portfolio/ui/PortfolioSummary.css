@@ -1,0 +1,19 @@
+/* Estilo para asegurar que el canvas del gráfico no se desborde y mantenga su aspect ratio */
+.summary-chart-container {
+    position: relative;
+    margin: auto;
+    height: 300px; /* Altura fija para el contenedor del gráfico */
+    width: 100%;   /* Ancho completo del contenedor padre */
+    max-width: 400px; /* Máximo ancho como en el HTML original */
+}
+
+@media (min-width: 768px) {
+    .summary-chart-container {
+        height: 350px; /* Un poco más alto en pantallas medianas y grandes */
+    }
+}
+
+/* Estilos para la flecha del desplegable */
+.accordion-arrow-rotate {
+    transform: rotate(180deg);
+}
