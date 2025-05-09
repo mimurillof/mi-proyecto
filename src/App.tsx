@@ -22,6 +22,7 @@ import SentimentCard from './components/SentimentCard';
 import DashboardGrid from './components/dashboard/DashboardGrid';
 import ReportsPage from './pages/ReportsPage'; // <-- Importar ReportsPage
 import PortfolioLayout from './components/portfolio/PortfolioLayout';
+import MarketPage from './pages/MarketPage'; // <-- Importar MarketPage
 
 function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -370,7 +371,15 @@ function App() {
             <PortfolioLayout />
           )}
 
-          {activeItem !== 'inicio' && activeItem !== 'portafolio' && activeItem !== 'reportes' && activeItem !== 'cartera' && (
+          {activeItem === 'mercado' && (
+            <MarketPage />
+          )}
+
+          {activeItem !== 'inicio' && 
+           activeItem !== 'portafolio' && 
+           activeItem !== 'reportes' && 
+           activeItem !== 'cartera' &&
+           activeItem !== 'mercado' && (
             <div className="flex justify-center items-center h-full text-gray-600">
               <div className="text-center">
                 <h2 className="text-2xl font-bold mb-2">{activeItem.charAt(0).toUpperCase() + activeItem.slice(1)}</h2>
