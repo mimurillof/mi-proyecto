@@ -1,11 +1,10 @@
 import React from 'react';
+import AlertsNotificationsCenter from '../ui/AlertsNotificationsCenter'; // Asegúrate que la ruta sea correcta
 
 const PortfolioRightSidebarContainer: React.FC = () => {
   return (
-    <div className="bg-gray-200 p-4 rounded shadow">
-      {/* Contenido para Notification */}
-      <h2 className="text-lg font-semibold">Notification</h2>
-      <p>Contenido del contenedor de la barra lateral derecha...</p>
+    <div className="bg-transparent dark:bg-transparent p-0 rounded shadow h-full"> {/* Ajustado para que el hijo controle su fondo/padding y ocupe toda la altura */}
+      <AlertsNotificationsCenter />
     </div>
   );
 };

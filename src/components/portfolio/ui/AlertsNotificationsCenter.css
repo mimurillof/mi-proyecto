@@ -1,0 +1,6 @@
+/* Estilos adicionales específicos para AlertsNotificationsCenter si son necesarios. */
+/* Por ejemplo, para asegurar que el scroll funcione bien dentro de un contenedor flex */
+.notifications-list-scroll {
+    max-height: 24rem; /* Equivalente a max-h-96 de Tailwind */
+    overflow-y: auto;
+}
