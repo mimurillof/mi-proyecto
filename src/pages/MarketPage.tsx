@@ -1,7 +1,8 @@
 import React from 'react';
 import TradingViewHeatmapWidget from '../components/market/TradingViewHeatmapWidget';
 import TradingViewCryptoHeatmapWidget from '../components/market/TradingViewCryptoHeatmapWidget';
-import TradingViewTimelineWidget from '../components/market/TradingViewTimelineWidget'; // <-- Importar el nuevo widget
+import TradingViewTimelineWidget from '../components/market/TradingViewTimelineWidget';
+import TradingViewAdvancedChartWidget from '../components/market/TradingViewAdvancedChartWidget'; // <-- Importar el nuevo widget
 
 const MarketPage: React.FC = () => {
   return (
@@ -18,9 +19,9 @@ const MarketPage: React.FC = () => {
         </div>
         
         {/* Fila Inferior */}
-        <div className="md:col-span-3 bg-gray-200 rounded-lg shadow p-4 flex items-center justify-center min-h-[250px] md:min-h-[350px] lg:min-h-[443px]">
+        <div className="md:col-span-3 bg-gray-200 rounded-lg shadow p-0 flex items-center justify-center min-h-[250px] md:min-h-[350px] lg:min-h-[443px] overflow-hidden">
           {/* Contenedor Inferior Izquierdo (aprox. 921x443) */}
-          <p className="text-sm text-gray-600">Contenedor Inferior Izquierdo</p>
+          <TradingViewAdvancedChartWidget />
         </div>
         <div className="md:col-span-2 bg-gray-200 rounded-lg shadow p-0 flex flex-col items-center justify-center text-center min-h-[250px] md:min-h-[350px] lg:min-h-[443px] overflow-hidden">
           {/* Contenedor Inferior Derecho (aprox. 500x443) */}
