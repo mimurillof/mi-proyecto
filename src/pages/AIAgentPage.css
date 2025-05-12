@@ -1,0 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Estilo base para todo el componente */
+body, .ai-agent-page {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Estilo base para los íconos de Material Symbols */
+.material-symbols-sharp {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400, /* Aumentado el peso para mejor visibilidad en fondo claro */
+  'GRAD' 0,
+  'opsz' 24;
+  font-family: 'Material Symbols Sharp';
+  font-style: normal;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+}
+
+.feature-card-icon {
+    font-size: 3rem; /* Aumentado para mejor visibilidad */
+    line-height: 1;
+    font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 48;
+}
+
+/* Estilos específicos para iconos de botones en el campo de chat */
+.text-2xl.material-symbols-sharp {
+    font-size: 1.75rem;
+    font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 40;
+}
+
+/* Estilos de scrollbar personalizados para tema claro */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9; /* slate-100 */
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1; /* slate-300 */
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; /* slate-400 */
+}

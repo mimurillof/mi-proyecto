@@ -23,6 +23,7 @@ import DashboardGrid from './components/dashboard/DashboardGrid';
 import ReportsPage from './pages/ReportsPage'; // <-- Importar ReportsPage
 import PortfolioLayout from './components/portfolio/PortfolioLayout';
 import MarketPage from './pages/MarketPage'; // <-- Importar MarketPage
+import AIAgentPage from './pages/AIAgentPage'; // <-- Nueva importación
 
 function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -375,11 +376,17 @@ function App() {
             <MarketPage />
           )}
 
+          {activeItem === 'ai' && ( // <-- Nueva condición para AI Agent
+            <AIAgentPage />
+          )}
+
           {activeItem !== 'inicio' && 
            activeItem !== 'portafolio' && 
            activeItem !== 'reportes' && 
            activeItem !== 'cartera' &&
-           activeItem !== 'mercado' && (
+           activeItem !== 'mercado' &&
+           activeItem !== 'ai' && // <-- Añadir 'ai' a la condición
+           (
             <div className="flex justify-center items-center h-full text-gray-600">
               <div className="text-center">
                 <h2 className="text-2xl font-bold mb-2">{activeItem.charAt(0).toUpperCase() + activeItem.slice(1)}</h2>
