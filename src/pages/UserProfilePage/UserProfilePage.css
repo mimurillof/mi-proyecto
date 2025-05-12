@@ -1,0 +1,36 @@
+.info-label {
+    font-weight: 600; /* semibold */
+    color: #075985; /* sky-800 */
+    margin-bottom: 0.25rem; /* mb-1 */
+}
+
+.info-value {
+    background-color: #f0f9ff; /* sky-50 */
+    padding: 0.65rem 0.85rem; /* Ajuste de padding para un look más suave */
+    border-radius: 0.375rem; /* rounded-md */
+    color: #374151; /* gray-700 */
+    width: 100%;
+    display: block;
+    border: 1px solid #e0f2fe; /* sky-100 */
+    line-height: 1.5; /* Para mejor legibilidad */
+    min-height: calc(1.5em + 1.3rem + 2px); /* Asegura altura mínima consistente con padding y border */
+    box-sizing: border-box; /* Incluye padding y border en el width/height total */
+}
+
+/* Estilo para el contenedor principal de la tarjeta de perfil */
+.profile-card {
+    background-color: white;
+    border-radius: 0.5rem; /* rounded-lg */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+    width: 100%; /* Asegura que la tarjeta ocupe el ancho del contenedor max-w-4xl */
+}
+
+/* Ajustes para asegurar que el contenedor bg-slate-50 ocupe la pantalla si es necesario */
+/* Si UserProfilePage es el componente raíz de una ruta, y quieres que ocupe toda la pantalla: */
+/* html, body, #root {
+    height: 100%;
+    margin: 0;
+} */
+
+/* El div con bg-slate-50 dentro de UserProfilePage.tsx ya tiene min-h-screen */
+/* Si este componente se renderiza dentro de otro layout, asegúrate que el layout permita expansión vertical */
