@@ -25,9 +25,12 @@ import PortfolioLayout from './components/portfolio/PortfolioLayout';
 import MarketPage from './pages/MarketPage'; // <-- Importar MarketPage
 import AIAgentPage from './pages/AIAgentPage'; // <-- Nueva importación
 import UserProfilePage from './pages/UserProfilePage/UserProfilePage'; // <-- Importar UserProfilePage
+import AccountSettingsPage from './pages/AccountSettingsPage/AccountSettingsPage'; // <-- Nueva importación
 
 // Importar CSS de UserProfilePage
 import './pages/UserProfilePage/UserProfilePage.css';
+// Importar CSS de AccountSettingsPage
+import './pages/AccountSettingsPage/AccountSettingsPage.css';
 
 function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -388,13 +391,18 @@ function App() {
             <UserProfilePage />
           )}
 
+          {activeItem === 'configuracion' && ( // <-- Nueva condición para Configuración
+            <AccountSettingsPage />
+          )}
+
           {activeItem !== 'inicio' && 
            activeItem !== 'portafolio' && 
            activeItem !== 'reportes' && 
            activeItem !== 'cartera' &&
            activeItem !== 'mercado' &&
            activeItem !== 'ai' &&
-           activeItem !== 'perfil' && // <-- Añadir 'perfil' a la condición
+           activeItem !== 'perfil' && 
+           activeItem !== 'configuracion' && // <-- Añadir 'configuracion' a la condición
            (
             <div className="flex justify-center items-center h-full text-gray-600">
               <div className="text-center">
