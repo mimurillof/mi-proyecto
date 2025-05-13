@@ -30,11 +30,12 @@ Actualmente, el proyecto se encuentra en sus fases iniciales de desarrollo.
 ## Estructura del Proyecto
 
 El proyecto tiene una estructura modular organizada por funcionalidades:
-
 * **Dashboard:** Visualización principal con gráficos de rendimiento y resumen de cartera
-* **Reportes:** Análisis detallados con capacidades de IA
-* **Portafolio:** Gestión y visualización de activos financieros
-* **Mercado:** Información y análisis de mercados financieros
+* **Reportes:** Análisis detallados con capacidades de IA, incluyendo nuevos widgets de reporte.
+* **Agente IA:** Página dedicada con funcionalidad de chat para asistencia inteligente.
+* **Portafolio:** Gestión y visualización de activos financieros, con diseño y gráficos interactivos mejorados.
+* **Mercado:** Información y análisis de mercados financieros con widgets de TradingView (gráficos, timelines, mapas de calor).
+* **Gestión de Usuario:** Páginas de perfil y configuración de cuenta, centro de notificaciones.
 
 ## Requisitos previos
 - Node.js (versión recomendada: 18.x o superior)
@@ -119,7 +120,7 @@ npm run preview
 * [x] Visualización de rendimiento de portafolio
 * [x] Resumen de holdings totales
 * [x] Vista general del portafolio
-* [ ] Dashboard completamente interactivo y personalizable
+* [ ] Dashboard completamente interactivo y personalizable (mejoras continuas)
 
 ### Reportes con IA
 * [x] Panel de control de IA
@@ -129,24 +130,30 @@ npm run preview
 * [x] Detección de anomalías
 * [x] Análisis detallado
 * [x] Simulaciones interactivas
+* [x] Adición de nuevos widgets de reporte
+* [x] Página de Agente IA con funcionalidad de chat
 * [ ] Generación automática de informes
 
 ### Portafolio
 * [x] Carrusel de portafolio
 * [x] Tarjetas de acciones
+* [x] Mejoras en diseño y visualización del portafolio (gráficos interactivos, resumen mejorado, nuevos componentes de interfaz)
 * [ ] Herramientas de rebalanceo
 * [ ] Análisis de diversificación
 
 ### Mercado
-* [ ] Visualización de datos de mercado en tiempo real
-* [ ] Análisis de tendencias de mercado
-* [ ] Alertas de mercado
+* [x] Visualización de datos de mercado en tiempo real (con widgets de TradingView: gráfico avanzado, timeline, mapa de calor crypto)
+* [x] Análisis de tendencias de mercado (facilitado por widgets de TradingView)
+* [x] Centro de notificaciones y alertas (incluye alertas de mercado)
 
 ### Características técnicas
-* [ ] Autenticación de usuarios
-* [ ] Almacenamiento de datos de usuario
-* [ ] API para datos financieros
-* [ ] Optimización para dispositivos móviles
+* [x] Página de perfil de usuario con datos y diseño mejorado
+* [x] Página de configuración de cuenta con funcionalidad y mejoras de interfaz
+* [x] Implementación de rutas de usuario y configuración de base de datos para gestión de perfiles y notificaciones
+* [x] Almacenamiento de datos de usuario (con configuración de base de datos)
+* [x] Autenticación de usuarios (base implementada con gestión de perfiles)
+* [ ] API para datos financieros (propia)
+* [x] Mejoras en la responsividad del diseño y estructura del código
 
 ## Capturas de Pantalla
 
