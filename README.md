@@ -151,6 +151,7 @@ npm run preview
 * [x] Página de configuración de cuenta con funcionalidad y mejoras de interfaz
 * [x] Implementación de rutas de usuario y configuración de base de datos para gestión de perfiles y notificaciones
 * [x] Almacenamiento de datos de usuario (con configuración de base de datos)
+* [x] Implementación de base de datos para formularios
 * [x] Autenticación de usuarios (base implementada con gestión de perfiles)
 * [ ] API para datos financieros (propia)
 * [x] Mejoras en la responsividad del diseño y estructura del código
