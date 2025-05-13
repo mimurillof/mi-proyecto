@@ -235,40 +235,40 @@ const AccountSettingsPage: React.FC = () => {
                                     className={`sidebar-link ${activeTab === 'content-profile-settings' ? 'active' : ''}`}
                                     onClick={(e) => { e.preventDefault(); handleTabClick('content-profile-settings'); }}
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5 mr-3">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                                     </svg>
-                                    Profile Settings
+                                    <span className="whitespace-nowrap">Profile Settings</span>
                                 </a>
                                 <a
                                     href="#"
                                     className={`sidebar-link ${activeTab === 'content-password' ? 'active' : ''}`}
                                     onClick={(e) => { e.preventDefault(); handleTabClick('content-password'); }}
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5 mr-3">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                                     </svg>
-                                    Password
+                                    <span className="whitespace-nowrap">Password</span>
                                 </a>
                                 <a
                                     href="#"
                                     className={`sidebar-link ${activeTab === 'content-notifications' ? 'active' : ''}`}
                                     onClick={(e) => { e.preventDefault(); handleTabClick('content-notifications'); }}
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5 mr-3">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
                                     </svg>
-                                    Notifications
+                                    <span className="whitespace-nowrap">Notifications</span>
                                 </a>
                                 <a
                                     href="#"
                                     className={`sidebar-link ${activeTab === 'content-verification' ? 'active' : ''}`}
                                     onClick={(e) => { e.preventDefault(); handleTabClick('content-verification'); }}
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5 mr-3">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    Verification
+                                    <span className="whitespace-nowrap">Verification</span>
                                 </a>
                             </nav>
                         </aside>
@@ -537,6 +537,7 @@ const AccountSettingsPage: React.FC = () => {
                                 <div className="mb-6">
                                     <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-8">Verificación de Cuenta</h2>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        {/* Columna Izquierda: Información y Carga de Documento */}
                                         <div className="md:col-span-2 space-y-6">
                                             <div>
                                                 <label htmlFor="verification-id-number" className="block text-sm font-medium text-gray-700 mb-1">Número de Identificación</label>
@@ -550,17 +551,44 @@ const AccountSettingsPage: React.FC = () => {
                                                 <label htmlFor="verification-expedition-date" className="block text-sm font-medium text-gray-700 mb-1">Fecha de Expedición</label>
                                                 <input type="text" name="verification-expedition-date" id="verification-expedition-date" value={profileData.idExpeditionDate || ''} readOnly className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-500 sm:text-sm" />
                                             </div>
+
                                             <div className="pt-6">
                                                 <h3 className="text-lg font-semibold text-gray-700 mb-4">Verificar Documento</h3>
-                                                {/* Additional verification content */}
+                                                <div className="w-full h-48 sm:h-64 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mb-4">
+                                                    <div className="text-center">
+                                                        <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                        </svg>
+                                                        <p className="mt-2 text-sm text-gray-600">Vista previa del documento</p>
+                                                        <p className="text-xs text-gray-500">Sube una imagen clara de tu documento.</p>
+                                                    </div>
+                                                </div>
+                                                <button type="button" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-sm">
+                                                    Cargar Documento
+                                                </button>
+                                                <p className="mt-2 text-xs text-gray-500">Estado: <span className="font-semibold text-yellow-600">Documento no cargado</span></p>
                                             </div>
                                         </div>
-                                        {/* Columna Derecha: Acciones de Verificación Puntuales (si existe o se planea) */}
-                                        {/* Ejemplo de cómo podría ser la columna derecha si se añade:
+
+                                        {/* Columna Derecha: Acciones de Verificación Puntuales */}
                                         <div className="md:col-span-1 space-y-4">
-                                            Contenido de la columna derecha
+                                            <button type="button" className="w-full flex items-center justify-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                                <svg className="w-5 h-5 mr-2 -ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                </svg>
+                                                Correo Verificado
+                                            </button>
+                                            <button type="button" className="w-full flex items-center justify-center px-4 py-2.5 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                Verificar Teléfono
+                                            </button>
+                                            <button type="button" className="w-full flex items-center justify-center px-4 py-2.5 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                Verificar Método de Pago
+                                            </button>
+                                            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                                <h4 className="text-sm font-semibold text-blue-700 mb-1">¿Por qué verificar?</h4>
+                                                <p className="text-xs text-blue-600">La verificación ayuda a mantener tu cuenta segura y nos permite ofrecerte todos nuestros servicios.</p>
+                                            </div>
                                         </div>
-                                        */}
                                     </div>
                                 </div>
                             </div>
