@@ -1,8 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './AccountSettingsPage.css'; // Importar los estilos CSS
+
+// Asumimos un userId fijo para el ejemplo. En una app real, esto vendría de la autenticación.
+const USER_ID = 1;
+
+interface UserProfileData {
+    firstName: string;
+    lastName: string;
+    email: string;
+    mobileNumber: string;
+    gender: string;
+    idNumber: string;
+    taxIdNumber: string;
+    taxIdCountry: string;
+    residentialAddress: string;
+    aboutMe: string;
+    avatarUrl?: string;
+    birthDate?: string; // Considerar formato Date si es necesario
+    idExpeditionDate?: string; // Considerar formato Date
+}
 
 const AccountSettingsPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState('content-profile-settings');
+
+    const [profileData, setProfileData] = useState<UserProfileData>({
+        firstName: '',
+        lastName: '',
+        email: '',
+        mobileNumber: '',
+        gender: 'male',
+        idNumber: '',
+        taxIdNumber: '',
+        taxIdCountry: '',
+        residentialAddress: '',
+        aboutMe: '',
+        avatarUrl: 'https://via.placeholder.com/150', // Default avatar
+    });
+
     const [notifications, setNotifications] = useState({
         priceLimit: true,
         newReport: false,
@@ -16,22 +50,183 @@ const AccountSettingsPage: React.FC = () => {
         facebookSync: false,
     });
 
+    const [passwordData, setPasswordData] = useState({
+        oldPassword: '',
+        newPassword: '',
+        confirmNewPassword: '',
+    });
+
     const handleTabClick = (targetId: string) => {
         setActiveTab(targetId);
+    };
+
+    const handleProfileInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setProfileData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleGenderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setProfileData(prev => ({ ...prev, gender: e.target.value }));
+    };
+
+    const handleProfileSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const response = await fetch(`/api/users/${USER_ID}/profile`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    first_name: profileData.firstName,
+                    last_name: profileData.lastName,
+                    mobile_number: profileData.mobileNumber,
+                    gender: profileData.gender,
+                    tax_id_number: profileData.taxIdNumber,
+                    tax_id_country: profileData.taxIdCountry,
+                    residential_address: profileData.residentialAddress,
+                    about_me: profileData.aboutMe,
+                    avatar_url: profileData.avatarUrl,
+                    birth_date: profileData.birthDate,
+                    id_expedition_date: profileData.idExpeditionDate,
+                }),
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to update profile');
+            }
+            alert('Profile updated successfully!');
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            alert(`Error updating profile: ${error instanceof Error ? error.message : String(error)}`);
+        }
     };
 
     const toggleNotification = (key: keyof typeof notifications) => {
         setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
     };
 
+    const handleNotificationSettingsSave = async () => {
+        try {
+            const response = await fetch(`/api/users/${USER_ID}/notifications`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    price_limit_notifications: notifications.priceLimit,
+                    new_report_notifications: notifications.newReport,
+                    important_news_notifications: notifications.importantNews,
+                    event_notifications: notifications.events,
+                    app_notifications: notifications.appNotifications,
+                    email_notifications: notifications.emailNotifications,
+                    browser_notifications: notifications.browserNotifications,
+                    google_sync_enabled: notifications.googleSync,
+                    linkedin_sync_enabled: notifications.linkedinSync,
+                    facebook_sync_enabled: notifications.facebookSync,
+                }),
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to update notification settings');
+            }
+            alert('Notification settings updated successfully!');
+        } catch (error) {
+            console.error('Error updating notification settings:', error);
+            alert(`Error updating notification settings: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    };
+
+    const handlePasswordInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setPasswordData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handlePasswordSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (passwordData.newPassword !== passwordData.confirmNewPassword) {
+            alert("New passwords do not match.");
+            return;
+        }
+        // Aquí iría la lógica para llamar a la API de cambio de contraseña
+        try {
+            // const response = await fetch(`/api/users/${USER_ID}/password`, {
+            //     method: 'PUT',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({
+            //         old_password: passwordData.oldPassword,
+            //         new_password: passwordData.newPassword,
+            //     }),
+            // });
+            // if (!response.ok) {
+            //     const errorData = await response.json();
+            //     throw new Error(errorData.error || 'Failed to change password');
+            // }
+            alert('Password changed successfully! (Simulated)');
+            setPasswordData({ oldPassword: '', newPassword: '', confirmNewPassword: '' });
+        } catch (error) {
+            console.error('Error changing password:', error);
+            alert(`Error changing password: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    };
+
+    useEffect(() => {
+        const fetchProfileData = async () => {
+            try {
+                const response = await fetch(`/api/users/${USER_ID}/profile`);
+                if (!response.ok) throw new Error('Failed to fetch profile data');
+                const data = await response.json();
+                setProfileData({
+                    firstName: data.first_name || '',
+                    lastName: data.last_name || '',
+                    email: data.email || '',
+                    mobileNumber: data.mobile_number || '',
+                    gender: data.gender || 'male',
+                    idNumber: data.id_number || '',
+                    taxIdNumber: data.tax_id_number || '',
+                    taxIdCountry: data.tax_id_country || '',
+                    residentialAddress: data.residential_address || '',
+                    aboutMe: data.about_me || '',
+                    avatarUrl: data.avatar_url || 'https://via.placeholder.com/150',
+                    birthDate: data.birth_date,
+                    idExpeditionDate: data.id_expedition_date,
+                });
+            } catch (error) {
+                console.error("Error fetching profile data:", error);
+            }
+        };
+
+        const fetchNotificationSettings = async () => {
+            try {
+                const response = await fetch(`/api/users/${USER_ID}/notifications`);
+                if (!response.ok) throw new Error('Failed to fetch notification settings');
+                const data = await response.json();
+                setNotifications({
+                    priceLimit: data.price_limit_notifications,
+                    newReport: data.new_report_notifications,
+                    importantNews: data.important_news_notifications,
+                    events: data.event_notifications,
+                    appNotifications: data.app_notifications,
+                    emailNotifications: data.email_notifications,
+                    browserNotifications: data.browser_notifications,
+                    googleSync: data.google_sync_enabled,
+                    linkedinSync: data.linkedin_sync_enabled,
+                    facebookSync: data.facebook_sync_enabled,
+                });
+            } catch (error) {
+                console.error("Error fetching notification settings:", error);
+            }
+        };
+
+        if (activeTab === 'content-profile-settings') {
+            fetchProfileData();
+        }
+        if (activeTab === 'content-notifications') {
+            fetchNotificationSettings();
+        }
+    }, [activeTab]);
+
     return (
         <div className="bg-gray-100 py-8 px-4 sm:px-6 lg:px-8 text-gray-800">
-            {/* Título ahora es hijo directo del contenedor con padding, fuera del bloque mx-auto */}
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">Account settings</h1>
-            {/* Este div con max-w-6xl mx-auto ahora solo envuelve el contenido principal (columnas) */}
             <div className="max-w-6xl mx-auto">
                 <div className="flex flex-col md:flex-row gap-4">
-                    {/* Este div ahora solo contiene el aside (panel de navegación) */}
                     <div className="w-full md:w-56 flex-shrink-0 self-start">
                         <aside className="w-full bg-white rounded-lg shadow-md p-4 md:p-6 md:pb-3">
                             <nav className="space-y-1">
@@ -84,104 +279,82 @@ const AccountSettingsPage: React.FC = () => {
                                 {/* Sección de Avatar/Foto de Perfil */}
                                 <div className="flex flex-col sm:flex-row items-center mb-8">
                                     <div className="relative mb-4 sm:mb-0 sm:mr-6">
-                                        <img className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-2 border-gray-300" src="https://via.placeholder.com/150" alt="User Avatar" />
+                                        <img className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-2 border-gray-300" src={profileData.avatarUrl} alt="User Avatar" />
                                         <label htmlFor="avatarUpload" className="absolute bottom-0 right-0 -mb-1 -mr-1 cursor-pointer">
                                             <span className="camera-icon">
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fillRule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586l-.707-.707A2 2 0 0012.414 4H7.586a2 2 0 00-1.293.293L5.586 5H4zm6 8a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                                                    <path d="M4 5a2 2 0 012-2h8a2 2 0 012 2h2a1 1 0 011 1v10a1 1 0 01-1 1h-2a2 2 0 01-2 2H6a2 2 0 01-2-2H2a1 1 0 01-1-1V6a1 1 0 011-1h2zm8 0H8v2h4V5z" />
                                                 </svg>
                                             </span>
                                         </label>
-                                        <input type="file" id="avatarUpload" className="hidden" />
-                                    </div>
-                                    <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-                                        <button type="button" onClick={() => document.getElementById('avatarUpload')?.click()} className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md text-sm sm:text-base">
-                                            Upload New
-                                        </button>
-                                        <button type="button" className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-md border border-gray-300 text-sm sm:text-base">
-                                            Delete avatar
-                                        </button>
                                     </div>
                                 </div>
-
-                                {/* Formulario de Información Personal */}
-                                <form action="#" method="POST">
+                                <form action="#" method="POST" onSubmit={handleProfileSave}>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-                                        
                                         <div>
                                             <label htmlFor="first-name" className="block text-sm font-medium text-gray-700 mb-1">First Name <span className="text-red-500">*</span></label>
-                                            <input type="text" name="first-name" id="first-name" defaultValue="Miguel Ángel" placeholder="First name" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                                            <input type="text" name="firstName" id="first-name" value={profileData.firstName} onChange={handleProfileInputChange} placeholder="First name" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                                         </div>
-
                                         <div>
                                             <label htmlFor="last-name" className="block text-sm font-medium text-gray-700 mb-1">Last Name <span className="text-red-500">*</span></label>
-                                            <input type="text" name="last-name" id="last-name" defaultValue="Murillo" placeholder="Last name" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                                            <input type="text" name="lastName" id="last-name" value={profileData.lastName} onChange={handleProfileInputChange} placeholder="Last name" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                                         </div>
-
                                         <div>
                                             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                            <input type="email" name="email" id="email" defaultValue="miguel.murillo@example.com" placeholder="examples@gmail.com" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-500 sm:text-sm" readOnly />
+                                            <input type="email" name="email" id="email" value={profileData.email} placeholder="examples@gmail.com" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-500 sm:text-sm" readOnly />
                                         </div>
-
                                         <div>
                                             <label htmlFor="mobile-number" className="block text-sm font-medium text-gray-700 mb-1">Mobile Number <span className="text-red-500">*</span></label>
                                             <div className="mt-1 flex rounded-md shadow-sm">
                                                 <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
                                                     🇨🇴 +57
                                                 </span>
-                                                <input type="tel" name="mobile-number" id="mobile-number" defaultValue="3001234567" placeholder="0806 123 7890" className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 border" />
+                                                <input type="tel" name="mobileNumber" id="mobile-number" value={profileData.mobileNumber} onChange={handleProfileInputChange} placeholder="0806 123 7890" className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 border" />
                                             </div>
                                         </div>
-                                        
                                         <div className="md:col-span-1">
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
                                             <div className="mt-2 space-y-2 sm:space-y-0 sm:flex sm:space-x-6">
                                                 <div className="flex items-center">
-                                                    <input id="gender-male" name="gender" type="radio" value="male" className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300" defaultChecked />
+                                                    <input id="gender-male" name="gender" type="radio" value="male" className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300" checked={profileData.gender === 'male'} onChange={handleGenderChange} />
                                                     <label htmlFor="gender-male" className="ml-2 block text-sm text-gray-900">
                                                         Male
                                                     </label>
                                                 </div>
                                                 <div className="flex items-center">
-                                                    <input id="gender-female" name="gender" type="radio" value="female" className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300" />
+                                                    <input id="gender-female" name="gender" type="radio" value="female" className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300" checked={profileData.gender === 'female'} onChange={handleGenderChange} />
                                                     <label htmlFor="gender-female" className="ml-2 block text-sm text-gray-900">
                                                         Female
                                                     </label>
                                                 </div>
                                             </div>
                                         </div>
-
                                         <div>
                                             <label htmlFor="id-number" className="block text-sm font-medium text-gray-700 mb-1">ID</label>
-                                            <input type="text" name="id-number" id="id-number" defaultValue="1020XXXXXX" placeholder="1559 000 7788 8DER" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-500 sm:text-sm" readOnly />
+                                            <input type="text" name="idNumber" id="id-number" value={profileData.idNumber} placeholder="1559 000 7788 8DER" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-500 sm:text-sm" readOnly />
                                         </div>
-
                                         <div>
                                             <label htmlFor="tax-id-number" className="block text-sm font-medium text-gray-700 mb-1">Tax Identification Number</label>
-                                            <input type="text" name="tax-id-number" id="tax-id-number" defaultValue="N/A" placeholder="examples@gmail.com" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                                            <input type="text" name="taxIdNumber" id="tax-id-number" value={profileData.taxIdNumber} onChange={handleProfileInputChange} placeholder="examples@gmail.com" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                                         </div>
-
                                         <div>
                                             <label htmlFor="tax-id-country" className="block text-sm font-medium text-gray-700 mb-1">Tax Identification Country</label>
                                             <div className="mt-1 flex rounded-md shadow-sm">
                                                 <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
                                                     🇨🇴
                                                 </span>
-                                                <input type="text" name="tax-id-country" id="tax-id-country" defaultValue="Colombia" placeholder="Nigeria" className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 border" />
+                                                <input type="text" name="taxIdCountry" id="tax-id-country" value={profileData.taxIdCountry} onChange={handleProfileInputChange} placeholder="Nigeria" className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 border" />
                                             </div>
                                         </div>
-
                                         <div className="md:col-span-2">
                                             <label htmlFor="residential-address" className="block text-sm font-medium text-gray-700 mb-1">Residential Address</label>
-                                            <textarea name="residential-address" id="residential-address" rows={3} placeholder="Ib street orogun ibadan" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" defaultValue="Calle Falsa 123, Bogotá, Colombia"></textarea>
+                                            <textarea name="residentialAddress" id="residential-address" rows={3} placeholder="Ib street orogun ibadan" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" value={profileData.residentialAddress} onChange={handleProfileInputChange}></textarea>
                                         </div>
-                                         <div className="md:col-span-2">
+                                        <div className="md:col-span-2">
                                             <label htmlFor="about-me" className="block text-sm font-medium text-gray-700 mb-1">About me</label>
-                                            <textarea name="about-me" id="about-me" rows={4} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" defaultValue="Estudiante de Ciencia de Datos y Desarrollo de Software, apasionado por la tecnología, la estadística y los juegos de estrategia. Siempre buscando aprender y aplicar nuevos conocimientos en proyectos innovadores."></textarea>
+                                            <textarea name="aboutMe" id="about-me" rows={4} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" value={profileData.aboutMe} onChange={handleProfileInputChange}></textarea>
                                         </div>
                                     </div>
-
-                                    {/* Acciones del Formulario */}
                                     <div className="mt-8 pt-6 border-t border-gray-200">
                                         <div className="flex justify-start">
                                             <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-sm">
@@ -196,28 +369,54 @@ const AccountSettingsPage: React.FC = () => {
                             <div id="content-password" className="content-section p-4 sm:p-6 lg:p-8">
                                 <div className="mb-6">
                                     <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-6">Cambiar Contraseña</h2>
-                                    <form action="#" method="POST" className="space-y-6">
+                                    <form onSubmit={handlePasswordSave} className="space-y-6">
                                         <div>
                                             <label htmlFor="old-password" className="block text-sm font-medium text-gray-700 mb-1">Contraseña Actual</label>
-                                            <input type="password" name="old-password" id="old-password" required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Ingresa tu contraseña actual" />
+                                            <input 
+                                                type="password" 
+                                                name="oldPassword" 
+                                                id="old-password" 
+                                                value={passwordData.oldPassword}
+                                                onChange={handlePasswordInputChange}
+                                                required 
+                                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+                                                placeholder="Ingresa tu contraseña actual" 
+                                            />
                                         </div>
 
                                         <div>
                                             <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 mb-1">Nueva Contraseña</label>
-                                            <input type="password" name="new-password" id="new-password" required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Ingresa tu nueva contraseña" />
+                                            <input 
+                                                type="password" 
+                                                name="newPassword" 
+                                                id="new-password" 
+                                                value={passwordData.newPassword}
+                                                onChange={handlePasswordInputChange}
+                                                required 
+                                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+                                                placeholder="Ingresa tu nueva contraseña" 
+                                            />
                                             <div className="mt-2 flex space-x-1">
+                                                {/* Indicador de fortaleza de contraseña (visual, sin lógica real aquí) */}
                                                 <div className="h-1.5 flex-1 bg-gray-200 rounded-full">
-                                                    <div className="h-1.5 bg-red-500 rounded-full w-1/3"></div>
+                                                    <div className={`h-1.5 rounded-full ${passwordData.newPassword.length > 0 ? (passwordData.newPassword.length < 6 ? 'bg-red-500 w-1/3' : (passwordData.newPassword.length < 10 ? 'bg-yellow-500 w-2/3' : 'bg-green-500 w-full')) : ''}`}></div>
                                                 </div>
-                                                <div className="h-1.5 flex-1 bg-gray-200 rounded-full"></div>
-                                                <div className="h-1.5 flex-1 bg-gray-200 rounded-full"></div>
                                             </div>
                                             <p className="mt-1 text-xs text-gray-500">Usa al menos 8 caracteres, una mayúscula, una minúscula y un número.</p>
                                         </div>
 
                                         <div>
                                             <label htmlFor="confirm-new-password" className="block text-sm font-medium text-gray-700 mb-1">Confirmar Nueva Contraseña</label>
-                                            <input type="password" name="confirm-new-password" id="confirm-new-password" required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Confirma tu nueva contraseña" />
+                                            <input 
+                                                type="password" 
+                                                name="confirmNewPassword" 
+                                                id="confirm-new-password" 
+                                                value={passwordData.confirmNewPassword}
+                                                onChange={handlePasswordInputChange}
+                                                required 
+                                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+                                                placeholder="Confirma tu nueva contraseña" 
+                                            />
                                         </div>
 
                                         <div className="pt-4 border-t border-gray-200">
@@ -271,14 +470,13 @@ const AccountSettingsPage: React.FC = () => {
                                                 </button>
                                             </div>
                                         ))}
-
                                         <h3 className="text-lg font-semibold text-gray-700 mb-4 pt-6">Canales de Notificación</h3>
                                         {[
                                             { key: 'appNotifications', label: 'Notificaciones de aplicación' },
                                             { key: 'emailNotifications', label: 'Notificaciones de correo' },
                                             { key: 'browserNotifications', label: 'Notificaciones de navegador' },
                                         ].map(item => (
-                                             <div key={item.key} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                                            <div key={item.key} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                                                 <p className="text-sm font-medium text-gray-900">{item.label}</p>
                                                 <button
                                                     type="button"
@@ -292,7 +490,6 @@ const AccountSettingsPage: React.FC = () => {
                                                 </button>
                                             </div>
                                         ))}
-                                        
                                         <div className="pt-8 mt-8 border-t border-gray-200">
                                             <h3 className="text-lg font-semibold text-gray-700 mb-6">Sincronizar con aplicaciones personales</h3>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -321,6 +518,17 @@ const AccountSettingsPage: React.FC = () => {
                                             </div>
                                         </div>
                                     </div>
+                                    <div className="mt-8 pt-6 border-t border-gray-200">
+                                        <div className="flex justify-start">
+                                            <button 
+                                                type="button" 
+                                                onClick={handleNotificationSettingsSave}
+                                                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-sm"
+                                            >
+                                                Save Notification Settings
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -332,51 +540,27 @@ const AccountSettingsPage: React.FC = () => {
                                         <div className="md:col-span-2 space-y-6">
                                             <div>
                                                 <label htmlFor="verification-id-number" className="block text-sm font-medium text-gray-700 mb-1">Número de Identificación</label>
-                                                <input type="text" name="verification-id-number" id="verification-id-number" defaultValue="1020XXXXXX" readOnly className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-500 sm:text-sm" />
+                                                <input type="text" name="verification-id-number" id="verification-id-number" value={profileData.idNumber || ''} readOnly className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-500 sm:text-sm" />
                                             </div>
                                             <div>
                                                 <label htmlFor="verification-birth-date" className="block text-sm font-medium text-gray-700 mb-1">Fecha de Nacimiento</label>
-                                                <input type="text" name="verification-birth-date" id="verification-birth-date" defaultValue="01/01/1990" readOnly className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-500 sm:text-sm" />
+                                                <input type="text" name="verification-birth-date" id="verification-birth-date" value={profileData.birthDate || ''} readOnly className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-500 sm:text-sm" />
                                             </div>
                                             <div>
                                                 <label htmlFor="verification-expedition-date" className="block text-sm font-medium text-gray-700 mb-1">Fecha de Expedición</label>
-                                                <input type="text" name="verification-expedition-date" id="verification-expedition-date" defaultValue="01/01/2010" readOnly className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-500 sm:text-sm" />
+                                                <input type="text" name="verification-expedition-date" id="verification-expedition-date" value={profileData.idExpeditionDate || ''} readOnly className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-500 sm:text-sm" />
                                             </div>
                                             <div className="pt-6">
                                                 <h3 className="text-lg font-semibold text-gray-700 mb-4">Verificar Documento</h3>
-                                                <div className="w-full h-48 sm:h-64 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mb-4">
-                                                    <div className="text-center">
-                                                        <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                        </svg>
-                                                        <p className="mt-2 text-sm text-gray-600">Vista previa del documento</p>
-                                                        <p className="text-xs text-gray-500">Sube una imagen clara de tu documento.</p>
-                                                    </div>
-                                                </div>
-                                                <button type="button" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-sm">
-                                                    Cargar Documento
-                                                </button>
-                                                <p className="mt-2 text-xs text-gray-500">Estado: <span className="font-semibold text-yellow-600">Documento no cargado</span></p>
+                                                {/* Additional verification content */}
                                             </div>
                                         </div>
+                                        {/* Columna Derecha: Acciones de Verificación Puntuales (si existe o se planea) */}
+                                        {/* Ejemplo de cómo podría ser la columna derecha si se añade:
                                         <div className="md:col-span-1 space-y-4">
-                                            <button type="button" className="w-full flex items-center justify-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                                <svg className="w-5 h-5 mr-2 -ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                                </svg>
-                                                Correo Verificado
-                                            </button>
-                                            <button type="button" className="w-full flex items-center justify-center px-4 py-2.5 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                                Verificar Teléfono
-                                            </button>
-                                             <button type="button" className="w-full flex items-center justify-center px-4 py-2.5 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                                Verificar Método de Pago
-                                            </button>
-                                            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                                                <h4 className="text-sm font-semibold text-blue-700 mb-1">¿Por qué verificar?</h4>
-                                                <p className="text-xs text-blue-600">La verificación ayuda a mantener tu cuenta segura y nos permite ofrecerte todos nuestros servicios.</p>
-                                            </div>
+                                            Contenido de la columna derecha
                                         </div>
+                                        */}
                                     </div>
                                 </div>
                             </div>
