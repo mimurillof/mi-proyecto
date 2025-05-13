@@ -185,7 +185,7 @@ function App() {
                   sidebarCollapsed ? 'justify-center w-full px-0' : 'space-x-3 px-3'
                 } ${activeItem === 'perfil' ? 'text-white bg-gray-800' : 'text-gray-400 hover:bg-gray-800'}`}
               > 
-                <img src={iconoPerfil} alt="Perfil" className="w-5 h-5 flex-shrink-0" /> 
+                <img src={iconoConfiguracion} alt="Perfil" className="w-5 h-5 flex-shrink-0" /> 
                 <span className={`font-medium transition-opacity duration-200 ${sidebarCollapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>Perfil</span>
               </a>
             </li>
@@ -198,7 +198,7 @@ function App() {
                   sidebarCollapsed ? 'justify-center w-full px-0' : 'space-x-3 px-3'
                 } ${activeItem === 'configuracion' ? 'text-white bg-gray-800' : 'text-gray-400 hover:bg-gray-800'}`}
               >
-                <img src={iconoConfiguracion} alt="Configuración" className="w-5 h-5 flex-shrink-0" /> 
+                <img src={iconoPerfil} alt="Configuración" className="w-5 h-5 flex-shrink-0" /> 
                 <span className={`font-medium transition-opacity duration-200 ${sidebarCollapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>Configuración</span>
               </a>
             </li>
