@@ -29,8 +29,7 @@ import AccountSettingsPage from './pages/AccountSettingsPage/AccountSettingsPage
 
 // Importar CSS de UserProfilePage
 import './pages/UserProfilePage/UserProfilePage.css';
-// Importar CSS de AccountSettingsPage
-import './pages/AccountSettingsPage/AccountSettingsPage.css';
+// import './pages/AccountSettingsPage/AccountSettingsPage.css'; // Elimina o comenta esta línea
 
 function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
