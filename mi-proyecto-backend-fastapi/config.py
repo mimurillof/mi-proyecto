@@ -19,6 +19,10 @@ class Settings(BaseSettings):
     
     # Environment
     ENVIRONMENT: str = "development"
+    
+    # AI Settings
+    GOOGLE_API_KEY: Optional[str] = None
+    GEMINI_API_KEY: Optional[str] = None
 
     class Config:
         env_file = ".env"

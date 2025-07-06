@@ -1,183 +1,189 @@
-# Página Web SENA
+# 🚀 Mi Proyecto - Financial AI Platform
 
-## Descripción
+Una plataforma de análisis financiero moderna con IA, desarrollada con React + TypeScript (frontend) y FastAPI + Python (backend), integrada con el agente financiero Horizon v3.0.
 
-Este es un proyecto en desarrollo como parte del programa de **Análisis y Desarrollo de Software** del SENA. El objetivo principal es crear un dashboard interactivo para visualización y análisis de datos financieros, con capacidades de inteligencia artificial para predicción de tendencias, detección de anomalías y simulación de escenarios de inversión.
+## 🌟 Características Principales
 
-La plataforma integra visualizaciones avanzadas de datos de inversiones, portafolios y mercados financieros, junto con herramientas analíticas impulsadas por IA para ayudar en la toma de decisiones de inversión.
+- **🤖 Agente IA Financiero**: Horizon v3.0 con capacidades avanzadas de análisis
+- **📊 Dashboard Interactivo**: Visualización de datos financieros en tiempo real
+- **💬 Chat Inteligente**: Interacción natural con el agente de IA
+- **📈 Análisis de Mercado**: Noticias, predicciones y análisis de tendencias
+- **📄 Procesamiento de Documentos**: Análisis de reportes financieros
+- **🔍 Búsqueda Web**: Información financiera actualizada en tiempo real
 
-Actualmente, el proyecto se encuentra en sus fases iniciales de desarrollo.
+## 🏗️ Arquitectura
 
-## Autor
-
-* **Nombre:** Miguel Angel Murillo Frias
-* **Ficha:** 2957794
-
-## Estado del Proyecto
-
-* **🚧 En Desarrollo 🚧**
-* Este proyecto está incompleto y se encuentra activamente en desarrollo. Las funcionalidades pueden cambiar y aún no está listo para producción.
-
-## Tecnologías Utilizadas
-
-* **Frontend:** React 18, TypeScript
-* **Backend:** FastAPI, Python (migrado desde Node.js)
-* **Base de Datos:** PostgreSQL con SQLAlchemy 2.0
-* **Autenticación:** JWT con FastAPI Security
-* **Visualización de Datos:** Chart.js, React-Chartjs-2, Plotly.js
-* **UI/UX:** Material UI, FontAwesome, TailwindCSS
-* **Herramientas de Desarrollo:** Vite, ESLint
-* **Estilos:** CSS Modules, TailwindCSS
-* **Gestor de Paquetes:** npm (frontend), pip (backend)
-
-## Estructura del Proyecto
-
-El proyecto tiene una estructura modular organizada por funcionalidades:
-* **Frontend (React/TypeScript):** `mi-proyecto/` - Aplicación React con Vite
-* **Backend (FastAPI/Python):** `mi-proyecto-backend-fastapi/` - API REST con autenticación JWT
-* **Dashboard:** Visualización principal con gráficos de rendimiento y resumen de cartera
-* **Reportes:** Análisis detallados con capacidades de IA, incluyendo nuevos widgets de reporte.
-* **Agente IA:** Página dedicada con funcionalidad de chat para asistencia inteligente.
-* **Portafolio:** Gestión y visualización de activos financieros, con diseño y gráficos interactivos mejorados.
-* **Mercado:** Información y análisis de mercados financieros con widgets de TradingView (gráficos, timelines, mapas de calor).
-* **Gestión de Usuario:** Páginas de perfil y configuración de cuenta, centro de notificaciones.
-
-## Requisitos previos
-- Node.js (versión recomendada: 18.x o superior)
-- npm (viene incluido con Node.js)
-
-## Instrucciones de instalación
-
-1. Clona o descarga este repositorio en tu equipo local
-
-2. Abre una terminal en la carpeta del proyecto (`mi-proyecto`)
-
-3. Instala todas las dependencias ejecutando:
-```bash
-npm install
+```
+┌─────────────────┐    REST API     ┌──────────────────┐    Gemini API    ┌─────────────────┐
+│   React Client  │ ←─────────────→ │  FastAPI Backend │ ←───────────────→ │   Google AI     │
+│  (Port 5173)    │                 │   (Port 8000)    │                  │    Service      │
+└─────────────────┘                 └──────────────────┘                  └─────────────────┘
 ```
 
-Este comando instalará todas las siguientes dependencias:
+## 🚀 Inicio Rápido
 
-### Dependencias principales:
-- @emotion/react v11.14.0
-- @emotion/styled v11.14.0
-- @fortawesome/fontawesome-svg-core v6.7.2
-- @fortawesome/free-solid-svg-icons v6.7.2
-- @fortawesome/react-fontawesome v0.2.2
-- @mui/icons-material v7.0.2
-- @mui/material v7.0.2
-- chart.js v4.4.9
-- chartjs-adapter-date-fns v3.0.0
-- chartjs-plugin-zoom v2.2.0
-- date-fns v2.30.0
-- gridstack v12.0.0
-- hammerjs v2.0.8
-- lucide-react v0.344.0
-- plotly.js v3.0.1
-- react v18.3.1
-- react-chartjs-2 v5.3.0
-- react-dom v18.3.1
-- react-plotly.js v2.6.0
-- tabulator-tables v6.3.1
+### Prerequisitos
+- Node.js 18+ 
+- Python 3.11+
+- API Key de Google Gemini
 
-### Dependencias de desarrollo:
-- @eslint/js v9.9.1
-- @types/react v18.3.5
-- @types/react-dom v18.3.0
-- @types/tabulator-tables v6.2.6
-- @vitejs/plugin-react v4.3.1
-- autoprefixer v10.4.16
-- eslint v9.9.1
-- eslint-plugin-react-hooks v5.1.0-rc.0
-- eslint-plugin-react-refresh v0.4.11
-- globals v15.9.0
-- postcss v8.4.31
-- tailwindcss v3.3.5
-- typescript v5.5.3
-- typescript-eslint v8.3.0
-- vite v5.4.2
-
-## Ejecución del proyecto
-
-### Frontend (React)
+### 1. Configuración del Backend
 ```bash
-# En la carpeta mi-proyecto/
-npm run dev
-```
+cd mi-proyecto-backend-fastapi
+python -m venv venv
+venv\Scripts\activate  # Windows
+pip install -r requirements.txt
 
-### Backend (FastAPI)
-```bash
-# En la carpeta mi-proyecto-backend-fastapi/
+# Configurar variables de entorno
+copy .env.example .env
+# Editar .env con tus API keys
+
+# Iniciar servidor
 python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### URLs de acceso
-- **Frontend:** http://localhost:5173
-- **Backend API:** http://localhost:8000
-- **Documentación API:** http://localhost:8000/docs
+### 2. Configuración del Frontend
+```bash
+cd mi-proyecto
+npm install
+npm run dev
+```
 
-## Notas adicionales
-- La carpeta `node_modules` ha sido excluida intencionalmente debido a su tamaño. Se recreará automáticamente al ejecutar `npm install`.
-- Si encuentras algún problema durante la instalación o ejecución, asegúrate de tener instaladas las versiones correctas de Node.js y npm.
+### 3. Acceso a la Aplicación
+- **Frontend**: http://localhost:5173
+- **API Documentation**: http://localhost:8000/docs
+- **Chat AI**: Navegar a la sección "AI Agent" en la aplicación
 
-## Funcionalidades Implementadas y Previstas
+## 📡 API Endpoints
 
-### Dashboard
-* [x] Visualización de rendimiento de portafolio
-* [x] Resumen de holdings totales
-* [x] Vista general del portafolio
-* [ ] Dashboard completamente interactivo y personalizable (mejoras continuas)
+| Endpoint | Método | Descripción |
+|----------|--------|-------------|
+| `/api/ai/chat` | POST | Chat con el agente IA |
+| `/api/ai/chat/upload` | POST | Chat con análisis de archivos |
+| `/api/ai/search-news` | POST | Búsqueda de noticias financieras |
+| `/api/ai/analyze-url` | POST | Análisis de sitios web |
+| `/api/ai/status` | GET | Estado del agente |
+| `/api/ai/health` | GET | Health check del sistema |
 
-### Reportes con IA
-* [x] Panel de control de IA
-* [x] Resumen de rendimiento
-* [x] Métricas avanzadas
-* [x] Gráficos predictivos
-* [x] Detección de anomalías
-* [x] Análisis detallado
-* [x] Simulaciones interactivas
-* [x] Adición de nuevos widgets de reporte
-* [x] Página de Agente IA con funcionalidad de chat
-* [ ] Generación automática de informes
+## 🔧 Tecnologías Utilizadas
 
-### Portafolio
-* [x] Carrusel de portafolio
-* [x] Tarjetas de acciones
-* [x] Mejoras en diseño y visualización del portafolio (gráficos interactivos, resumen mejorado, nuevos componentes de interfaz)
-* [ ] Herramientas de rebalanceo
-* [ ] Análisis de diversificación
+### Frontend
+- **React 18** con TypeScript
+- **Vite** como build tool
+- **Tailwind CSS** para estilos
+- **Lucide React** para iconos
 
-### Mercado
-* [x] Visualización de datos de mercado en tiempo real (con widgets de TradingView: gráfico avanzado, timeline, mapa de calor crypto)
-* [x] Análisis de tendencias de mercado (facilitado por widgets de TradingView)
-* [x] Centro de notificaciones y alertas (incluye alertas de mercado)
+### Backend  
+- **FastAPI** framework asíncrono
+- **SQLAlchemy 2.0** ORM
+- **Pydantic** validación de datos
+- **Google Gemini** modelos de IA
 
-### Características técnicas
-* [x] Página de perfil de usuario con datos y diseño mejorado
-* [x] Página de configuración de cuenta con funcionalidad y mejoras de interfaz
-* [x] Implementación de rutas de usuario y configuración de base de datos para gestión de perfiles y notificaciones
-* [x] Almacenamiento de datos de usuario (con configuración de base de datos)
-* [x] Implementación de base de datos para formularios
-* [x] Autenticación de usuarios (base implementada con gestión de perfiles)
-* [x] **MIGRACIÓN COMPLETA A FASTAPI** - Backend moderno con arquitectura asíncrona
-* [x] **API REST FUNCIONAL** - Endpoints de autenticación y gestión de usuarios
-* [x] **ELIMINACIÓN DE BACKEND LEGACY** - Código Node.js anterior removido
-* [ ] API para datos financieros (propia)
-* [x] Mejoras en la responsividad del diseño y estructura del código
+### Agente IA
+- **Horizon v3.0** agente financiero
+- **Google Search** herramientas de búsqueda
+- **Web Scraping** análisis de URLs
+- **Document Processing** análisis de archivos
 
-## Capturas de Pantalla
+## 📁 Estructura del Proyecto
 
-*(Se agregarán cuando el proyecto esté más avanzado)*
+```
+mi-proyecto/
+├── src/                          # Frontend React
+│   ├── components/              # Componentes reutilizables
+│   ├── pages/                   # Páginas principales
+│   │   └── AIAgentPage.tsx     # Página del chat IA
+│   ├── config/                 # Configuración
+│   │   └── api.ts             # Config de endpoints
+│   └── ...
+├── mi-proyecto-backend-fastapi/ # Backend FastAPI
+│   ├── api/                    # Routers de API
+│   │   └── ai_router.py       # Endpoints del agente IA
+│   ├── chat_agent/            # Servicio del agente Horizon
+│   │   └── agent_service.py   # Lógica principal del agente
+│   ├── models/                # Modelos Pydantic
+│   ├── auth/                  # Autenticación JWT
+│   └── main.py               # Aplicación principal
+└── README.md                 # Este archivo
+```
 
-## Contribuciones
+## 🤖 Capacidades del Agente Horizon
 
-Por el momento, al ser un proyecto académico individual, no se buscan contribuciones externas.
+- **Análisis Financiero**: Ratios, métricas y evaluación de activos
+- **Noticias de Mercado**: Búsqueda y análisis de información actualizada
+- **Procesamiento de Documentos**: Análisis de reportes y archivos financieros
+- **Predicciones**: Modelos de forecasting y análisis predictivo
+- **Educación Financiera**: Explicación de conceptos y términos
 
-## Licencia
+## 🔐 Variables de Entorno
 
-Este proyecto es parte de un trabajo académico del SENA y su uso está restringido a fines educativos.
+Crear archivo `.env` en `mi-proyecto-backend-fastapi/`:
+
+```env
+GOOGLE_API_KEY=tu_api_key_de_gemini
+SERPER_API_KEY=tu_api_key_de_serper  
+DATABASE_URL=sqlite:///./financial_agent.db
+SECRET_KEY=tu_secret_key_jwt
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+```
+
+## 🧪 Testing
+
+El sistema incluye una suite completa de tests de integración que verifica:
+- Conectividad backend-frontend
+- Funcionalidad de endpoints
+- Configuración CORS
+- Respuestas del agente IA
+
+## 🚀 Deployment
+
+### Desarrollo
+```bash
+# Terminal 1: Backend
+cd mi-proyecto-backend-fastapi
+python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+# Terminal 2: Frontend  
+cd mi-proyecto
+npm run dev
+```
+
+### Producción
+- Frontend: Build con `npm run build` y servir con nginx/Apache
+- Backend: Deploy con Docker o directamente con gunicorn/uvicorn
+- Base de datos: Migrar de SQLite a PostgreSQL para producción
+
+## 📚 Documentación Adicional
+
+- **API Docs**: http://localhost:8000/docs (Swagger UI)
+- **ReDoc**: http://localhost:8000/redoc
+- **Integración Completa**: Ver `INTEGRACION_COMPLETA.md`
+
+## 👨‍💻 Información del Desarrollador
+
+- **Autor**: Miguel Angel Murillo Frias
+- **Programa**: Análisis y Desarrollo de Software - SENA
+- **Ficha**: 2957794
+
+## 🤝 Contribución
+
+1. Fork del proyecto
+2. Crear rama de feature (`git checkout -b feature/AmazingFeature`)
+3. Commit cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abrir Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT - ver archivo [LICENSE](LICENSE) para detalles.
+
+## 📞 Soporte
+
+Si tienes preguntas o problemas:
+1. Revisa la documentación de API en `/docs`
+2. Verifica que ambos servicios estén ejecutándose
+3. Confirma las variables de entorno en `.env`
 
 ---
 
-*Este README se irá actualizando a medida que el proyecto avance.*
+**Desarrollado con ❤️ utilizando React, FastAPI y Google Gemini**

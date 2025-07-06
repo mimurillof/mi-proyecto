@@ -18,6 +18,7 @@ app = FastAPI(
 origins = [
     settings.CLIENT_ORIGIN,
     "http://localhost:3000",  # React dev server alternative
+    "http://localhost:5173",  # Vite dev server
     "http://127.0.0.1:5173",  # Vite dev server alternative
 ]
 

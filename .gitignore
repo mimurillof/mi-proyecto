@@ -41,3 +41,28 @@ lerna-debug.log*
 
 # Thumbs
 Thumbs.db
+
+# Python Backend
+mi-proyecto-backend-fastapi/__pycache__/
+mi-proyecto-backend-fastapi/.venv/
+mi-proyecto-backend-fastapi/venv/
+mi-proyecto-backend-fastapi/*.pyc
+mi-proyecto-backend-fastapi/*.pyo
+mi-proyecto-backend-fastapi/*.db
+mi-proyecto-backend-fastapi/.env
+
+# Test files (ya eliminados)
+test_*.py
+test_*.html
+test_*.txt
+
+# Archivos temporales
+*.tmp
+*.temp
+__azurite_*
+__blobstorage__/
+
+# Archivos de backup
+*.bak
+*.backup
+*.old

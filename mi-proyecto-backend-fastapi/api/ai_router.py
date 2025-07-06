@@ -133,7 +133,7 @@ async def health_check():
         horizon_agent = get_agent()
         
         return APIResponse(
-            status="success",
+            success=True,
             message="Agente operativo",
             data={
                 "status": "healthy",
@@ -147,7 +147,7 @@ async def health_check():
         return JSONResponse(
             status_code=503,
             content={
-                "status": "error",
+                "success": False,
                 "message": f"Error en agente: {str(e)}",
                 "data": None
             }
