@@ -1,22 +1,24 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .api import user_router, auth_router, ai_router
-from .config import settings
-from .database import engine
-from .db_models import models
-
-# Create the database tables
-models.Base.metadata.create_all(bind=engine)
+from api import user_router, auth_router, ai_router
+from config import settings
 
 app = FastAPI(
-    title="Mi Proyecto API",
-    description="Backend para la aplicación de finanzas con IA.",
-    version="0.1.0",
+    title=settings.PROJECT_NAME,
+    description="Backend para la aplicación de finanzas con IA - FastAPI Migration",
+    version="1.0.0",
+    openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
 
 # Configuración de CORS
 origins = [
     settings.CLIENT_ORIGIN,
+    "http://localhost:3000",  # React dev server alternative
+    "http://127.0.0.1:5173",  # Vite dev server alternative
 ]
 
 app.add_middleware(
@@ -27,10 +29,39 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/api/health")
+# Health check endpoint
+@app.get("/")
 async def root():
-    return {"status": "ok"}
+    return {
+        "message": "Mi Proyecto API - FastAPI Backend",
+        "status": "ok",
+        "version": "1.0.0"
+    }
 
-app.include_router(auth_router.router, tags=["Auth"], prefix="/api/auth")
-app.include_router(user_router.router, tags=["Users"], prefix="/api/users")
-app.include_router(ai_router.router, tags=["AI"], prefix="/api/ai") 
+@app.get(f"{settings.API_V1_STR}/health")
+async def health_check():
+    return {
+        "status": "healthy",
+        "environment": settings.ENVIRONMENT
+    }
+
+# Include routers
+app.include_router(
+    auth_router, 
+    tags=["Authentication"], 
+    prefix=f"{settings.API_V1_STR}/auth"
+)
+app.include_router(
+    user_router, 
+    tags=["Users"], 
+    prefix=f"{settings.API_V1_STR}/users"
+)
+app.include_router(
+    ai_router, 
+    tags=["AI"], 
+    prefix=f"{settings.API_V1_STR}/ai"
+)
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000) 

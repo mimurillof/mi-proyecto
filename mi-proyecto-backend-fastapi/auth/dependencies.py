@@ -1,25 +1,33 @@
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
-from ..config import settings
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from sqlalchemy.ext.asyncio import AsyncSession
+from database import get_db
+from crud.user_service import user_crud
+from auth.security import verify_token, create_credentials_exception
+from db_models.models import User
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+# OAuth2 scheme
+security = HTTPBearer()
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
-    # In a real app, you'd get the user from the DB here
-    # user = await get_user_from_db(username=username)
-    # if user is None:
-    #     raise credentials_exception
-    return {"username": username} # returning a dummy user 
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: AsyncSession = Depends(get_db)
+) -> User:
+    """Get current authenticated user"""
+    token = credentials.credentials
+    email = verify_token(token)
+    
+    if email is None:
+        raise create_credentials_exception()
+    
+    user = await user_crud.get_user_by_email(db, email=email)
+    if user is None:
+        raise create_credentials_exception()
+    
+    return user
+
+async def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
+    """Get current active user (placeholder for future is_active field)"""
+    # For now, all users are considered active
+    # In the future, you might want to check user.is_active
+    return current_user 

@@ -21,15 +21,20 @@ Actualmente, el proyecto se encuentra en sus fases iniciales de desarrollo.
 ## Tecnologías Utilizadas
 
 * **Frontend:** React 18, TypeScript
+* **Backend:** FastAPI, Python (migrado desde Node.js)
+* **Base de Datos:** PostgreSQL con SQLAlchemy 2.0
+* **Autenticación:** JWT con FastAPI Security
 * **Visualización de Datos:** Chart.js, React-Chartjs-2, Plotly.js
 * **UI/UX:** Material UI, FontAwesome, TailwindCSS
 * **Herramientas de Desarrollo:** Vite, ESLint
 * **Estilos:** CSS Modules, TailwindCSS
-* **Gestor de Paquetes:** npm
+* **Gestor de Paquetes:** npm (frontend), pip (backend)
 
 ## Estructura del Proyecto
 
 El proyecto tiene una estructura modular organizada por funcionalidades:
+* **Frontend (React/TypeScript):** `mi-proyecto/` - Aplicación React con Vite
+* **Backend (FastAPI/Python):** `mi-proyecto-backend-fastapi/` - API REST con autenticación JWT
 * **Dashboard:** Visualización principal con gráficos de rendimiento y resumen de cartera
 * **Reportes:** Análisis detallados con capacidades de IA, incluyendo nuevos widgets de reporte.
 * **Agente IA:** Página dedicada con funcionalidad de chat para asistencia inteligente.
@@ -95,20 +100,22 @@ Este comando instalará todas las siguientes dependencias:
 
 ## Ejecución del proyecto
 
-Para iniciar el servidor de desarrollo, ejecuta:
+### Frontend (React)
 ```bash
+# En la carpeta mi-proyecto/
 npm run dev
 ```
 
-Para compilar el proyecto para producción:
+### Backend (FastAPI)
 ```bash
-npm run build
+# En la carpeta mi-proyecto-backend-fastapi/
+python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Para previsualizar la versión de producción:
-```bash
-npm run preview
-```
+### URLs de acceso
+- **Frontend:** http://localhost:5173
+- **Backend API:** http://localhost:8000
+- **Documentación API:** http://localhost:8000/docs
 
 ## Notas adicionales
 - La carpeta `node_modules` ha sido excluida intencionalmente debido a su tamaño. Se recreará automáticamente al ejecutar `npm install`.
@@ -153,6 +160,9 @@ npm run preview
 * [x] Almacenamiento de datos de usuario (con configuración de base de datos)
 * [x] Implementación de base de datos para formularios
 * [x] Autenticación de usuarios (base implementada con gestión de perfiles)
+* [x] **MIGRACIÓN COMPLETA A FASTAPI** - Backend moderno con arquitectura asíncrona
+* [x] **API REST FUNCIONAL** - Endpoints de autenticación y gestión de usuarios
+* [x] **ELIMINACIÓN DE BACKEND LEGACY** - Código Node.js anterior removido
 * [ ] API para datos financieros (propia)
 * [x] Mejoras en la responsividad del diseño y estructura del código
 
