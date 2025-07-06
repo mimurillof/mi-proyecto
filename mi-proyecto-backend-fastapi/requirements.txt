@@ -9,4 +9,10 @@ python-multipart>=0.0.6
 asyncpg>=0.29.0
 alembic>=1.13.0
 python-dotenv>=1.0.0
-pydantic-settings>=2.1.0 
+pydantic-settings>=2.1.0
+# Dependencias para el agente financiero
+google-genai>=0.3.0
+google-generativeai>=0.8.0
+websockets>=12.0
+tenacity>=8.0.0
+typing-inspection>=0.4.0 
