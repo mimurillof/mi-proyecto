@@ -5,9 +5,7 @@ import {
   ArrowUpRight, Bell, Sun, Search, HelpCircle 
 } from 'lucide-react';
 
-// Stagewise imports for AI-powered editing
-import { StagewiseToolbar } from '@stagewise/toolbar-react';
-import { ReactPlugin } from '@stagewise-plugins/react';
+
 
 // Importaciones de iconos
 import iconoHome from './images/icons/home.svg';
@@ -85,13 +83,6 @@ function App() {
 
   return (
     <>
-      {/* Stagewise Toolbar for AI-powered editing in development */}
-      <StagewiseToolbar 
-        config={{
-          plugins: [ReactPlugin]
-        }}
-      />
-      
       <div className="flex h-screen bg-[#F5F7FB] text-white overflow-hidden">
         {/* Sidebar */}
         <aside className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-[#1a1d24] border-r border-gray-800 flex flex-col transition-all duration-300 ease-in-out overflow-y-auto`}>
