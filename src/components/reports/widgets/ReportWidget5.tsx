@@ -1,13 +1,13 @@
 import React from 'react';
 import ReportWidgetBase from './ReportWidgetBase';
-import AssetDetailTable from '../AssetDetailTable'; // Importa el nuevo componente
+import CorrelationAnalysis from '../analysis/CorrelationAndDrawdownAnalysis'; // Importar el componente de correlación
 
 const ReportWidget5: React.FC = () => {
   return (
-    // Ajustado className: eliminado flex/justify-center, mb-0 se mantiene. La altura puede necesitar ajuste.
-    <ReportWidgetBase widgetNumber={5} className="h-auto mb-0"> {/* Cambiado h-[500px] a h-auto para que se ajuste al contenido */}
-      {/* Renderiza el componente de la tabla de detalles de activos */}
-      <AssetDetailTable />
+    // Ajustado className para permitir que el contenido se ajuste completamente con altura mínima
+    <ReportWidgetBase widgetNumber={5} className="h-full flex flex-col min-h-[400px]"> 
+      {/* Renderiza el componente de análisis de correlación */}
+      <CorrelationAnalysis />
     </ReportWidgetBase>
   );
 };

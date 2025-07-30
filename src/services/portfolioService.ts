@@ -56,6 +56,11 @@ export interface Correlations {
     asset2: string;
     correlation: number;
   }>>;
+  summary: {
+    avg_correlation: number;
+    max_correlation: number;
+    min_correlation: number;
+  };
 }
 
 export interface PortfolioComposition {

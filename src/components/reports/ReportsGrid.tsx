@@ -6,6 +6,7 @@ import ReportWidget3 from './widgets/ReportWidget3';
 import ReportWidget4 from './widgets/ReportWidget4';
 import ReportWidget5 from './widgets/ReportWidget5';
 import ReportWidget6 from './widgets/ReportWidget6';
+import ReportWidget7 from './widgets/ReportWidget7';
 
 const ReportsGrid: React.FC = () => {
   return (
@@ -25,15 +26,19 @@ const ReportsGrid: React.FC = () => {
         </div>
       </div>
 
-      {/* Sección Inferior: Widgets 6 (izquierda) y 5 (derecha) */}
-      <div className="flex flex-row gap-2"> {/* Reducido el gap de 4 a 2 para acercar los widgets */}
-        {/* Columna Izquierda (Widget 6) - Reducido aún más, de 5/12 a 4/12 */}
+      {/* Sección Inferior: 3 widgets independientes - Donut, Correlación, Drawdown */}
+      <div className="flex flex-row gap-4 min-h-[500px]"> 
+        {/* Widget 6 - Composición del Portfolio (Donut cuadrado) */}
         <div className="w-4/12"> 
           <ReportWidget6 />
         </div>
-        {/* Columna Derecha (Widget 5) - Aumentado de 7/12 a 8/12 */}
-        <div className="w-8/12"> 
+        {/* Widget 5 - Matriz de Correlación */}
+        <div className="w-4/12"> 
           <ReportWidget5 />
+        </div>
+        {/* Widget 7 - Análisis de Drawdown (nuevo widget) */}
+        <div className="w-4/12"> 
+          <ReportWidget7 />
         </div>
       </div>
 

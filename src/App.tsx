@@ -10,7 +10,6 @@ import {
 // Importaciones de iconos
 import iconoHome from './images/icons/home.svg';
 import iconoDashboard from './images/icons/dashboard.svg';
-import iconoPortafolio from './images/icons/Portafolio.svg';
 import iconoReportes from './images/icons/Reportes.svg';
 import iconoCartera from './images/icons/Cartera.svg';
 import iconoMercado from './images/icons/Mercado.svg';
@@ -23,12 +22,10 @@ import iconoBarCollapse from './images/icons/Bar Collapse.svg';
 import SentimentCard from './components/SentimentCard';
 import DashboardGrid from './components/dashboard/DashboardGrid';
 import ReportsPage from './pages/ReportsPage'; // <-- Importar ReportsPage
-import PortfolioLayout from './components/portfolio/PortfolioLayout';
 import MarketPage from './pages/MarketPage'; // <-- Importar MarketPage
 import AIAgentPage from './pages/AIAgentPage'; // <-- Nueva importación
 import UserProfilePage from './pages/UserProfilePage/UserProfilePage'; // <-- Importar UserProfilePage
 import AccountSettingsPage from './pages/AccountSettingsPage/AccountSettingsPage'; // <-- Nueva importación
-import PortfolioPage from './pages/PortfolioPage'; // <-- Nueva importación para Portfolio Analyzer
 
 // Importar CSS de UserProfilePage
 import './pages/UserProfilePage/UserProfilePage.css';
@@ -173,19 +170,6 @@ function App() {
                 >
                   <img src={iconoAI} alt="AI Agent" className="w-5 h-5 flex-shrink-0" />
                   <span className={`font-medium transition-opacity duration-200 ${sidebarCollapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>AI Agent</span>
-                </a>
-              </li>
-
-              <li className={`list-none ${activeItem === 'portfolio-analyzer' ? 'active' : ''}`}>
-                <a 
-                  href="#" 
-                  onClick={() => handleMenuClick('portfolio-analyzer')}
-                  className={`flex items-center py-3 rounded-lg ${
-                    sidebarCollapsed ? 'justify-center w-full px-0' : 'space-x-3 px-3'
-                  } ${activeItem === 'portfolio-analyzer' ? 'text-white bg-gray-800' : 'text-gray-400 hover:bg-gray-800'}`}
-                >
-                  <img src={iconoPortafolio} alt="Portfolio Analyzer" className="w-5 h-5 flex-shrink-0" />
-                  <span className={`font-medium transition-opacity duration-200 ${sidebarCollapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>Portfolio Analyzer</span>
                 </a>
               </li>
             </nav>
@@ -390,20 +374,12 @@ function App() {
               <ReportsPage />
             )}
 
-            {activeItem === 'cartera' && (
-              <PortfolioLayout />
-            )}
-
             {activeItem === 'mercado' && (
               <MarketPage />
             )}
 
             {activeItem === 'ai' && ( // <-- Nueva condición para AI Agent
               <AIAgentPage />
-            )}
-
-            {activeItem === 'portfolio-analyzer' && ( // <-- Nueva condición para Portfolio Analyzer
-              <PortfolioPage />
             )}
 
             {activeItem === 'perfil' && ( // <-- Nueva condición para Perfil
@@ -420,7 +396,6 @@ function App() {
              activeItem !== 'cartera' &&
              activeItem !== 'mercado' &&
              activeItem !== 'ai' &&
-             activeItem !== 'portfolio-analyzer' &&
              activeItem !== 'perfil' && 
              activeItem !== 'configuracion' && // <-- Añadir 'configuracion' a la condición
              (

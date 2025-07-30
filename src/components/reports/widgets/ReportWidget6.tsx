@@ -4,8 +4,8 @@ import LivePortfolioCompositionChart from '../charts/LivePortfolioCompositionCha
 
 const ReportWidget6: React.FC = () => {
   return (
-    // Eliminar clases de ancho y alto fijos (w-[600px], h-[500px]) y shrink-0.
-    <ReportWidgetBase widgetNumber={6} className="flex flex-col overflow-hidden"> {/* Mantener flex para que el gráfico interno se ajuste */}
+    // Aumentar altura mínima para que el donut se vea más grande y equilibrado con el Widget 5
+    <ReportWidgetBase widgetNumber={6} className="flex flex-col overflow-hidden min-h-[550px]"> 
       <LivePortfolioCompositionChart />
     </ReportWidgetBase>
   );

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getChartUrl } from '../../../services/portfolioService';
+import ChartWithFullscreen from '../ChartWithFullscreen';
 
 const LivePortfolioChart: React.FC = () => {
     const [chartUrl, setChartUrl] = useState<string>('');
@@ -45,17 +46,18 @@ const LivePortfolioChart: React.FC = () => {
     }
 
     return (
-        <div className="w-full h-full">
-            <iframe
-                src={chartUrl}
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                title="Gráfico de Rendimiento Acumulado"
-                className="rounded-lg"
-                style={{ minHeight: '400px' }}
-            />
-        </div>
+        <ChartWithFullscreen
+            chartUrl={chartUrl}
+            title="Rendimiento Acumulado del Portafolio"
+            height="100%"
+            className="w-full h-full"
+            additionalInfo={
+                <div className="text-sm text-gray-600">
+                    <p>Este gráfico muestra la evolución del rendimiento acumulado del portafolio a lo largo del tiempo.</p>
+                    <p className="mt-1">Los datos se actualizan automáticamente cada 5 minutos.</p>
+                </div>
+            }
+        />
     );
 };
 
