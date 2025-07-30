@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { metricsData } from '../../../data/investmentMetrics';
+import { fetchLiveMetrics, type LiveMetricsResponse } from '../../../services/portfolioService';
 import MetricCard from './MetricCard';
 import './metrics.css'; // Importar los estilos CSS
 
@@ -7,6 +7,90 @@ const InvestmentMetricsCarousel: React.FC = () => {
     const [startIndex, setStartIndex] = useState(0);
     const [cardsToShow, setCardsToShow] = useState(5); // Valor inicial para desktop
     const containerRef = useRef<HTMLDivElement>(null);
+    const [liveMetrics, setLiveMetrics] = useState<LiveMetricsResponse | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // Hook para cargar métricas dinámicas del Portfolio Analyzer
+    useEffect(() => {
+        const loadLiveMetrics = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const data = await fetchLiveMetrics();
+                setLiveMetrics(data);
+            } catch (err) {
+                console.error('Error cargando métricas:', err);
+                setError('Error al cargar las métricas del portfolio');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadLiveMetrics();
+        
+        // Actualizar cada 5 minutos
+        const interval = setInterval(loadLiveMetrics, 5 * 60 * 1000);
+        return () => clearInterval(interval);
+    }, []);
+
+    // Convertir los datos del Portfolio Analyzer al formato esperado por MetricCard
+    const metricsData = liveMetrics ? [
+        { 
+            id: 1, 
+            name: 'Rendimiento Anualizado', 
+            value: `${liveMetrics.performance_metrics.annualized_return.toFixed(2)}%`, 
+            change: { direction: 'up' as const, value: `+${(liveMetrics.performance_metrics.annualized_return / 12).toFixed(1)}%` } 
+        },
+        { 
+            id: 2, 
+            name: 'Volatilidad Anualizada', 
+            value: `${liveMetrics.performance_metrics.annualized_volatility.toFixed(2)}%`, 
+            change: { direction: 'neutral' as const, value: '-' } 
+        },
+        { 
+            id: 3, 
+            name: 'Ratio de Sharpe', 
+            value: liveMetrics.performance_metrics.sharpe_ratio.toFixed(2), 
+            change: { direction: liveMetrics.performance_metrics.sharpe_ratio > 1 ? 'up' as const : 'down' as const, value: liveMetrics.performance_metrics.sharpe_ratio > 1 ? '+0.1' : '-0.1' } 
+        },
+        { 
+            id: 4, 
+            name: 'Máximo Drawdown', 
+            value: `${liveMetrics.performance_metrics.max_drawdown.toFixed(2)}%`, 
+            change: { direction: 'down' as const, value: `${(liveMetrics.performance_metrics.max_drawdown / 10).toFixed(1)}%` } 
+        },
+        { 
+            id: 5, 
+            name: 'Ratio de Sortino', 
+            value: liveMetrics.performance_metrics.sortino_ratio.toFixed(2), 
+            change: { direction: liveMetrics.performance_metrics.sortino_ratio > 1 ? 'up' as const : 'neutral' as const, value: liveMetrics.performance_metrics.sortino_ratio > 1 ? '+0.05' : '-' } 
+        },
+        { 
+            id: 6, 
+            name: 'Ratio de Calmar', 
+            value: liveMetrics.performance_metrics.calmar_ratio.toFixed(2), 
+            change: { direction: 'neutral' as const, value: '-' } 
+        },
+        { 
+            id: 7, 
+            name: 'VaR Diario', 
+            value: `${liveMetrics.performance_metrics.var_daily.toFixed(2)}%`, 
+            change: { direction: 'down' as const, value: `${(liveMetrics.performance_metrics.var_daily / 5).toFixed(2)}%` } 
+        },
+        { 
+            id: 8, 
+            name: 'Asimetría (Skewness)', 
+            value: liveMetrics.performance_metrics.skewness.toFixed(2), 
+            change: { direction: 'neutral' as const, value: '-' } 
+        },
+        { 
+            id: 9, 
+            name: 'Curtosis (Kurtosis)', 
+            value: liveMetrics.performance_metrics.kurtosis.toFixed(2), 
+            change: { direction: 'neutral' as const, value: '-' } 
+        },
+    ] : [];
 
     // Ajustar dinámicamente cardsToShow basado en el ancho del contenedor
     useEffect(() => {
@@ -47,6 +131,31 @@ const InvestmentMetricsCarousel: React.FC = () => {
     const cardWidthRem = 14;
     const gapRem = 1;
     const totalShiftRem = cardWidthRem + gapRem;
+
+    // Mostrar estados de carga y error
+    if (loading) {
+        return (
+            <div ref={containerRef} className="relative w-full flex items-center justify-center">
+                <div className="text-gray-500">Cargando métricas del portfolio...</div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div ref={containerRef} className="relative w-full flex items-center justify-center">
+                <div className="text-red-500">{error}</div>
+            </div>
+        );
+    }
+
+    if (metricsData.length === 0) {
+        return (
+            <div ref={containerRef} className="relative w-full flex items-center justify-center">
+                <div className="text-gray-500">No hay métricas disponibles</div>
+            </div>
+        );
+    }
 
     return (
         <div ref={containerRef} className="relative w-full"> {/* Añadir ref y w-full */}
