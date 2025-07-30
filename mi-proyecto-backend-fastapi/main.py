@@ -5,6 +5,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api import user_router, auth_router, ai_router
+from api.portfolio_router import router as portfolio_router
 from config import settings
 
 app = FastAPI(
@@ -61,6 +62,11 @@ app.include_router(
     ai_router, 
     tags=["AI"], 
     prefix=f"{settings.API_V1_STR}/ai"
+)
+app.include_router(
+    portfolio_router, 
+    tags=["Portfolio"], 
+    prefix=""  # Ya incluye el prefijo /api/portfolio en el router
 )
 
 if __name__ == "__main__":
