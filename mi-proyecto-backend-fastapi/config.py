@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     # AI Settings
     GOOGLE_API_KEY: Optional[str] = None
     GEMINI_API_KEY: Optional[str] = None
+    SERPER_API_KEY: Optional[str] = None
 
     class Config:
         env_file = ".env"
