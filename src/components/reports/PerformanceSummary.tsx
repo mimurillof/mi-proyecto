@@ -1,111 +1,57 @@
-import React from 'react';
-import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-
-// Registrar los componentes necesarios de Chart.js
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { getApiUrl } from '../../config/api';
 
 const PerformanceSummary: React.FC = () => {
-  const chartData = {
-    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-    datasets: [
-      {
-        label: 'Valor del Portafolio (€)',
-        data: [10000, 10200, 10150, 10500, 10450, 10700, 10800, 10750, 11000, 10900, 11200, 11300],
-        borderColor: 'rgb(59, 130, 246)', // Azul más acorde con tema claro
-        backgroundColor: 'rgba(59, 130, 246, 0.5)',
-        tension: 0.1,
-        fill: false,
-      },
-      {
-        label: 'Benchmark (MSCI World)',
-        data: [10000, 10100, 10200, 10350, 10500, 10600, 10750, 10900, 10950, 11100, 11150, 11400],
-        borderColor: 'rgb(239, 68, 68)', // Rojo más acorde
-        backgroundColor: 'rgba(239, 68, 68, 0.5)',
-        tension: 0.1,
-        borderDash: [5, 5],
-        fill: false,
-      },
-    ],
-  };
+  const iframeSrc = getApiUrl('/api/analizer/file/portfolio_growth_interactive.html');
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false, // Importante para que el gráfico llene el contenedor
-    scales: {
-      y: {
-        beginAtZero: false,
-        ticks: {
-          callback: function (value: number | string) {
-            // Asegurarse de que value es número antes de llamar a toLocaleString
-            if (typeof value === 'number') {
-              return '€' + value.toLocaleString('es-ES');
-            }
-            return value;
-          },
-          color: '#374151', // Color de texto gris oscuro para ejes
-        },
-        grid: {
-            color: '#e5e7eb', // Color de la cuadrícula gris claro
-        },
-      },
-      x: {
-          ticks: {
-              color: '#374151', // Color de texto gris oscuro para ejes
-          },
-          grid: {
-              color: '#e5e7eb', // Color de la cuadrícula gris claro
-          },
-      }
-    },
-    plugins: {
-      legend: {
-          labels: {
-              color: '#1f2937', // Color de texto para la leyenda
-          }
-      },
-      tooltip: {
-        mode: 'index' as const, // Tipo correcto para mode
-        intersect: false,
-        titleColor: '#ffffff', // Color del título en tooltip
-        bodyColor: '#ffffff', // Color del cuerpo en tooltip
-        backgroundColor: 'rgba(0, 0, 0, 0.7)', // Fondo del tooltip
-      },
-      title: {
-        display: false, // El título se maneja fuera
-      },
-    },
-    hover: {
-      mode: 'nearest' as const, // Tipo correcto para mode
-      intersect: true,
-    },
-  };
+  // Dimensiones nativas del HTML (definidas en el script): 1000x600
+  const BASE_WIDTH = 1000;
+  const BASE_HEIGHT = 600;
+  const chartContainerRef = useRef<HTMLDivElement | null>(null);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const el = chartContainerRef.current;
+    if (!el) return;
+
+    const updateScale = () => {
+      const availableWidth = el.clientWidth;
+      const newScale = Math.max(0.5, Math.min(1, availableWidth / BASE_WIDTH));
+      setScale(newScale);
+    };
+
+    updateScale();
+    const ro = new ResizeObserver(updateScale);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const scaledHeight = useMemo(() => Math.round(BASE_HEIGHT * scale), [scale]);
 
   return (
     // Contenedor principal adaptado para tema claro y dimensiones
-    <div className="w-full h-full bg-white p-4 rounded-lg flex flex-col md:flex-row gap-4">
+    <div className="w-full h-full bg-white p-4 rounded-lg flex flex-col md:flex-row gap-4 min-h-[560px]">
       {/* Área del Gráfico */}
       <div className="md:w-3/5 h-full flex flex-col">
-        <h2 className="text-lg font-semibold mb-2 text-gray-800">Evolución del Portafolio</h2>
-        <div className="relative flex-grow"> {/* flex-grow para que ocupe el espacio restante */}
-          <Line options={chartOptions} data={chartData} />
+        {/* Título accesible sin ocupar espacio visual */}
+        <h2 className="sr-only">Evolución del Portafolio</h2>
+        <div ref={chartContainerRef} className="relative w-full overflow-hidden rounded-md border border-gray-100" style={{ height: scaledHeight }}>
+          <div
+            style={{
+              width: BASE_WIDTH,
+              height: BASE_HEIGHT,
+              transform: `scale(${scale})`,
+              transformOrigin: 'top left',
+            }}
+          >
+            <iframe
+              src={iframeSrc}
+              title="Evolución del Portafolio (Interactivo)"
+              className="border-0 block"
+              scrolling="no"
+              style={{ width: BASE_WIDTH, height: BASE_HEIGHT, overflow: 'hidden' }}
+            />
+          </div>
         </div>
       </div>
 
