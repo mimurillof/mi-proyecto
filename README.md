@@ -1,53 +1,45 @@
-# 🚀 Mi Proyecto - Financial AI Platform
+# 🚀 Mi Proyecto Frontend - Financial AI Platform
 
-Una plataforma de análisis financiero moderna con IA, desarrollada con React + TypeScript (frontend) y FastAPI + Python (backend), integrada con el agente financiero Horizon v3.0.
+Una plataforma frontend moderna para análisis financiero con IA, desarrollada con React + TypeScript. Este proyecto se conecta con un backend FastAPI independiente para proporcionar funcionalidades avanzadas de análisis financiero.
 
 ## 🌟 Características Principales
 
-- **🤖 Agente IA Financiero**: Horizon v3.0 con capacidades avanzadas de análisis
+- **🤖 Interfaz para Agente IA**: Comunicación con Horizon v3.0 
 - **📊 Dashboard Interactivo**: Visualización de datos financieros en tiempo real
-- **💬 Chat Inteligente**: Interacción natural con el agente de IA
-- **📈 Análisis de Mercado**: Noticias, predicciones y análisis de tendencias
-- **📄 Procesamiento de Documentos**: Análisis de reportes financieros
-- **🔍 Búsqueda Web**: Información financiera actualizada en tiempo real
+- **💬 Chat Interface**: Interfaz para el chat con agente de IA
+- **📈 Análisis de Mercado**: Visualización de noticias, predicciones y tendencias
+- **📄 Vista de Documentos**: Interfaz para análisis de reportes financieros
+- **🔍 Componentes de Búsqueda**: Interfaz para información financiera en tiempo real
 
 ## 🏗️ Arquitectura
 
 ```
-┌─────────────────┐    REST API     ┌──────────────────┐    Gemini API    ┌─────────────────┐
-│   React Client  │ ←─────────────→ │  FastAPI Backend │ ←───────────────→ │   Google AI     │
-│  (Port 5173)    │                 │   (Port 8000)    │                  │    Service      │
-└─────────────────┘                 └──────────────────┘                  └─────────────────┘
+┌─────────────────┐    REST API     ┌──────────────────┐
+│   React Client  │ ←─────────────→ │  FastAPI Backend │
+│  (Port 5173+)   │                 │   (Port 8000)    │
+│                 │                 │  (Repo separado) │
+└─────────────────┘                 └──────────────────┘
 ```
 
 ## 🚀 Inicio Rápido
 
 ### Prerequisitos
-- Node.js 18+ 
-- Python 3.11+
-- API Key de Google Gemini
+- Node.js 18+
+- Backend FastAPI corriendo (repositorio separado)
 
-### 1. Configuración del Backend
+### Configuración del Frontend
 ```bash
-cd mi-proyecto-backend-fastapi
-python -m venv venv
-venv\Scripts\activate  # Windows
-pip install -r requirements.txt
-
-# Configurar variables de entorno
-copy .env.example .env
-# Editar .env con tus API keys
-
-# Iniciar servidor
-python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-### 2. Configuración del Frontend
-```bash
+git clone [tu-repo-frontend]
 cd mi-proyecto
 npm install
 npm run dev
 ```
+
+### Backend Requerido
+El frontend requiere que el backend FastAPI esté corriendo. El backend está en un repositorio separado:
+- Repositorio Backend: `mi-proyecto-backend`
+- Puerto por defecto: `http://localhost:8000`
+- Documentación API: `http://localhost:8000/docs`
 
 ### 3. Acceso a la Aplicación
 - **Frontend**: http://localhost:5173
@@ -72,40 +64,46 @@ npm run dev
 - **Vite** como build tool
 - **Tailwind CSS** para estilos
 - **Lucide React** para iconos
+- **Chart.js** para gráficos
+- **Date-fns** para manejo de fechas
 
-### Backend  
+### Backend (Repositorio Separado)
 - **FastAPI** framework asíncrono
 - **SQLAlchemy 2.0** ORM
 - **Pydantic** validación de datos
 - **Google Gemini** modelos de IA
 
-### Agente IA
+### Agente IA (En Backend)
 - **Horizon v3.0** agente financiero
 - **Google Search** herramientas de búsqueda
 - **Web Scraping** análisis de URLs
 - **Document Processing** análisis de archivos
 
-## 📁 Estructura del Proyecto
+## 📁 Estructura del Proyecto Frontend
 
 ```
 mi-proyecto/
 ├── src/                          # Frontend React
 │   ├── components/              # Componentes reutilizables
+│   │   ├── dashboard/          # Componentes del dashboard
+│   │   ├── market/             # Componentes de mercado
+│   │   └── reports/            # Componentes de reportes
 │   ├── pages/                   # Páginas principales
-│   │   └── AIAgentPage.tsx     # Página del chat IA
+│   │   ├── AIAgentPage.tsx     # Página del chat IA
+│   │   ├── MarketPage.tsx      # Página de mercado
+│   │   └── ReportsPage.tsx     # Página de reportes
+│   ├── services/               # Servicios para API calls
 │   ├── config/                 # Configuración
 │   │   └── api.ts             # Config de endpoints
-│   └── ...
-├── mi-proyecto-backend-fastapi/ # Backend FastAPI
-│   ├── api/                    # Routers de API
-│   │   └── ai_router.py       # Endpoints del agente IA
-│   ├── chat_agent/            # Servicio del agente Horizon
-│   │   └── agent_service.py   # Lógica principal del agente
-│   ├── models/                # Modelos Pydantic
-│   ├── auth/                  # Autenticación JWT
-│   └── main.py               # Aplicación principal
+│   └── data/                  # Datos mock y constantes
+├── public/                     # Archivos estáticos
 └── README.md                 # Este archivo
 ```
+
+## 🔗 Repositorios Relacionados
+
+- **Frontend**: `mi-proyecto` (este repositorio)
+- **Backend**: `mi-proyecto-backend` (repositorio separado)
 
 ## 🤖 Capacidades del Agente Horizon
 
