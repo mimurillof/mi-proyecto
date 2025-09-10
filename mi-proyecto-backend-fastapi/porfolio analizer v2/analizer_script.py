@@ -1,4 +1,6 @@
 # %%
+import os
+import sys
 import yfinance as yf
 import pandas as pd
 import numpy as np
@@ -7,30 +9,37 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from scipy.optimize import minimize
 import json
-import os
 from datetime import datetime
 from IPython import get_ipython
 from IPython.display import Markdown
 import streamlit as st
 
+# Habilitar import del proveedor de datos ubicado en la raíz del proyecto
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+# Definir el directorio donde se encuentra este script para guardar archivos
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+from client_data_provider import (
+    get_client_portfolio,
+    fetch_portfolio_market_data,
+)
 
 # ==============================================================================
 # 1. COLECCIÓN Y PREPARACIÓN DE DATOS
 # ==============================================================================
 
-# Lista de tickers
-tickers = ["NVDA", "GOOG", "GOOGL", "AAPL", "TLT", "IEF", "MBB", "BTC-USD", "ETH-USD", "PAXG-USD"]
+# Portafolio del cliente (placeholder a BD comentado dentro del proveedor)
+portfolio_cfg = get_client_portfolio(client_id=None)
+tickers = portfolio_cfg["tickers"]
+default_weights = portfolio_cfg["weights"]
 
-# Descargar datos históricos
-data = yf.download(tickers, period="5y") # Descargar 5 años de datos
-
-# Eliminar filas con valores NaN
-data_cleaned = data.dropna()
-
-# Mostrar la forma del dataframe antes y después de la limpieza
-print("--- 1. Preparación de Datos ---")
-print(f"Forma del dataframe original: {data.shape}")
-print(f"Forma del dataframe después de eliminar NaNs: {data_cleaned.shape}\n")
+# Descargar datos históricos via proveedor (unifica con Portfolio_analizer)
+print("--- 1. Preparación de Datos (Proveedor) ---")
+prices_df, daily_returns = fetch_portfolio_market_data(tickers, period="5y")
+print(f"Días descargados: {len(prices_df)} | Activos: {len(tickers)}\n")
 
 
 # ==============================================================================
@@ -42,20 +51,15 @@ print(f"Forma del dataframe después de eliminar NaNs: {data_cleaned.shape}\n")
 # Calculate the daily returns for each asset in the `data_cleaned` DataFrame.
 #
 # Select the 'Close' price data
-close_prices = data_cleaned['Close']
-
-# Calculate the daily percentage change
-daily_returns = close_prices.pct_change()
+close_prices = prices_df
 
 
 # ## Calculate portfolio returns
 # ### Subtask:
 # Calculate the daily returns for a hypothetical portfolio based on the individual asset returns. This will require defining portfolio weights.
 #
-# Define portfolio weights (equal weights in this example)
-num_assets = daily_returns.shape[1]
-weights = [1.0 / num_assets] * num_assets
-portfolio_weights = pd.Series(weights, index=daily_returns.columns)
+# Define portfolio weights (desde proveedor; equal-weight por defecto)
+portfolio_weights = pd.Series(default_weights).reindex(daily_returns.columns).fillna(0)
 
 # Calculate the weighted daily returns
 weighted_daily_returns = daily_returns * portfolio_weights
@@ -356,13 +360,9 @@ print("\n")
 # ### Subtask:
 # Calculate the weights for the Equal-Weighted (EW) portfolio.
 #
-# Determine the number of assets
+# Equal-Weighted (EW) para comparación
 num_assets = daily_returns.shape[1]
-
-# Calculate the weight for each asset
 equal_weight = 1.0 / num_assets
-
-# Create a pandas Series for the equal weights
 ew_weights = pd.Series(equal_weight, index=daily_returns.columns)
 
 print("Pesos del Portafolio de Ponderación Equitativa (EW):")
@@ -425,20 +425,8 @@ print("\n")
 # Take client's dollar-value investments, calculate the total portfolio value, and convert them into percentage weights for analysis.
 #
 # --- ENTRADA DEL CLIENTE (VALORES EN DÓLARES) ---
-# Modifica este diccionario con los montos en dólares que el cliente tiene invertidos en cada activo.
-# Los tickers deben coincidir con los que se están analizando.
-
-valores_en_dolares_cliente = {
-    "NVDA": 300,
-    "GOOGL": 225,
-    "AAPL": 225,
-    "BTC-USD": 300,
-    "ETH-USD": 300,
-    "PAXG-USD": 75,
-    "TLT": 75,
-    # "IEF" y "MBB" no están en el portafolio del cliente, por lo que se omiten.
-    # El peso de "GOOG" es cero.
-}
+# Placeholder: si existiera BD, estos valores vendrían del perfil del cliente.
+valores_en_dolares_cliente = {t: 1.0 for t in tickers}  # equiponderado por defecto
 
 # --- CÁLCULO AUTOMÁTICO DE PESOS ---
 
@@ -679,10 +667,10 @@ print("\n🎯 Mostrando Frontera Eficiente Interactiva...")
 fig_ef.show()
 
 # Guardar gráficos en archivos
-fig_growth.write_html("portfolio_growth_interactive.html")
-fig_ef.write_html("efficient_frontier_interactive.html")
-fig_growth.write_image("portfolio_growth.png", width=1000, height=600)
-fig_ef.write_image("efficient_frontier.png", width=1100, height=700)
+fig_growth.write_html(os.path.join(SCRIPT_DIR, "portfolio_growth_interactive.html"))
+fig_ef.write_html(os.path.join(SCRIPT_DIR, "efficient_frontier_interactive.html"))
+fig_growth.write_image(os.path.join(SCRIPT_DIR, "portfolio_growth.png"), width=1000, height=600)
+fig_ef.write_image(os.path.join(SCRIPT_DIR, "efficient_frontier.png"), width=1100, height=700)
 
 print("\n✅ Creación del Dashboard Completa!")
 print("=" * 60)
@@ -773,14 +761,14 @@ def run_simulation_streamlit(n_scenarios, mu, sigma):
     )
     
     try:
-        fig_trajectories.write_image('monte_carlo_trajectories.png', width=1000, height=600, scale=2)
-        fig_histogram.write_image('monte_carlo_distribution.png', width=900, height=500, scale=2)
+        fig_trajectories.write_image(os.path.join(SCRIPT_DIR, 'monte_carlo_trajectories.png'), width=1000, height=600, scale=2)
+        fig_histogram.write_image(os.path.join(SCRIPT_DIR, 'monte_carlo_distribution.png'), width=900, height=500, scale=2)
         print("\n💾 Imágenes de alta resolución de Monte Carlo exportadas.")
     except Exception as e:
         print(f"\n⚠️ Falló la exportación de Monte Carlo a PNG: {e}")
 
-    fig_trajectories.write_html('monte_carlo_trajectories.html')
-    fig_histogram.write_html('monte_carlo_distribution.html')
+    fig_trajectories.write_html(os.path.join(SCRIPT_DIR, 'monte_carlo_trajectories.html'))
+    fig_histogram.write_html(os.path.join(SCRIPT_DIR, 'monte_carlo_distribution.html'))
     
     fig_trajectories.show()
     fig_histogram.show()
@@ -910,9 +898,9 @@ def generar_treemap_original():
 
         # 10. EXPORTAR GRÁFICOS
         try:
-            fig.write_image('msr_portfolio_treemap_original.png', width=1000, height=600, scale=2)
+            fig.write_image(os.path.join(SCRIPT_DIR, 'msr_portfolio_treemap_original.png'), width=1000, height=600, scale=2)
             print("\n💾 Imagen de alta resolución exportada: msr_portfolio_treemap_original.png")
-            fig.write_html('msr_portfolio_treemap_original.html')
+            fig.write_html(os.path.join(SCRIPT_DIR, 'msr_portfolio_treemap_original.html'))
             print("📱 Archivo HTML interactivo guardado: msr_portfolio_treemap_original.html")
         except Exception as e:
             print(f"\n⚠️ Falló la exportación a PNG o HTML: {e}")
@@ -948,7 +936,7 @@ def generar_informe_financiero_completo():
     reporte_md += f"**Fecha de Generación:** {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
     reporte_md += "## 📊 1. Resumen de Datos y Activos\n\n"
     reporte_md += f"* **Activos:** `{', '.join(tickers)}`\n"
-    reporte_md += f"* **Período:** `{data_cleaned.index.min().strftime('%Y-%m-%d')}` a `{data_cleaned.index.max().strftime('%Y-%m-%d')}`\n"
+    reporte_md += f"* **Período:** `{prices_df.index.min().strftime('%Y-%m-%d')}` a `{prices_df.index.max().strftime('%Y-%m-%d')}`\n"
     
     metricas_activos = pd.DataFrame({
         "Retorno Anualizado": expected_returns,
@@ -977,7 +965,7 @@ def generar_informe_financiero_completo():
     reporte_md += f"* **Riqueza Terminal Mediana:** `${sim_params['median_terminal_wealth']:,.2f}`\n"
     reporte_md += f"* **Rango (5%-95%):** `${sim_params['percentile_5']:,.2f}` - `${sim_params['percentile_95']:,.2f}`\n"
 
-    nombre_archivo = "reporte_financiero_exhaustivo.md"
+    nombre_archivo = os.path.join(SCRIPT_DIR, "reporte_financiero_exhaustivo.md")
     try:
         with open(nombre_archivo, "w", encoding="utf-8") as f:
             f.write(reporte_md)
@@ -1015,7 +1003,7 @@ def capture_portfolio_analysis():
 
 print("\n--- Exportando resultados a JSON ---")
 results_json = capture_portfolio_analysis()
-output_filename = 'portfolio_analysis_results.json'
+output_filename = os.path.join(SCRIPT_DIR, 'portfolio_analysis_results.json')
 with open(output_filename, 'w', encoding='utf-8') as f:
     json.dump(results_json, f, indent=2, ensure_ascii=False)
 print(f"✅ Resultados guardados en: '{output_filename}'")

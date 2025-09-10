@@ -37,7 +37,13 @@ from src.portfolio_metrics import generate_complete_analysis, calculate_portfoli
 from src.data_manager import fetch_portfolio_data, calculate_returns, get_current_asset_info
 from src.api_responses import format_for_fastapi
 from src.asset_classifier import AssetClassifier, classify_and_visualize_portfolio
-from nuevo_portafolio_webapp import get_diversified_portfolio_config, analyze_diversified_portfolio_for_webapp
+# Integración del proveedor de datos centralizado (ubicado en la raíz)
+import sys
+ROOT_DIR = str(Path(__file__).resolve().parent)
+PROJECT_ROOT = str(Path(__file__).resolve().parent.parent)
+if PROJECT_ROOT not in sys.path:
+    sys.path.append(PROJECT_ROOT)
+from client_data_provider import get_client_portfolio, fetch_portfolio_market_data
 
 # TODO: Importar dependencias de base de datos cuando estén implementadas
 # from database.config import get_database_connection
@@ -153,25 +159,53 @@ async def analyze_default_portfolio():
     try:
         print("🚀 Iniciando análisis del portafolio por defecto...")
         
-        # Ejecutar análisis del portafolio diversificado
-        results = analyze_diversified_portfolio_for_webapp()
-        
-        if results["success"]:
-            return JSONResponse(
-                content={
-                    "status": "success",
-                    "message": "Análisis completado exitosamente",
-                    "data": results["api_response"],
-                    "generated_files": list(results["output_files"].keys()),
-                    "analysis_timestamp": datetime.now().isoformat()
-                },
-                status_code=200
-            )
-        else:
-            raise HTTPException(
-                status_code=500, 
-                detail=f"Error en el análisis: {results.get('error', 'Error desconocido')}"
-            )
+        # Obtener portafolio por defecto del proveedor (equiponderado)
+        cfg = get_client_portfolio(client_id=None)
+        tickers = cfg["tickers"]
+        weights = cfg["weights"]
+
+        # Descargar datos y retornos con el proveedor
+        prices_df, asset_returns = fetch_portfolio_market_data(tickers, period="5y")
+        if prices_df.empty:
+            raise HTTPException(status_code=500, detail="No se pudieron descargar datos del portafolio por defecto")
+
+        # Calcular retornos del portafolio
+        weights_array = [weights[t] for t in tickers]
+        portfolio_returns = calculate_portfolio_returns(asset_returns, weights_array)
+
+        # Ejecutar análisis completo y respuesta API
+        output_files = generate_complete_analysis(
+            portfolio_returns=portfolio_returns,
+            asset_returns=asset_returns,
+            portfolio_weights=weights,
+            risk_free_rate=0.02,
+            output_dir="outputs",
+            generate_api_response=True
+        )
+
+        from src.portfolio_metrics import generate_performance_summary, find_optimal_portfolios
+        performance_metrics = generate_performance_summary(portfolio_returns, 0.02)
+        optimal_portfolios = find_optimal_portfolios(asset_returns, 0.02)
+
+        api_response = format_for_fastapi(
+            portfolio_returns=portfolio_returns,
+            asset_returns=asset_returns,
+            portfolio_weights=weights,
+            metrics=performance_metrics,
+            optimized_portfolios=optimal_portfolios,
+            output_dir="outputs"
+        )
+
+        return JSONResponse(
+            content={
+                "status": "success",
+                "message": "Análisis completado exitosamente",
+                "data": api_response,
+                "generated_files": list(output_files.keys()),
+                "analysis_timestamp": datetime.now().isoformat(),
+            },
+            status_code=200,
+        )
             
     except Exception as e:
         print(f"❌ Error en endpoint de análisis: {e}")
@@ -205,22 +239,15 @@ async def analyze_custom_portfolio(request: PortfolioAnalysisRequest):
         end_date = request.end_date or datetime.now().strftime('%Y-%m-%d')
         start_date = request.start_date or (datetime.now() - timedelta(days=730)).strftime('%Y-%m-%d')
         
-        # Descargar datos
+        # Descargar datos (proveedor central)
         print(f"📊 Descargando datos del {start_date} al {end_date}...")
-        asset_data = fetch_portfolio_data(
-            tickers=request.tickers,
-            start_date=start_date,
-            end_date=end_date
-        )
-        
-        if asset_data.empty:
+        prices_df, asset_returns = fetch_portfolio_market_data(request.tickers, start_date=start_date, end_date=end_date)
+
+        if prices_df.empty or asset_returns.empty:
             raise HTTPException(
                 status_code=404,
                 detail="No se pudieron obtener datos para los tickers especificados"
             )
-        
-        # Calcular retornos
-        asset_returns = calculate_returns(asset_data)
         
         # Calcular retornos del portafolio
         weights_array = [request.weights[ticker] for ticker in request.tickers]
@@ -275,12 +302,12 @@ async def get_portfolio_config():
     Obtiene la configuración del portafolio por defecto
     """
     try:
-        config = get_diversified_portfolio_config()
+        cfg = get_client_portfolio(client_id=None)
         return JSONResponse(
             content={
                 "status": "success",
-                "config": config,
-                "description": "Configuración del portafolio diversificado por defecto",
+                "config": cfg,
+                "description": "Configuración del portafolio por defecto (proveedor central)",
                 "last_updated": datetime.now().isoformat()
             }
         )
@@ -407,28 +434,16 @@ async def get_classification_example():
         JSONResponse: Ejemplo de clasificación sin generar gráficos
     """
     try:
-        # Portafolio de ejemplo diversificado
-        example_request = AssetClassificationRequest(
-            tickers=["AAPL", "MSFT", "SPY", "BTC-USD", "GLD", "TLT", "VNQ", "AMZN"],
-            weights={
-                "AAPL": 0.15,    # Tech individual
-                "MSFT": 0.10,    # Tech individual  
-                "AMZN": 0.10,    # Tech individual
-                "SPY": 0.25,     # ETF S&P 500
-                "BTC-USD": 0.05, # Criptomoneda
-                "GLD": 0.10,     # ETF Oro
-                "TLT": 0.15,     # ETF Bonos largo plazo
-                "VNQ": 0.10      # ETF Real Estate
-            },
-            api_key=None,  # Usar clasificación básica
-            include_charts=False
-        )
-        
+        # Portafolio de ejemplo desde proveedor (equiponderado por defecto)
+        cfg = get_client_portfolio(client_id=None)
+        tickers = cfg["tickers"]
+        weights = cfg["weights"]
+
         # Realizar clasificación
         classifier = AssetClassifier()
         classification_df = classifier.classify_portfolio_assets(
-            example_request.tickers, 
-            example_request.weights
+            tickers,
+            weights
         )
         
         return JSONResponse(
@@ -442,7 +457,7 @@ async def get_classification_example():
                         "categories": classification_df.groupby('category')['weight'].sum().to_dict()
                     }
                 },
-                "note": "Este es un ejemplo. Usa POST /api/portfolio/classify para tu portafolio personalizado.",
+                "note": "Ejemplo usando portafolio por defecto del proveedor. Usa POST /api/portfolio/classify para tu portafolio personalizado.",
                 "timestamp": datetime.now().isoformat()
             }
         )

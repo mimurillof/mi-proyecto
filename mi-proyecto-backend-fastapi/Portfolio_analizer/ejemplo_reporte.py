@@ -20,7 +20,18 @@ Versión: 2.0.0
 import pandas as pd
 import numpy as np
 from src.portfolio_metrics import generate_complete_analysis, calculate_portfolio_returns
-from src.data_manager import fetch_portfolio_data, calculate_returns, get_current_asset_info
+from src.data_manager import calculate_returns, get_current_asset_info
+import sys
+import os
+
+# Habilitar import del proveedor de datos ubicado en la raíz del proyecto
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+from client_data_provider import (
+    get_client_portfolio,
+    fetch_portfolio_market_data,
+)
 from datetime import datetime, timedelta
 import os
 
@@ -39,15 +50,11 @@ def ejemplo_reporte_completo():
     print("🚀 Iniciando análisis completo de portafolio...")
     print("=" * 60)
     
-    # 1. Configuración del portafolio
-    print("⚙️ Configurando portafolio...")
-    symbols = ['AAPL', 'GOOGL', 'MSFT', 'AMZN']
-    weights = {
-        'AAPL': 0.25,   # Apple Inc.
-        'GOOGL': 0.25,  # Alphabet Inc.
-        'MSFT': 0.25,   # Microsoft Corp.
-        'AMZN': 0.25    # Amazon.com Inc.
-    }
+    # 1. Configuración del portafolio (centralizado en proveedor)
+    print("⚙️ Configurando portafolio (Proveedor)...")
+    cfg = get_client_portfolio(client_id=None)
+    symbols = cfg['tickers']
+    weights = cfg['weights']
     
     print(f"   • Activos: {', '.join(symbols)}")
     print(f"   • Pesos: {', '.join([f'{w*100:.0f}%' for w in weights.values()])}")
@@ -68,26 +75,11 @@ def ejemplo_reporte_completo():
             volume_str = f"Vol: {volume_val / 1e6:.2f}M" if volume_val else "Vol: N/A"
             print(f"   • {info['ticker']:<7} | Precio: ${info.get('current_price', 0):<8.2f} ({info.get('percent_change', 0):>6.2f}%) | {market_cap_str:<15} | {volume_str}")
 
-    # 2. Descarga de datos de mercado
-    print("\n📊 Descargando datos de mercado...")
+    # 2. Descarga de datos de mercado (proveedor)
+    print("\n📊 Descargando datos de mercado (Proveedor)...")
     
     try:
-        # Configurar fechas para los últimos 2 años
-        end_date = datetime.now().strftime('%Y-%m-%d')
-        start_date = (datetime.now() - timedelta(days=730)).strftime('%Y-%m-%d')
-        
-        print(f"   • Período: {start_date} a {end_date}")
-        print("   • Fuente: Yahoo Finance")
-        
-        # Descargar datos históricos
-        asset_data = fetch_portfolio_data(
-            tickers=symbols,
-            start_date=start_date,
-            end_date=end_date
-        )
-        
-        # Calcular retornos diarios
-        asset_returns = calculate_returns(asset_data)
+        asset_data, asset_returns = fetch_portfolio_market_data(symbols, period="5y")
         
         print(f"   ✅ Descargados {len(asset_data)} días de datos")
         

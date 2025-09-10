@@ -735,53 +735,28 @@ def classify_and_visualize_portfolio(tickers: List[str], weights: Dict[str, floa
 
 # Ejemplo de uso
 if __name__ == "__main__":
-    # Ejemplo con portafolio diversificado usando diferentes tipos de tickers
-    example_tickers = [
-        "AAPL",      # Apple Inc. (Acción)
-        "MSFT",      # Microsoft Corp. (Acción)
-        "GOOGL",     # Alphabet Inc. (Acción)
-        "SPY",       # SPDR S&P 500 ETF (ETF)
-        "QQQ",       # Invesco QQQ ETF (ETF)
-        "BTC-USD",   # Bitcoin (Criptomoneda)
-        "ETH-USD",   # Ethereum (Criptomoneda)
-        "GLD",       # SPDR Gold ETF (ETF - Materias Primas)
-        "TLT",       # iShares 20+ Year Treasury Bond ETF (ETF - Renta Fija)
-        "VNQ",       # Vanguard Real Estate ETF (ETF - REITs)
-        "GC=F",      # Gold Futures (Futuro)
-        "EURUSD=X",  # EUR/USD (Divisa)
-        "^GSPC"      # S&P 500 Index (Índice)
-    ]
-    
-    example_weights = {
-        "AAPL": 0.15,
-        "MSFT": 0.12,
-        "GOOGL": 0.10,
-        "SPY": 0.20,
-        "QQQ": 0.10,
-        "BTC-USD": 0.08,
-        "ETH-USD": 0.05,
-        "GLD": 0.08,
-        "TLT": 0.07,
-        "VNQ": 0.03,
-        "GC=F": 0.01,
-        "EURUSD=X": 0.005,
-        "^GSPC": 0.005
-    }
-    
-    print("=== ANÁLISIS DE PORTAFOLIO CON CONTROL DE GENERACIONES ===")
+    # Usar el proveedor central para obtener un portafolio por defecto
+    import sys, os
+    from pathlib import Path
+    PROJECT_ROOT = str(Path(__file__).resolve().parents[2])
+    if PROJECT_ROOT not in sys.path:
+        sys.path.append(PROJECT_ROOT)
+    from client_data_provider import get_client_portfolio
+
+    cfg = get_client_portfolio(client_id=None)
+    example_tickers = cfg["tickers"]
+    example_weights = cfg["weights"]
+
+    print("=== ANÁLISIS DE PORTAFOLIO CON CONTROL DE GENERACIONES (Proveedor) ===")
     print(f"Analizando {len(example_tickers)} activos...")
     
-    # Mostrar estado actual de reportes
-    # classifier_temp = AssetClassifier()
-    # classifier_temp.show_daily_reports_status()
-    
-    # Clasificar y visualizar usando Yahoo Finance (gratuito) con control de generaciones
+    # Clasificar y visualizar usando Yahoo Finance con control de generaciones
     classification_df, files = classify_and_visualize_portfolio(
-        example_tickers, 
-        example_weights, 
-        cache_enabled=True,  # Habilitar caché para eficiencia
-        cleanup_old_reports=True,  # Limpiar reportes antiguos
-        days_to_keep=30  # Mantener reportes de los últimos 30 días
+        example_tickers,
+        example_weights,
+        cache_enabled=True,
+        cleanup_old_reports=True,
+        days_to_keep=30
     )
     
     print("\n=== RESULTADOS DE CLASIFICACIÓN ===")
