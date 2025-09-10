@@ -1,24 +1,45 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-date-fns';
-import { es } from 'date-fns/locale';
 
 type TimeframeType = '1D' | '1W' | '1M' | '6M' | '1Y';
 
-const PortfolioPerformanceChart: React.FC = () => {
+// Interfaz para los datos de activos
+interface StockData {
+  symbol: string;
+  name: string;
+  price: number;
+  change: number;
+  units: number;
+}
+
+interface PortfolioPerformanceChartProps {
+  selectedStock: StockData | null;
+}
+
+const PortfolioPerformanceChart: React.FC<PortfolioPerformanceChartProps> = ({ selectedStock }) => {
   const [timeframe, setTimeframe] = useState<TimeframeType>('6M');
   const chartRef = useRef<HTMLCanvasElement | null>(null);
   const chartInstanceRef = useRef<Chart | null>(null);
 
   // Función para generar datos de ejemplo basados en el timeframe
-  const generateData = (selectedTimeframe: TimeframeType) => {
+  const generateData = (selectedTimeframe: TimeframeType, stock: StockData | null = null) => {
     let labels: Date[] = [];
     let dataPoints: number[] = [];
-    const baseValue = 150000;
-    const volatility = 0.15; // 15% de volatilidad
+    let baseValue: number;
+    let volatility: number;
+
+    // Si hay un activo seleccionado, usar su precio como base
+    if (stock) {
+      baseValue = stock.price;
+      volatility = 0.25; // Mayor volatilidad para activos individuales
+    } else {
+      baseValue = 150000; // Valor base del portafolio
+      volatility = 0.15; // Menor volatilidad para el portafolio diversificado
+    }
 
     let numPoints: number;
-    let startDate = new Date();
+    const startDate = new Date();
 
     switch (selectedTimeframe) {
       case '1D':
@@ -91,7 +112,7 @@ const PortfolioPerformanceChart: React.FC = () => {
       const ctx = chartRef.current.getContext('2d');
       
       if (ctx) {
-        const { labels, dataPoints } = generateData(timeframe);
+        const { labels, dataPoints } = generateData(timeframe, selectedStock);
 
         // Crear gradiente para el fondo
         const gradient = ctx.createLinearGradient(0, 0, 0, 300);
@@ -109,7 +130,7 @@ const PortfolioPerformanceChart: React.FC = () => {
           data: {
             labels: labels,
             datasets: [{
-              label: 'Valor del Portafolio',
+              label: selectedStock ? `Precio de ${selectedStock.symbol}` : 'Valor del Portafolio',
               data: dataPoints,
               borderColor: '#2563eb', // Azul brillante
               borderWidth: 2,
@@ -226,12 +247,14 @@ const PortfolioPerformanceChart: React.FC = () => {
         chartInstanceRef.current.destroy();
       }
     };
-  }, [timeframe]); // Re-ejecutar cuando cambie timeframe
+  }, [timeframe, selectedStock]); // Re-ejecutar cuando cambie timeframe o el activo seleccionado
 
   return (
     <div className="w-full h-full flex flex-col" style={{ height: '365.896px' }}>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-gray-800">Rendimiento del Portafolio</h2>
+        <h2 className="text-lg font-semibold text-gray-800">
+          {selectedStock ? `${selectedStock.name} (${selectedStock.symbol})` : 'Rendimiento del Portafolio'}
+        </h2>
         <div className="flex space-x-1 bg-gray-100 rounded-full p-1">
           {(['1D', '1W', '1M', '6M', '1Y'] as TimeframeType[]).map((tf) => (
             <button

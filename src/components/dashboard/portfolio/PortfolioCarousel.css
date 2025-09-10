@@ -96,7 +96,7 @@
     background-color: #f9fafb; /* Fondo muy claro, casi blanco */
     border: 1px solid #e5e7eb; /* Borde gris claro */
     transition: all 0.2s ease-in-out;
-    cursor: pointer;
+    cursor: pointer; /* Indica que es clickeable */
 }
 
 .stock-card:hover {

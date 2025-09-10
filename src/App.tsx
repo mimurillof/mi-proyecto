@@ -116,8 +116,8 @@ function App() {
                     sidebarCollapsed ? 'justify-center w-full px-0' : 'space-x-3 px-3'
                   } ${activeItem === 'portafolio' ? 'text-white bg-gray-800' : 'text-gray-400 hover:bg-gray-800'}`}
                 >
-                  <img src={iconoDashboard} alt="Dashboard" className="w-5 h-5 flex-shrink-0" />
-                  <span className={`font-medium transition-opacity duration-200 ${sidebarCollapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>Dashboard</span>
+                  <img src={iconoCartera} alt="Portafolio" className="w-5 h-5 flex-shrink-0" />
+                  <span className={`font-medium transition-opacity duration-200 ${sidebarCollapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>Portafolio</span>
                 </a>
               </li>
               
@@ -131,19 +131,6 @@ function App() {
                 >
                   <img src={iconoReportes} alt="Reportes" className="w-5 h-5 flex-shrink-0" />
                   <span className={`font-medium transition-opacity duration-200 ${sidebarCollapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>Reportes</span>
-                </a>
-              </li>
-              
-              <li className={`list-none ${activeItem === 'cartera' ? 'active' : ''}`}>
-                <a 
-                  href="#" 
-                  onClick={() => handleMenuClick('cartera')}
-                  className={`flex items-center py-3 rounded-lg ${
-                    sidebarCollapsed ? 'justify-center w-full px-0' : 'space-x-3 px-3'
-                  } ${activeItem === 'cartera' ? 'text-white bg-gray-800' : 'text-gray-400 hover:bg-gray-800'}`}
-                >
-                  <img src={iconoCartera} alt="Portafolio" className="w-5 h-5 flex-shrink-0" />
-                  <span className={`font-medium transition-opacity duration-200 ${sidebarCollapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>Portafolio</span>
                 </a>
               </li>
               
@@ -393,7 +380,6 @@ function App() {
             {activeItem !== 'inicio' && 
              activeItem !== 'portafolio' && 
              activeItem !== 'reportes' && 
-             activeItem !== 'cartera' &&
              activeItem !== 'mercado' &&
              activeItem !== 'ai' &&
              activeItem !== 'perfil' && 

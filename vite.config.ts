@@ -26,7 +26,6 @@ export default defineConfig({
         inicio: 'public/pages/inicio.html',
         dashboard: 'public/pages/dashboard.html',
         reportes: 'public/pages/reportes.html',
-        portafolio: 'public/pages/portafolio.html',
         mercado: 'public/pages/mercado.html',
         ai_agent: 'public/pages/ai_agent.html'
       }

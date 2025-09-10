@@ -25,15 +25,20 @@ const stockLogos: StockLogos = {
 
 interface StockCardProps {
     stock: StockData;
+    onStockSelect: (stock: StockData) => void;
 }
 
-const StockCard: React.FC<StockCardProps> = ({ stock }) => {
+const StockCard: React.FC<StockCardProps> = ({ stock, onStockSelect }) => {
     const isPositive = stock.change > 0;
     // No aplicaremos clases de 'glow' por ahora, nos enfocamos en la estructura y colores base
     const cardClass = "stock-card"; 
 
+    const handleClick = () => {
+        onStockSelect(stock);
+    };
+
     return (
-        <div className={cardClass}>
+        <div className={cardClass} onClick={handleClick}>
             <div className="stock-price">
                 ${stock.price.toFixed(2)}
             </div>

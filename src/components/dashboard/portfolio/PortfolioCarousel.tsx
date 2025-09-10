@@ -16,8 +16,24 @@ const stocksData = [
     { symbol: 'MSFT', name: 'Microsoft', price: 427.87, change: +0.85, units: 15 },
 ];
 
-const PortfolioCarousel: React.FC = () => {
-    const [scrollPosition, setScrollPosition] = useState(0);
+// Interfaz para los datos de activos
+interface StockData {
+    symbol: string;
+    name: string;
+    price: number;
+    change: number;
+    units: number;
+}
+
+interface PortfolioCarouselProps {
+    onStockSelect: (stock: StockData) => void;
+    onPortfolioView: () => void;
+}
+
+const PortfolioCarousel: React.FC<PortfolioCarouselProps> = ({ 
+    onStockSelect, 
+    onPortfolioView 
+}) => {
     const [showLeftButton, setShowLeftButton] = useState(false);
     const [showRightButton, setShowRightButton] = useState(true);
     const carouselRef = useRef<HTMLDivElement>(null);
@@ -60,12 +76,17 @@ const PortfolioCarousel: React.FC = () => {
                 window.removeEventListener('resize', checkScrollButtons);
             };
         }
-    }, [stocksData]); // Re-evaluar si los datos cambian
+    }, []); // Solo ejecutar en el montaje inicial
 
     return (
         <div className="portfolio-container">
             <div className="portfolio-header">
-                <div className="portfolio-title">Mi Portafolio</div>
+                <div 
+                    className="portfolio-title cursor-pointer hover:text-blue-600 transition-colors" 
+                    onClick={onPortfolioView}
+                >
+                    Mi Portafolio
+                </div>
                 <div className="portfolio-buttons-container">
                     <button className="portfolio-action-button">
                         <Eye size={16} className="mr-1" /> {/* Icono lucide */}
@@ -91,7 +112,11 @@ const PortfolioCarousel: React.FC = () => {
                 <div className="cards-carousel" ref={carouselRef}>
                     {stocksData.map((stock, index) => (
                         // Usar index como parte de la key si los símbolos pueden repetirse
-                        <StockCard key={`${stock.symbol}-${index}`} stock={stock} />
+                        <StockCard 
+                            key={`${stock.symbol}-${index}`} 
+                            stock={stock} 
+                            onStockSelect={onStockSelect}
+                        />
                     ))}
                 </div>
 
