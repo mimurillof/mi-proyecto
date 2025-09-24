@@ -10,12 +10,12 @@ const ActionsFeedback: React.FC = () => {
 
   const handleDownload = () => {
     console.log("Simulación: Iniciar descarga del reporte...");
-    alert("Simulación: Descarga iniciada (acción no funcional).");
+    // Modal o notificación reemplazaría el alert aquí
   };
 
   const handleShare = () => {
     console.log("Simulación: Abrir opciones para compartir...");
-    alert("Simulación: Compartir activado (acción no funcional).");
+    // Modal o notificación reemplazaría el alert aquí
   };
 
   const handleFeedback = (feedbackType: 'positive' | 'negative') => {
@@ -31,7 +31,7 @@ const ActionsFeedback: React.FC = () => {
 
   const handleSendComment = () => {
     if (!selectedFeedback) {
-      alert("Por favor, selecciona primero si el análisis fue útil o no (👍/👎).");
+      console.log("Por favor, selecciona primero si el análisis fue útil o no (👍/👎).");
       return;
     }
     console.log(`Simulación: Enviando feedback (${selectedFeedback}) con comentario: "${comment}"`);

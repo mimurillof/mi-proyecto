@@ -1,11 +1,20 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReportsGrid from '../components/reports/ReportsGrid';
-import AIReportView from '../components/reports/AIReportView'; // Asegúrate de crear este componente
+import AIReportView from '../components/reports/AIReportView';
 
 type ActiveReportView = 'financiero' | 'ai';
 
 const ReportsPage: React.FC = () => {
   const [activeView, setActiveView] = useState<ActiveReportView>('financiero');
+
+  useEffect(() => {
+    // Si viene una señal desde el ribbon, abrir Reporte AI
+    const shouldOpenAI = sessionStorage.getItem('openAIReport') === '1';
+    if (shouldOpenAI) {
+      setActiveView('ai');
+      sessionStorage.removeItem('openAIReport');
+    }
+  }, []);
 
   return (
     <div className="flex flex-col h-full">

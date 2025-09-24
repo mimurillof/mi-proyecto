@@ -45,6 +45,13 @@ function App() {
   };
 
   useEffect(() => {
+    function handleNavigateToReportsAI() {
+      setActiveItem('reportes');
+      // ReportsPage leerá sessionStorage y abrirá la pestaña AI
+    }
+
+    window.addEventListener('navigateToReportsAI' as any, handleNavigateToReportsAI);
+
     if (tradingViewWidgetContainerRef.current) {
         tradingViewWidgetContainerRef.current.innerHTML = '';
     }
@@ -77,6 +84,9 @@ function App() {
       copyrightDiv.style.color = '#888';
       copyrightDiv.innerHTML = `<a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank" style="color: #3BB3E4; text-decoration: none;"><span class="blue-text">Track all markets on TradingView</span></a>`;
     }
+    return () => {
+      window.removeEventListener('navigateToReportsAI' as any, handleNavigateToReportsAI);
+    };
   }, [activeItem]);
 
   return (
@@ -86,11 +96,10 @@ function App() {
         <aside className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-[#1a1d24] border-r border-gray-800 flex flex-col transition-all duration-300 ease-in-out overflow-y-auto`}>
           <div className="p-4 flex-1">
             <div className={`flex ${sidebarCollapsed ? 'justify-center' : 'items-center space-x-2'} mb-8`}>
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                <div className="w-4 h-4 bg-white rounded-full"></div>
-              </div>
-              <span className={`font-semibold text-lg transition-opacity duration-200 ${sidebarCollapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>
-                Dashboard
+              <img src="/favicon.ico" alt="Horizon" className="w-8 h-8" />
+              <span className={`transition-opacity duration-200 ${sidebarCollapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>
+                <span className="font-semibold text-lg text-white">Horizon</span>
+                <span className="text-sm text-gray-400 ml-1">Dash</span>
               </span>
             </div>
             

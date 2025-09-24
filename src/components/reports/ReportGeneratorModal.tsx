@@ -24,7 +24,7 @@ const ReportGeneratorModal: React.FC<ReportGeneratorModalProps> = ({ isOpen, onC
     data.metrics = metrics; // Añadir métricas seleccionadas
 
     console.log('Parámetros del Reporte:', data);
-    alert('Reporte solicitado. Revisa la consola para ver los parámetros.');
+    console.log('Reporte solicitado. Revisa la consola para ver los parámetros.');
     // Aquí iría la lógica para enviar 'data' al backend
     onClose(); // Cerrar modal
   };
