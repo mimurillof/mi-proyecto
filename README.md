@@ -138,7 +138,7 @@ El sistema incluye una suite completa de tests de integración que verifica:
 ### Desarrollo
 ```bash
 # Terminal 1: Backend
-cd mi-proyecto-backend-fastapi
+cd mi-proyecto-backend
 python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 # Terminal 2: Frontend  

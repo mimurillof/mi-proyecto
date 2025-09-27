@@ -10,6 +10,13 @@ interface BackendResponse {
   report_id?: string;
 }
 
+interface PortfolioReportResponse {
+  report: any;
+  session_id?: string;
+  model_used?: string;
+  metadata?: Record<string, any>;
+}
+
 const endpointFor: Record<RibbonKey, string> = {
   summary: API_CONFIG.ENDPOINTS.RIBBON_SUMMARY,
   performance: API_CONFIG.ENDPOINTS.RIBBON_PERFORMANCE,
@@ -23,17 +30,41 @@ const AIControlPanel: React.FC = () => {
   const [title, setTitle] = useState<string>('');
   const [message, setMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [reportData, setReportData] = useState<PortfolioReportResponse | null>(null);
 
   async function callBackend(key: RibbonKey) {
     setLoading(true);
+    setReportData(null);
     try {
       const url = getApiUrl(endpointFor[key]);
-      const res = await fetch(url);
-      const data: BackendResponse = await res.json();
+      const isCustomReport = key === 'customReport';
+
+      const requestInit: RequestInit = {
+        method: isCustomReport ? 'POST' : 'GET'
+      };
+
+      if (isCustomReport) {
+        requestInit.headers = {
+          'Content-Type': 'application/json'
+        };
+        requestInit.body = JSON.stringify({});
+      }
+
+      const res = await fetch(url, requestInit);
+      const contentType = res.headers.get('content-type') || '';
+      const data = contentType.includes('application/json') ? await res.json() : await res.text();
+
       if (!res.ok) throw new Error(data?.message || 'Error desconocido');
 
-      setTitle(data.title || 'Información');
-      setMessage(data.message || '');
+      if (isCustomReport) {
+        setTitle('Informe generado correctamente');
+        setMessage('El agente remoto ha generado un informe estructurado.');
+        setReportData(data as PortfolioReportResponse);
+      } else {
+        const parsedData = data as BackendResponse;
+        setTitle(parsedData.title || 'Información');
+        setMessage(parsedData.message || '');
+      }
       setOpen(true);
     } catch (e: any) {
       setTitle('Error');
@@ -95,6 +126,11 @@ const AIControlPanel: React.FC = () => {
 
       <Modal isOpen={open} onClose={() => setOpen(false)} title={title}>
         <p className="text-sm leading-6">{message}</p>
+        {reportData && (
+          <pre className="mt-4 max-h-72 overflow-y-auto rounded bg-gray-100 p-3 text-xs text-gray-800">
+{JSON.stringify(reportData, null, 2)}
+          </pre>
+        )}
         {loading && <p className="mt-4 text-blue-500">Cargando...</p>}
       </Modal>
     </div>
