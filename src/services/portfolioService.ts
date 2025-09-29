@@ -3,8 +3,10 @@
  * Proporciona métodos para obtener métricas en vivo y gráficos del backend FastAPI
  */
 
-// Configuración de la API
-const API_URL = 'http://localhost:8000/api/portfolio';
+import { API_CONFIG, getApiUrl } from '../config/api';
+
+// Configuración de la API - Usa la configuración centralizada
+const API_URL = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PORTFOLIO_BASE}`;
 
 // Interfaces TypeScript para los datos del Portfolio Analyzer
 export interface PerformanceMetrics {
