@@ -31,48 +31,134 @@ const AIControlPanel: React.FC = () => {
   const [message, setMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [reportData, setReportData] = useState<PortfolioReportResponse | null>(null);
+  const [progress, setProgress] = useState<string>('');
 
   async function callBackend(key: RibbonKey) {
     setLoading(true);
     setReportData(null);
+    setProgress('');
+    
     try {
       const url = getApiUrl(endpointFor[key]);
       const isCustomReport = key === 'customReport';
 
-      const requestInit: RequestInit = {
-        method: isCustomReport ? 'POST' : 'GET'
-      };
-
       if (isCustomReport) {
-        requestInit.headers = {
-          'Content-Type': 'application/json'
-        };
-        requestInit.body = JSON.stringify({});
-      }
-
-      const res = await fetch(url, requestInit);
-      const contentType = res.headers.get('content-type') || '';
-      const data = contentType.includes('application/json') ? await res.json() : await res.text();
-
-      if (!res.ok) throw new Error(data?.message || 'Error desconocido');
-
-      if (isCustomReport) {
-        setTitle('Informe generado correctamente');
-        setMessage('El agente remoto ha generado un informe estructurado.');
-        setReportData(data as PortfolioReportResponse);
+        // Nuevo flujo asíncrono para custom report
+        await handleCustomReportAsync();
       } else {
+        // Flujo normal para otros endpoints
+        const res = await fetch(url, { method: 'GET' });
+        const contentType = res.headers.get('content-type') || '';
+        const data = contentType.includes('application/json') ? await res.json() : await res.text();
+
+        if (!res.ok) throw new Error(data?.message || 'Error desconocido');
+
         const parsedData = data as BackendResponse;
         setTitle(parsedData.title || 'Información');
         setMessage(parsedData.message || '');
+        setOpen(true);
+        setLoading(false);
       }
-      setOpen(true);
     } catch (e: any) {
       setTitle('Error');
       setMessage(e?.message || 'No se pudo conectar con el servidor');
       setOpen(true);
-    } finally {
       setLoading(false);
     }
+  }
+
+  async function handleCustomReportAsync() {
+    try {
+      // 1. Iniciar generación del reporte
+      setProgress('Iniciando generación del reporte...');
+      const startUrl = getApiUrl(API_CONFIG.ENDPOINTS.RIBBON_CUSTOM_REPORT_START);
+      const startRes = await fetch(startUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      });
+
+      if (!startRes.ok) {
+        throw new Error('Error al iniciar la generación del reporte');
+      }
+
+      const { report_id, poll_url } = await startRes.json();
+      
+      // 2. Hacer polling para verificar el estado
+      setProgress('Generando reporte con IA... Esto puede tomar 1-2 minutos.');
+      await pollReportStatus(report_id);
+
+    } catch (error: any) {
+      setTitle('Error');
+      setMessage(error?.message || 'Error generando el reporte');
+      setOpen(true);
+      setLoading(false);
+    }
+  }
+
+  async function pollReportStatus(reportId: string) {
+    const maxAttempts = 60; // 60 intentos * 3 segundos = 3 minutos máximo
+    let attempts = 0;
+
+    const checkStatus = async (): Promise<void> => {
+      try {
+        attempts++;
+        const statusUrl = getApiUrl(`${API_CONFIG.ENDPOINTS.RIBBON_CUSTOM_REPORT_STATUS}/${reportId}`);
+        const statusRes = await fetch(statusUrl);
+
+        if (!statusRes.ok) {
+          throw new Error('Error al consultar el estado del reporte');
+        }
+
+        const statusData = await statusRes.json();
+
+        if (statusData.status === 'completed') {
+          // Reporte completado exitosamente
+          setTitle('✅ Informe generado correctamente');
+          setMessage('El agente remoto ha generado un informe estructurado.');
+          setReportData(statusData.result as PortfolioReportResponse);
+          setProgress('');
+          setOpen(true);
+          setLoading(false);
+        } else if (statusData.status === 'error') {
+          // Error en la generación
+          setTitle('❌ Error');
+          setMessage(statusData.error || 'Error desconocido al generar el reporte');
+          setProgress('');
+          setOpen(true);
+          setLoading(false);
+        } else if (statusData.status === 'processing') {
+          // Aún procesando
+          setProgress('⏳ Generando reporte con IA... Por favor espere.');
+          
+          if (attempts >= maxAttempts) {
+            throw new Error('Tiempo de espera excedido. El reporte puede estar aún procesándose.');
+          }
+          
+          // Continuar polling después de 3 segundos
+          setTimeout(() => checkStatus(), 3000);
+        } else if (statusData.status === 'pending') {
+          // Pendiente de iniciar
+          setProgress('⏳ Reporte en cola... Iniciando generación.');
+          
+          if (attempts >= maxAttempts) {
+            throw new Error('Tiempo de espera excedido.');
+          }
+          
+          // Continuar polling después de 2 segundos
+          setTimeout(() => checkStatus(), 2000);
+        }
+      } catch (error: any) {
+        setTitle('Error');
+        setMessage(error?.message || 'Error consultando el estado del reporte');
+        setProgress('');
+        setOpen(true);
+        setLoading(false);
+      }
+    };
+
+    // Iniciar el polling
+    await checkStatus();
   }
 
   return (
@@ -131,7 +217,14 @@ const AIControlPanel: React.FC = () => {
 {JSON.stringify(reportData, null, 2)}
           </pre>
         )}
-        {loading && <p className="mt-4 text-blue-500">Cargando...</p>}
+        {loading && (
+          <div className="mt-4">
+            <p className="text-blue-500">{progress || 'Cargando...'}</p>
+            <div className="mt-2 w-full bg-gray-200 rounded-full h-2.5">
+              <div className="bg-blue-600 h-2.5 rounded-full animate-pulse" style={{width: '100%'}}></div>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );

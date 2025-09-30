@@ -31,6 +31,8 @@ export const API_CONFIG = {
         RIBBON_FORECAST: '/api/ribbon/forecast',
         RIBBON_ALERTS: '/api/ribbon/alerts',
         RIBBON_CUSTOM_REPORT: '/api/ribbon/custom-report',
+        RIBBON_CUSTOM_REPORT_START: '/api/ribbon/custom-report/start',
+        RIBBON_CUSTOM_REPORT_STATUS: '/api/ribbon/custom-report/status',
         PORTFOLIO_BASE: '/api/portfolio'
     }
 };

@@ -261,30 +261,68 @@ VITE_API_URL=http://localhost:8000
 heroku config:set CLIENT_ORIGIN=https://tudominio.com -a horizon-backend-316b23e32b8b
 ```
 
-## 🔐 Actualizar CORS en el Backend
+## 🔐 Actualizar CORS en el Backend (CRÍTICO)
 
-Después de desplegar en Vercel, actualiza las variables de entorno del backend para incluir tu URL de Vercel:
+**⚠️ ESTE PASO ES OBLIGATORIO** - Sin esto, el frontend no podrá comunicarse con el backend.
+
+Después de desplegar en Vercel, **DEBES** actualizar las variables de entorno del backend:
 
 ```bash
-# Obtener la URL de tu despliegue en Vercel
-# Por ejemplo: https://mi-proyecto-abc123.vercel.app
+# 1. Obtener la URL exacta de tu despliegue en Vercel
+# Ejemplo: https://mi-proyecto-topaz-omega.vercel.app
 
-# Actualizar el backend para aceptar peticiones desde Vercel
-heroku config:set CLIENT_ORIGIN=https://mi-proyecto-abc123.vercel.app -a horizon-backend-316b23e32b8b
+# 2. Configurar CLIENT_ORIGIN en Heroku
+heroku config:set CLIENT_ORIGIN=https://mi-proyecto-topaz-omega.vercel.app -a horizon-backend
+
+# 3. Verificar que se configuró correctamente
+heroku config:get CLIENT_ORIGIN -a horizon-backend
+
+# 4. Si modificaste el código CORS en main.py, redesplegar:
+# (En mi-proyecto-backend/)
+git push heroku main
 ```
 
-O si tienes múltiples orígenes, actualiza `CORS_ORIGINS` en el código del backend.
+**Síntomas de que esto no está configurado:**
+```
+❌ Access to fetch has been blocked by CORS policy
+❌ Error al cargar las métricas del portfolio
+❌ Failed to fetch
+```
+
+**Notas importantes:**
+- La URL debe ser EXACTA (sin `/` al final)
+- El backend incluye automáticamente `CLIENT_ORIGIN` en CORS
+- Si cambias el dominio personalizado de Vercel, actualiza esta variable
 
 ## 🚨 Troubleshooting
 
 ### Error: CORS blocked
 
 **Síntoma**: Error de CORS en la consola del navegador
+```
+Access to fetch has been blocked by CORS policy: 
+No 'Access-Control-Allow-Origin' header is present on the requested resource.
+```
 
 **Solución**:
-1. Verifica que la URL del frontend esté en `CLIENT_ORIGIN` del backend
-2. O agrega la URL a `CORS_ORIGINS` en `mi-proyecto-backend/config.py`
-3. Redesplega el backend
+1. Configurar `CLIENT_ORIGIN` en el backend de Heroku con la URL exacta de Vercel:
+   ```bash
+   heroku config:set CLIENT_ORIGIN=https://tu-proyecto.vercel.app -a horizon-backend
+   ```
+2. Verificar que se configuró:
+   ```bash
+   heroku config:get CLIENT_ORIGIN -a horizon-backend
+   ```
+3. Redesplegar el backend si modificaste el código CORS:
+   ```bash
+   # En mi-proyecto-backend/
+   git push heroku main
+   ```
+
+**IMPORTANTE**: 
+- La URL debe ser EXACTA (sin `/` al final)
+- El backend automáticamente incluye `CLIENT_ORIGIN` en los orígenes permitidos de CORS
+- Si cambias el dominio de Vercel, actualiza `CLIENT_ORIGIN` nuevamente
 
 ### Error: Network request failed
 
@@ -312,6 +350,18 @@ O si tienes múltiples orígenes, actualiza `CORS_ORIGINS` en el código del bac
 1. Las variables de entorno deben empezar con `VITE_`
 2. Después de agregar variables, haz un **redeploy** en Vercel
 3. Limpia el cache del navegador
+
+### Error: "Failed to fetch" al generar reportes
+
+**Síntoma**: Al hacer click en "Generar Reporte", aparece "Failed to fetch" después de 30 segundos
+
+**Causa**: Heroku tiene un límite de 30 segundos para requests. Generar reportes con IA toma más tiempo.
+
+**Soluciones**:
+1. **Temporal**: El backend está configurado para usar el modelo rápido de Gemini
+2. **Permanente**: Se debe implementar procesamiento asíncrono con polling
+
+**Documentación completa**: Ver `REPORTE_TIMEOUT_SOLUTION.md` en la raíz del proyecto
 
 ## 📊 Monitoreo y Logs
 
