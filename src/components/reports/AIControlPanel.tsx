@@ -43,6 +43,12 @@ const AIControlPanel: React.FC = () => {
       const isCustomReport = key === 'customReport';
 
       if (isCustomReport) {
+        // Abrir modal INMEDIATAMENTE para mostrar progreso
+        setTitle('🔄 Generando Reporte');
+        setMessage('Iniciando proceso de generación...');
+        setProgress('Preparando solicitud al servidor...');
+        setOpen(true);
+        
         // Nuevo flujo asíncrono para custom report
         await handleCustomReportAsync();
       } else {
@@ -70,7 +76,9 @@ const AIControlPanel: React.FC = () => {
   async function handleCustomReportAsync() {
     try {
       // 1. Iniciar generación del reporte
-      setProgress('Iniciando generación del reporte...');
+      setProgress('📤 Enviando solicitud al backend...');
+      setMessage('Conectando con el servidor...');
+      
       const startUrl = getApiUrl(API_CONFIG.ENDPOINTS.RIBBON_CUSTOM_REPORT_START);
       const startRes = await fetch(startUrl, {
         method: 'POST',
@@ -85,13 +93,14 @@ const AIControlPanel: React.FC = () => {
       const { report_id, poll_url } = await startRes.json();
       
       // 2. Hacer polling para verificar el estado
-      setProgress('Generando reporte con IA... Esto puede tomar 1-2 minutos.');
+      setProgress('⏳ Generando reporte con IA (Gemini 2.5 Pro)...');
+      setMessage('Este proceso puede tomar entre 1 y 2 minutos. Por favor no cierre esta ventana.');
       await pollReportStatus(report_id);
 
     } catch (error: any) {
-      setTitle('Error');
+      setTitle('❌ Error');
       setMessage(error?.message || 'Error generando el reporte');
-      setOpen(true);
+      setProgress('');
       setLoading(false);
     }
   }
@@ -114,22 +123,22 @@ const AIControlPanel: React.FC = () => {
 
         if (statusData.status === 'completed') {
           // Reporte completado exitosamente
-          setTitle('✅ Informe generado correctamente');
-          setMessage('El agente remoto ha generado un informe estructurado.');
+          setTitle('✅ Informe Generado Exitosamente');
+          setMessage('El reporte ha sido generado con éxito usando Gemini 2.5 Pro.');
           setReportData(statusData.result as PortfolioReportResponse);
           setProgress('');
-          setOpen(true);
           setLoading(false);
         } else if (statusData.status === 'error') {
           // Error en la generación
-          setTitle('❌ Error');
+          setTitle('❌ Error en la Generación');
           setMessage(statusData.error || 'Error desconocido al generar el reporte');
           setProgress('');
-          setOpen(true);
           setLoading(false);
         } else if (statusData.status === 'processing') {
           // Aún procesando
-          setProgress('⏳ Generando reporte con IA... Por favor espere.');
+          const elapsed = attempts * 3;
+          setProgress(`⏳ Generando reporte con IA (Gemini 2.5 Pro)... ${elapsed}s transcurridos`);
+          setMessage('El modelo de IA está analizando tu portafolio. Esto puede tomar 1-2 minutos.');
           
           if (attempts >= maxAttempts) {
             throw new Error('Tiempo de espera excedido. El reporte puede estar aún procesándose.');
@@ -140,6 +149,7 @@ const AIControlPanel: React.FC = () => {
         } else if (statusData.status === 'pending') {
           // Pendiente de iniciar
           setProgress('⏳ Reporte en cola... Iniciando generación.');
+          setMessage('Tu solicitud está siendo procesada...');
           
           if (attempts >= maxAttempts) {
             throw new Error('Tiempo de espera excedido.');
@@ -149,10 +159,9 @@ const AIControlPanel: React.FC = () => {
           setTimeout(() => checkStatus(), 2000);
         }
       } catch (error: any) {
-        setTitle('Error');
+        setTitle('❌ Error de Conexión');
         setMessage(error?.message || 'Error consultando el estado del reporte');
         setProgress('');
-        setOpen(true);
         setLoading(false);
       }
     };
