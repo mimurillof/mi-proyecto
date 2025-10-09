@@ -1,14 +1,6 @@
 import React from 'react';
 import PortfolioCarousel from '../portfolio/PortfolioCarousel'; // Importa el nuevo componente
-
-// Interfaz para los datos de activos
-interface StockData {
-  symbol: string;
-  name: string;
-  price: number;
-  change: number;
-  units: number;
-}
+import { StockData } from '../portfolio/StockCard';
 
 interface UpperRightContainerProps {
   onStockSelect: (stock: StockData) => void;

@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import Chart from 'chart.js/auto';
-import 'chartjs-adapter-date-fns';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { fetchPortfolioChartHtml } from '../../../services/portfolioManagerService';
 
 type TimeframeType = '1D' | '1W' | '1M' | '6M' | '1Y';
 
-// Interfaz para los datos de activos
 interface StockData {
   symbol: string;
   name: string;
@@ -17,262 +15,140 @@ interface PortfolioPerformanceChartProps {
   selectedStock: StockData | null;
 }
 
+const enhanceChartHtml = (html: string): string => {
+  if (!html) {
+    return html;
+  }
+
+  const responsiveStyles = `
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background: transparent;
+        width: 100%;
+        height: 100%;
+      }
+
+      .plot-container.plotly, .js-plotly-plot, .main-svg, .svg-container {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+
+      .svg-container {
+        height: auto !important;
+        aspect-ratio: auto;
+      }
+    </style>
+  `;
+
+  if (html.includes('</head>')) {
+    return html.replace('</head>', `${responsiveStyles}</head>`);
+  }
+
+  if (html.includes('<body')) {
+    return html.replace('<body', `<body style="margin:0;padding:0;overflow:hidden;">${responsiveStyles}`);
+  }
+
+  return `${responsiveStyles}${html}`;
+};
+
 const PortfolioPerformanceChart: React.FC<PortfolioPerformanceChartProps> = ({ selectedStock }) => {
-  const [timeframe, setTimeframe] = useState<TimeframeType>('6M');
-  const chartRef = useRef<HTMLCanvasElement | null>(null);
-  const chartInstanceRef = useRef<Chart | null>(null);
+  const timeframe: TimeframeType = '6M';
+  const [chartHtml, setChartHtml] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const requestRef = useRef(0);
+  const chartCacheRef = useRef<Map<string, string>>(new Map());
 
-  // Función para generar datos de ejemplo basados en el timeframe
-  const generateData = (selectedTimeframe: TimeframeType, stock: StockData | null = null) => {
-    let labels: Date[] = [];
-    let dataPoints: number[] = [];
-    let baseValue: number;
-    let volatility: number;
+  const chartTitle = useMemo(
+    () => (selectedStock ? `${selectedStock.name} (${selectedStock.symbol})` : 'Rendimiento del Portafolio'),
+    [selectedStock],
+  );
 
-    // Si hay un activo seleccionado, usar su precio como base
-    if (stock) {
-      baseValue = stock.price;
-      volatility = 0.25; // Mayor volatilidad para activos individuales
-    } else {
-      baseValue = 150000; // Valor base del portafolio
-      volatility = 0.15; // Menor volatilidad para el portafolio diversificado
-    }
+  const chartKey = useMemo(
+    () => (selectedStock ? selectedStock.symbol.trim().toUpperCase() : 'portfolio'),
+    [selectedStock],
+  );
 
-    let numPoints: number;
-    const startDate = new Date();
+  const loadChart = useCallback(
+    async (tf: TimeframeType, targetKey: string) => {
+      setLoading(true);
+      setError(null);
 
-    switch (selectedTimeframe) {
-      case '1D':
-        numPoints = 24; // Horas
-        startDate.setDate(startDate.getDate() - 1);
-        labels = Array.from({ length: numPoints }, (_, i) => {
-          const d = new Date(startDate);
-          d.setHours(d.getHours() + i);
-          return d;
-        });
-        break;
-      case '1W':
-        numPoints = 7; // Días
-        startDate.setDate(startDate.getDate() - 7);
-        labels = Array.from({ length: numPoints }, (_, i) => {
-          const d = new Date(startDate);
-          d.setDate(d.getDate() + i);
-          return d;
-        });
-        break;
-      case '1M':
-        numPoints = 30; // Días
-        startDate.setMonth(startDate.getMonth() - 1);
-        labels = Array.from({ length: numPoints }, (_, i) => {
-          const d = new Date(startDate);
-          d.setDate(d.getDate() + i);
-          return d;
-        });
-        break;
-      case '6M':
-        numPoints = 6; // Meses
-        startDate.setMonth(startDate.getMonth() - 6);
-        labels = Array.from({ length: numPoints }, (_, i) => {
-          const d = new Date(startDate);
-          d.setMonth(d.getMonth() + i);
-          return d;
-        });
-        break;
-      case '1Y':
-        numPoints = 12; // Meses
-        startDate.setFullYear(startDate.getFullYear() - 1);
-        labels = Array.from({ length: numPoints }, (_, i) => {
-          const d = new Date(startDate);
-          d.setMonth(d.getMonth() + i);
-          return d;
-        });
-        break;
-      default:
-        numPoints = 6; // Default a 6M
-        startDate.setMonth(startDate.getMonth() - 6);
-        labels = Array.from({ length: numPoints }, (_, i) => {
-          const d = new Date(startDate);
-          d.setMonth(d.getMonth() + i);
-          return d;
-        });
-    }
+      const requestId = requestRef.current + 1;
+      requestRef.current = requestId;
 
-    let currentValue = baseValue;
-    dataPoints = labels.map(() => {
-      const change = (Math.random() - 0.48) * baseValue * volatility / Math.sqrt(numPoints);
-      currentValue += change;
-      return Math.max(0, currentValue); // Evitar valores negativos
-    });
+      const cacheKey = `${targetKey}::${tf}`;
+      if (chartCacheRef.current.has(cacheKey)) {
+        const cachedHtml = chartCacheRef.current.get(cacheKey) ?? '';
+        if (requestRef.current === requestId) {
+          setChartHtml(cachedHtml);
+          setLoading(false);
+        }
+        return;
+      }
 
-    return { labels, dataPoints };
-  };
+      try {
+        const html = await fetchPortfolioChartHtml(targetKey);
+        if (requestRef.current !== requestId) {
+          return;
+        }
+        const enhancedHtml = enhanceChartHtml(html);
+        setChartHtml(enhancedHtml);
+        chartCacheRef.current.set(cacheKey, enhancedHtml);
+      } catch (err) {
+        if (requestRef.current !== requestId) {
+          return;
+        }
+        const message = err instanceof Error ? err.message : 'Error desconocido al cargar el gráfico.';
+        setError(message);
+        setChartHtml('');
+      } finally {
+        if (requestRef.current === requestId) {
+          setLoading(false);
+        }
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
-    if (chartRef.current) {
-      const ctx = chartRef.current.getContext('2d');
-      
-      if (ctx) {
-        const { labels, dataPoints } = generateData(timeframe, selectedStock);
-
-        // Crear gradiente para el fondo
-        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, 'rgba(37, 99, 235, 0.4)'); // Azul más intenso arriba
-        gradient.addColorStop(1, 'rgba(37, 99, 235, 0)'); // Transparente abajo
-
-        // Destruir gráfico anterior si existe
-        if (chartInstanceRef.current) {
-          chartInstanceRef.current.destroy();
-        }
-
-        // Crear nueva instancia del gráfico
-        chartInstanceRef.current = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: labels,
-            datasets: [{
-              label: selectedStock ? `Precio de ${selectedStock.symbol}` : 'Valor del Portafolio',
-              data: dataPoints,
-              borderColor: '#2563eb', // Azul brillante
-              borderWidth: 2,
-              pointRadius: 0, // Sin puntos visibles
-              pointHoverRadius: 6, // Punto al pasar el cursor
-              pointHoverBackgroundColor: '#2563eb',
-              pointHoverBorderColor: '#FFFFFF',
-              pointHoverBorderWidth: 2,
-              tension: 0.3, // Línea ligeramente curvada
-              fill: true,
-              backgroundColor: gradient,
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              x: {
-                type: 'time',
-                time: {
-                  unit: timeframe === '1D' ? 'hour' : (timeframe === '1W' || timeframe === '1M' ? 'day' : 'month'),
-                  tooltipFormat: timeframe === '1D' ? 'dd MMM, HH:mm' : 'dd MMM, yyyy',
-                  displayFormats: {
-                    hour: 'HH:mm',
-                    day: 'dd MMM',
-                    month: 'MMM',
-                    year: 'yyyy'
-                  }
-                },
-                grid: {
-                  display: false,
-                  color: '#e5e7eb', // Cambiado a gris claro (Tailwind gray-200)
-                },
-                ticks: {
-                  color: '#94a3b8', // Color tailwind slate-400
-                  maxRotation: 0,
-                  autoSkip: true,
-                  maxTicksLimit: 7
-                },
-                border: {
-                  display: false,
-                  color: '#e5e7eb', // Cambiado a gris claro (Tailwind gray-200)
-                }
-              },
-              y: {
-                beginAtZero: false,
-                grid: {
-                  color: '#e5e7eb', // Cambiado a gris claro (Tailwind gray-200)
-                  drawOnChartArea: true,
-                  drawBorder: false
-                },
-                ticks: {
-                  color: '#6b7280', // Gris medio para etiquetas Y
-                  padding: 10,
-                  callback: function(value: number | string) {
-                    const numValue = typeof value === 'string' ? parseFloat(value) : value;
-                    if (numValue >= 1000000) return '$' + (numValue / 1000000).toFixed(1) + 'M';
-                    if (numValue >= 1000) return '$' + (numValue / 1000).toFixed(0) + 'K';
-                    return '$' + numValue;
-                  },
-                  maxTicksLimit: 5
-                }
-              }
-            },
-            plugins: {
-              legend: {
-                display: false
-              },
-              tooltip: {
-                enabled: true,
-                mode: 'index',
-                intersect: false,
-                backgroundColor: '#f8fafc', // Color claro para tooltip
-                titleColor: '#334155', // Texto oscuro para mejor contraste
-                bodyColor: '#334155', // Texto oscuro para mejor contraste
-                borderColor: '#e2e8f0', // Borde sutil
-                borderWidth: 1,
-                padding: 10,
-                displayColors: false,
-                callbacks: {
-                  title: function(tooltipItems: any[]) {
-                    const date = new Date(tooltipItems[0].parsed.x);
-                    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
-                  },
-                  label: function(context: any) {
-                    let label = context.dataset.label || '';
-                    if (label) {
-                      label += ': ';
-                    }
-                    if (context.parsed.y !== null) {
-                      label += '$' + context.parsed.y.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-                    }
-                    return label;
-                  }
-                }
-              }
-            },
-            interaction: {
-              mode: 'index',
-              intersect: false,
-            },
-            hover: {
-              mode: 'nearest',
-              intersect: true
-            }
-          }
-        });
-      }
-    }
-
-    // Cleanup: destruir el gráfico al desmontar
-    return () => {
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-    };
-  }, [timeframe, selectedStock]); // Re-ejecutar cuando cambie timeframe o el activo seleccionado
+    loadChart(timeframe, chartKey);
+  }, [chartKey, timeframe, loadChart]);
 
   return (
-    <div className="w-full h-full flex flex-col" style={{ height: '365.896px' }}>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-gray-800">
-          {selectedStock ? `${selectedStock.name} (${selectedStock.symbol})` : 'Rendimiento del Portafolio'}
-        </h2>
-        <div className="flex space-x-1 bg-gray-100 rounded-full p-1">
-          {(['1D', '1W', '1M', '6M', '1Y'] as TimeframeType[]).map((tf) => (
-            <button
-              key={tf}
-              onClick={() => setTimeframe(tf)}
-              className={`px-3 py-1 text-xs font-medium rounded-full ${
-                timeframe === tf
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:bg-gray-200'
-              } transition-colors`}
-            >
-              {tf}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="flex-1 min-h-0 pb-6">
-        <canvas ref={chartRef} />
+    <div className="w-full flex flex-col overflow-hidden">
+      <div className="relative w-full aspect-[16/9] min-h-[300px] max-h-[420px] overflow-hidden">
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center text-sm text-gray-500 bg-white/70 z-20">
+            Cargando gráfico…
+          </div>
+        )}
+
+        {error && !loading && (
+          <div className="absolute inset-0 flex items-center justify-center text-sm text-red-500 z-20 text-center px-4">
+            {error}
+          </div>
+        )}
+
+        {chartHtml && !error && (
+          <iframe
+            key={`${chartKey}-${timeframe}`}
+            title={chartTitle}
+            srcDoc={chartHtml}
+            className="absolute inset-0 w-full h-full border-0"
+            scrolling="no"
+            sandbox="allow-scripts allow-same-origin"
+          />
+        )}
+
+        {!chartHtml && !loading && !error && (
+          <div className="absolute inset-0 flex items-center justify-center text-sm text-gray-400 z-10">
+            No hay gráfico disponible para esta vista.
+          </div>
+        )}
       </div>
     </div>
   );

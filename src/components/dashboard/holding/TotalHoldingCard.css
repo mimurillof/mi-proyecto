@@ -48,6 +48,11 @@
     background-color: #e5e7eb;
 }
 
+.holding-time-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 
 .holding-dropdown-button {
   background-color: transparent;
@@ -66,6 +71,11 @@
     border-color: #9ca3af;
 }
 
+.holding-dropdown-button:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
 
 .holding-total-amount {
   font-size: 1.5rem; /* 24px - reducido de 30px */
@@ -74,6 +84,12 @@
   width: 100%;
   text-align: left;
   color: #111827; /* Color casi negro */
+}
+
+.holding-total-amount--loading {
+  color: #9ca3af;
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 .holding-return-info {
@@ -102,6 +118,25 @@
 .holding-return-absolute {
    /* Hereda el color de .holding-return-info */
    font-weight: 500;
+}
+
+.holding-status {
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.holding-status--error {
+  color: #dc2626;
+}
+
+.holding-status--info {
+  color: #2563eb;
+}
+
+.holding-meta {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
 }
 
 /* Responsive (opcional, ajustar si es necesario) */

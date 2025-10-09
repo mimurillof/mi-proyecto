@@ -63,6 +63,16 @@
     /* Estilización básica de la barra de scroll (Webkit) - Sin anidamiento */
 }
 
+.watchlist-feedback {
+    padding: 16px;
+    font-size: 0.95rem;
+    color: #4B5563;
+}
+
+.watchlist-feedback--error {
+    color: #DC2626;
+}
+
 /* Estilos específicos para el scrollbar dentro de .watchlistScrollableList */
 .watchlistScrollableList::-webkit-scrollbar {
     width: 6px;
@@ -97,20 +107,11 @@
 
 .MuiListItemIcon-root {
     min-width: auto;
-    color: #6B7280; /* Gris medio */
-    font-size: 1.8rem;
-    background-color: #F3F4F6; /* Gris muy claro */
-    border-radius: 50%;
     width: 36px;
     height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-.MuiListItemIcon-root img {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
 }
 
 .MuiListItemText-root {

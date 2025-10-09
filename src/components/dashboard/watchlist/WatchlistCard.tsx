@@ -1,61 +1,179 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
-    Typography, Tabs, Tab, Box,
-    List, ListItem, ListItemIcon, ListItemText, Icon
+    Typography,
+    Tabs,
+    Tab,
+    List,
+    ListItem,
+    ListItemIcon,
+    ListItemText,
 } from '@mui/material';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import './WatchlistCard.css'; // Importar los estilos CSS
+import './WatchlistCard.css';
+import {
+    fetchPortfolioMarket,
+    MarketOverviewEntry,
+    MarketOverviewResult,
+} from '../../../services/portfolioManagerService';
+import WatchlistItemIcon from './WatchlistItemIcon';
 
-// --- Tipos y Datos de Ejemplo ---
+export type WatchlistCategory = 'viewed' | 'gainer' | 'loser' | 'active';
+
 interface WatchlistItem {
     name: string;
-    symbol: string;
+    ticker: string;
+    displaySymbol: string;
     price: number;
     change: number;
-    logoIcon: string; // Nombre del icono de Material Icons
-    type: 'viewed' | 'gainer' | 'loser';
+    logoUrl?: string | null;
+    type: WatchlistCategory;
 }
 
-const initialWatchlistItems: WatchlistItem[] = [
-    { name: "Spotify", symbol: "NYSE SPOT", price: 230.50, change: 2.34, logoIcon: "music_note", type: 'viewed' },
-    { name: "Amazon", symbol: "NYSE AMZN", price: 185.10, change: -1.15, logoIcon: "shopping_bag", type: 'viewed' },
-    { name: "Tesla", symbol: "NASDAQ TSLA", price: 175.80, change: 3.10, logoIcon: "electric_car", type: 'gainer' },
-    { name: "Apple", symbol: "NASDAQ AAPL", price: 190.30, change: 0.85, logoIcon: "apple", type: 'gainer' },
-    { name: "Nio", symbol: "NYSE NIO", price: 4.50, change: -5.20, logoIcon: "ev_station", type: 'loser' },
-    { name: "Microsoft", symbol: "NASDAQ MSFT", price: 420.70, change: 1.50, logoIcon: "important_devices", type: 'viewed' },
-    { name: "Nvidia", symbol: "NASDAQ NVDA", price: 910.00, change: 4.55, logoIcon: "memory", type: 'gainer' },
-    { name: "Boeing", symbol: "NYSE BA", price: 178.20, change: -3.80, logoIcon: "flight", type: 'loser' },
-    { name: "Netflix", symbol: "NASDAQ NFLX", price: 615.30, change: 1.95, logoIcon: "theaters", type: 'gainer' },
-    { name: "AMD", symbol: "NASDAQ AMD", price: 160.50, change: -0.75, logoIcon: "developer_board", type: 'loser' },
-    { name: "Disney", symbol: "NYSE DIS", price: 105.10, change: 0.25, logoIcon: "movie", type: 'viewed' },
-    { name: "PayPal", symbol: "NASDAQ PYPL", price: 63.80, change: -2.10, logoIcon: "paypal", type: 'loser' }, // Nota: 'paypal' no es un icono estándar de Material Icons. Podrías necesitar un icono personalizado o uno genérico.
-    { name: "Salesforce", symbol: "NYSE CRM", price: 270.90, change: 1.10, logoIcon: "cloud", type: 'gainer' },
-    { name: "Intel", symbol: "NASDAQ INTC", price: 30.50, change: -1.55, logoIcon: "memory", type: 'loser' },
-];
-
-// --- Componente Principal ---
 const WatchlistCard: React.FC = () => {
-    const [selectedTab, setSelectedTab] = useState(0); // 0: Most Viewed, 1: Gainers, 2: Losers
+    const [selectedTab, setSelectedTab] = useState<number>(0);
+    const [items, setItems] = useState<WatchlistItem[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
         setSelectedTab(newValue);
     };
 
-    // Filtrar items basado en la pestaña seleccionada
+    useEffect(() => {
+        let mounted = true;
+
+        const loadWatchlist = async () => {
+            setLoading(true);
+            setError(null);
+
+            try {
+                const { market }: MarketOverviewResult = await fetchPortfolioMarket();
+
+                if (!mounted) {
+                    return;
+                }
+
+                const flattenList = (
+                    list: MarketOverviewEntry[] | undefined,
+                    type: WatchlistCategory,
+                ): WatchlistItem[] => {
+                    if (!Array.isArray(list)) {
+                        return [];
+                    }
+
+                    return list
+                        .filter((entry): entry is MarketOverviewEntry => Boolean(entry?.symbol))
+                        .map((entry) => {
+                            const ticker = entry.symbol ?? '';
+                            const displaySymbol = entry.exchange
+                                ? `${entry.exchange} ${ticker}`
+                                : ticker;
+
+                            return {
+                                name: entry.name ?? ticker,
+                                ticker,
+                                displaySymbol,
+                        price: entry.current_price ?? 0,
+                        change: entry.change_percent ?? 0,
+                                logoUrl: entry.logo_url ?? null,
+                                type,
+                            };
+                        });
+                };
+
+                const viewed = flattenList(market.most_viewed, 'viewed');
+                const gainers = flattenList(market.gainers, 'gainer');
+                const losers = flattenList(market.losers, 'loser');
+                const actives = flattenList((market as MarketOverview & { most_active?: MarketOverviewEntry[] }).most_active, 'active');
+
+                const combined = [...viewed, ...gainers, ...losers, ...actives];
+
+                setItems(combined);
+            } catch (err) {
+                console.error('Error al cargar watchlist:', err);
+                if (!mounted) {
+                    return;
+                }
+                const message = err instanceof Error ? err.message : 'Error desconocido al cargar la watchlist.';
+                setError(message);
+                setItems([]);
+            } finally {
+                if (mounted) {
+                setLoading(false);
+                }
+            }
+        };
+
+        loadWatchlist();
+
+        return () => {
+            mounted = false;
+        };
+    }, []);
+
     const filteredItems = useMemo(() => {
-        switch (selectedTab) {
-            case 1: // Gainers
-                return initialWatchlistItems.filter(item => item.change > 0).sort((a, b) => b.change - a.change); // Ordenar por mayor ganancia
-            case 2: // Losers
-                return initialWatchlistItems.filter(item => item.change < 0).sort((a, b) => a.change - b.change); // Ordenar por mayor pérdida
-            case 0: // Most Viewed (o todos si no hay tipo 'viewed')
-            default:
-                 const viewedItems = initialWatchlistItems.filter(item => item.type === 'viewed');
-                 // Si no hay 'viewed', mostrar todos como fallback (o podrías dejarlos vacíos)
-                 return viewedItems.length > 0 ? viewedItems : initialWatchlistItems;
+        if (items.length === 0) {
+            return [];
         }
-    }, [selectedTab]);
+
+        switch (selectedTab) {
+            case 1: {
+                return items
+                    .filter((item) => item.type === 'gainer')
+                    .sort((a, b) => (b.change ?? 0) - (a.change ?? 0));
+            }
+            case 2: {
+                return items
+                    .filter((item) => item.type === 'loser')
+                    .sort((a, b) => (a.change ?? 0) - (b.change ?? 0));
+            }
+            case 0:
+            default: {
+                const viewedItems = items.filter((item) => item.type === 'viewed');
+                 return viewedItems.length > 0 ? viewedItems : items;
+            }
+        }
+    }, [items, selectedTab]);
+
+    if (loading) {
+        return (
+            <div className="watchlistContainer">
+                <div className="headerRow">
+                    <Typography variant="h6" component="div" className="watchlistTitle">
+                        Watchlist
+                    </Typography>
+                </div>
+                <div className="watchlist-feedback">Cargando watchlist…</div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="watchlistContainer">
+                <div className="headerRow">
+                    <Typography variant="h6" component="div" className="watchlistTitle">
+                        Watchlist
+                    </Typography>
+                </div>
+                <div className="watchlist-feedback watchlist-feedback--error">{error}</div>
+            </div>
+        );
+    }
+
+    if (filteredItems.length === 0) {
+        return (
+            <div className="watchlistContainer">
+                <div className="headerRow">
+                    <Typography variant="h6" component="div" className="watchlistTitle">
+                        Watchlist
+                    </Typography>
+                </div>
+                <div className="watchlist-feedback">No hay datos disponibles.</div>
+            </div>
+        );
+    }
 
     return (
         <div className="watchlistContainer">
@@ -84,29 +202,32 @@ const WatchlistCard: React.FC = () => {
                     {filteredItems.map((item) => {
                         const isPositive = item.change > 0;
                         const ChangeIcon = isPositive ? ArrowUpwardIcon : ArrowDownwardIcon;
+
                         return (
-                            <ListItem key={item.symbol} disablePadding> {/* Añadir disablePadding si se maneja en CSS */}
+                            <ListItem key={`${item.ticker}-${item.type}`} disablePadding>
                                 <ListItemIcon>
-                                    {/* Usar Icon de MUI para mostrar el icono por nombre */}
-                                    <Icon>{item.logoIcon || 'inventory_2'}</Icon> {/* inventory_2 como fallback */}
+                                    <WatchlistItemIcon symbol={item.ticker} logoUrl={item.logoUrl} />
                                 </ListItemIcon>
                                 <ListItemText
                                     primary={item.name}
-                                    secondary={item.symbol}
+                                    secondary={item.displaySymbol}
                                     primaryTypographyProps={{ className: 'MuiListItemText-primary' }}
                                     secondaryTypographyProps={{ className: 'MuiListItemText-secondary' }}
                                 />
                                 <div className="priceChangeContainer">
                                     <Typography variant="body1" component="span" className="itemPrice">
-                                        ${item.price.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+                                        ${item.price.toLocaleString('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2,
+                                        })}
                                     </Typography>
                                     <Typography
                                         variant="body2"
                                         component="span"
                                         className={`itemChange ${isPositive ? 'itemChangePositive' : 'itemChangeNegative'}`}
                                     >
-                                        <ChangeIcon sx={{ fontSize: 'inherit', verticalAlign: 'middle' }} /> {/* Ajustar icono */}
-                                        {Math.abs(item.change).toFixed(2)}%
+                                        <ChangeIcon sx={{ fontSize: 'inherit', verticalAlign: 'middle' }} />
+                                        {`${isPositive ? '+' : ''}${Math.abs(item.change).toFixed(2)}%`}
                                     </Typography>
                                 </div>
                             </ListItem>

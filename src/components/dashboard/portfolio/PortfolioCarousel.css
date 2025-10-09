@@ -197,5 +197,50 @@
     right: -10px; /* Posición ajustada */
 }
 
+.portfolio-status-wrapper {
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
+}
+
+.portfolio-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+}
+
+.portfolio-status--loading {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    border-color: #bfdbfe;
+}
+
+.portfolio-status--info {
+    background-color: #ecfeff;
+    color: #0369a1;
+    border-color: #bae6fd;
+}
+
+.portfolio-status--warning {
+    background-color: #fffbeb;
+    color: #b45309;
+    border-color: #fcd34d;
+}
+
+.portfolio-status--error {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+
+.portfolio-status__meta {
+    font-weight: 500;
+}
+
 /* Responsive (opcional, ajustar si es necesario) */
 /* @media (max-width: 768px) { ... } */
