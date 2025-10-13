@@ -26,6 +26,7 @@ import MarketPage from './pages/MarketPage'; // <-- Importar MarketPage
 import AIAgentPage from './pages/AIAgentPage'; // <-- Nueva importación
 import UserProfilePage from './pages/UserProfilePage/UserProfilePage'; // <-- Importar UserProfilePage
 import AccountSettingsPage from './pages/AccountSettingsPage/AccountSettingsPage'; // <-- Nueva importación
+import { Card, CardHeader, CardFooter, Image, Button } from '@heroui/react';
 
 // Importar CSS de UserProfilePage
 import './pages/UserProfilePage/UserProfilePage.css';
@@ -269,7 +270,7 @@ function App() {
               <> 
                 <div className="flex flex-col lg:flex-row gap-6 w-full h-full"> 
                   <div className="flex flex-col gap-6 w-full lg:w-1/2 flex-grow"> 
-                    <div className="bg-white rounded-lg shadow p-4 text-black overflow-y-auto news-component-container"> 
+                    <div className="bg-white rounded-lg shadow p-4 text-black overflow-hidden news-component-container">
                       <div className="product-list">
                         <a href="#" aria-label="Título de la Noticia 1" className="product-list-item">
                           <div className="product-description-container">
@@ -312,29 +313,121 @@ function App() {
                         </a>
                       </div>
                     </div>
-                    <div ref={mentionsContainerRef} className="bg-white rounded-lg shadow text-black overflow-y-auto flex-grow">
-                      <div className="post-card-container">
+                    <div ref={mentionsContainerRef} className="bg-white rounded-lg shadow text-black overflow-hidden flex-grow p-4">
+                      <div className="flex h-full flex-col gap-3">
                           <h3 className="component-title">Menciones Recientes</h3>
-                          <div className="post-card">
-                              <div className="post-header">
-                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="icon-reddit"> <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm4.17-10.157a.75.75 0 00-1.06-1.06l-1.007 1.007a.75.75 0 101.06 1.06l1.007-1.007zm-4.34 5.78a.75.75 0 00-1.06 1.06l-1.5-1.5a.75.75 0 00-1.06 0l-1.5 1.5a.75.75 0 101.06 1.06l1.22-1.22 1.22 1.22a.75.75 0 001.06 0l1.5-1.5a.75.75 0 000-1.06l-1.5-1.5zM10 12a2 2 0 100-4 2 2 0 000 4zm-4.17-4.157a.75.75 0 10-1.06 1.06l1.007 1.007a.75.75 0 101.06-1.06L5.83 7.843z" clipRule="evenodd" /></svg>
-                                  <span>r/wallstreetbets · hace 2h</span>
+                        <div className="grid flex-1 min-h-0 grid-cols-12 gap-3 auto-rows-[140px] sm:auto-rows-[170px]">
+                          <Card className="relative col-span-12 md:col-span-6 xl:col-span-4">
+                            <span className="absolute inset-0 z-[1] bg-gradient-to-t from-black/70 via-black/30 to-transparent" aria-hidden="true" />
+                            <CardHeader className="absolute z-10 top-2 flex-col items-start gap-1">
+                              <span className="inline-flex items-center gap-1 rounded-full bg-black/60 px-2 py-[2px] text-[10px] font-semibold uppercase tracking-wide text-white">Reddit • r/wallstreetbets</span>
+                              <h4 className="text-white text-xs font-semibold">"$XYZ se perfila para romper resistencias"</h4>
+                              <p className="text-[11px] text-white/80">Usuarios coordinan una entrada agresiva antes del cierre semanal.</p>
+                            </CardHeader>
+                            <CardFooter className="absolute bottom-2 left-2 right-2 z-10 rounded-lg border border-white/20 bg-white/10 px-3 py-2 backdrop-blur-sm">
+                              <div className="flex w-full items-center justify-between text-[11px] text-white/80">
+                                <span>Upvotes • 12.4k</span>
+                                <span className="text-emerald-200">+18% sentimiento</span>
                               </div>
-                              <p className="post-content">"Creo que $XYZ va a explotar la próxima semana. ¡Todos a bordo! 🚀🚀 #ToTheMoon"</p>
+                            </CardFooter>
+                            <Image
+                              removeWrapper
+                              alt="Operador observando pantallas con gráficos volátiles"
+                              className="z-0 w-full h-full object-cover"
+                              src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=1200&q=80"
+                            />
+                          </Card>
+                          <Card className="relative col-span-12 md:col-span-6 xl:col-span-4">
+                            <span className="absolute inset-0 z-[1] bg-gradient-to-t from-black/75 via-slate-900/30 to-transparent" aria-hidden="true" />
+                            <CardHeader className="absolute z-10 top-2 flex-col items-start gap-1">
+                              <span className="inline-flex items-center gap-1 rounded-full bg-sky-500/80 px-2 py-[2px] text-[10px] font-semibold uppercase tracking-wide text-white">X • @InversorPro</span>
+                              <h4 className="text-white text-xs font-semibold">Mercado atento a la decisión de tasas</h4>
+                              <p className="text-[11px] text-white/80">"Powell sugiere pausa prolongada. Liquidez se mueve a bonos cortos."</p>
+                            </CardHeader>
+                            <CardFooter className="absolute bottom-2 left-2 right-2 z-10 rounded-lg border border-white/20 bg-white/10 px-3 py-2 backdrop-blur-sm">
+                              <div className="flex items-center justify-between text-[11px] text-white/80">
+                                <span>Reposts • 2.1k</span>
+                                <span className="text-amber-200">🛈 Riesgo moderado</span>
+                              </div>
+                            </CardFooter>
+                            <Image
+                              removeWrapper
+                              alt="Panel de control financiero con gráficas y boletines"
+                              className="z-0 w-full h-full object-cover"
+                              src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1200&q=80"
+                            />
+                          </Card>
+                          <Card className="relative col-span-12 md:col-span-6 xl:col-span-4">
+                            <span className="absolute inset-0 z-[1] bg-gradient-to-t from-black/70 via-slate-800/25 to-transparent" aria-hidden="true" />
+                            <CardHeader className="absolute z-10 top-2 flex-col items-start gap-1">
+                              <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/80 px-2 py-[2px] text-[10px] font-semibold uppercase tracking-wide text-white">Foro Private Equity</span>
+                              <h4 className="text-white text-xs font-semibold">Rotación hacia energía limpia</h4>
+                              <p className="text-[11px] text-white/85">Gestores reportan récord de capital entrando en ETF solares para Q4.</p>
+                            </CardHeader>
+                            <CardFooter className="absolute bottom-2 left-2 right-2 z-10 rounded-lg border border-white/20 bg-white/10 px-3 py-2 backdrop-blur-sm">
+                              <div className="flex items-center justify-between text-[11px] text-white/80">
+                                <span>Gestores • 38</span>
+                                <span className="text-emerald-200">Flujos +9.3%</span>
                           </div>
-                          <div className="post-card">
-                              <div className="post-header">
-                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="icon-twitter"> <path d="M6.29 18.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 4.774a8.317 8.317 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84" /></svg>
-                                  <span>@Inversor_Pro · hace 15m</span>
+                            </CardFooter>
+                            <Image
+                              removeWrapper
+                              alt="Panel solar iluminado al atardecer"
+                              className="z-0 w-full h-full object-cover"
+                              src="https://images.unsplash.com/photo-1509395176047-4a66953fd231?auto=format&fit=crop&w=1200&q=80"
+                            />
+                          </Card>
+                          <Card isFooterBlurred className="col-span-12 xl:col-span-5">
+                            <CardHeader className="absolute z-10 top-2 flex-col items-start gap-1">
+                              <span className="inline-flex items-center gap-1 rounded-full bg-white/80 px-2 py-[2px] text-[10px] font-semibold uppercase tracking-wide text-gray-900">Breaking • Último minuto</span>
+                              <h4 className="text-black font-medium text-base">"TechMega" anuncia split 3:1</h4>
+                              <p className="text-[11px] text-gray-800/80">CEO confirma resultados por encima del consenso y recompras por 4B USD.</p>
+                            </CardHeader>
+                            <Image
+                              removeWrapper
+                              alt="Analistas celebrando resultados tecnológicos"
+                              className="z-0 w-full h-full object-cover"
+                              src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80"
+                            />
+                            <CardFooter className="absolute bg-white/75 bottom-2 left-2 right-2 border border-white/60 z-10 justify-between rounded-xl px-3 py-2">
+                              <div>
+                                <p className="text-[11px] font-semibold text-gray-900">After hours: +6.3%</p>
+                                <p className="text-[11px] text-gray-700">Volumen 3x promedio</p>
                               </div>
-                              <p className="post-content">"Mucha incertidumbre en el mercado ahora mismo. Mejor ser cauteloso y esperar a ver qué pasa con las tasas de interés. #Finanzas #Trading"</p>
-                          </div>
-                          <div className="post-card">
-                              <div className="post-header">
-                                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="icon-reddit"> <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm4.17-10.157a.75.75 0 00-1.06-1.06l-1.007 1.007a.75.75 0 101.06 1.06l1.007-1.007zm-4.34 5.78a.75.75 0 00-1.06 1.06l-1.5-1.5a.75.75 0 00-1.06 0l-1.5 1.5a.75.75 0 101.06 1.06l1.22-1.22 1.22 1.22a.75.75 0 001.06 0l1.5-1.5a.75.75 0 000-1.06l-1.5-1.5zM10 12a2 2 0 100-4 2 2 0 000 4zm-4.17-4.157a.75.75 0 10-1.06 1.06l1.007 1.007a.75.75 0 101.06-1.06L5.83 7.843z" clipRule="evenodd" /></svg>
-                                  <span>r/investing · hace 5h</span>
+                              <Button className="text-[11px]" color="primary" radius="full" size="sm">
+                                Seguir ticker
+                              </Button>
+                            </CardFooter>
+                          </Card>
+                          <Card isFooterBlurred className="col-span-12 xl:col-span-7">
+                            <CardHeader className="absolute z-10 top-2 flex-col items-start gap-1">
+                              <span className="inline-flex items-center gap-1 rounded-full bg-violet-500/80 px-2 py-[2px] text-[10px] font-semibold uppercase tracking-wide text-white">Podcast • MarketTalk</span>
+                              <h4 className="text-white text-sm font-semibold">Episodio especial: "Cómo navegar la volatilidad"</h4>
+                              <p className="text-[11px] text-white/80">Invitados revisan estrategias defensivas, coberturas y sectores refugio.</p>
+                            </CardHeader>
+                            <Image
+                              removeWrapper
+                              alt="Estudio de podcast financiero con micrófonos y gráficos"
+                              className="z-0 w-full h-full object-cover"
+                              src="https://images.unsplash.com/photo-1525182008055-f88b95ff7980?auto=format&fit=crop&w=1200&q=80"
+                            />
+                            <CardFooter className="absolute bg-black/50 bottom-2 left-2 right-2 z-10 border border-white/20 px-3 py-2">
+                              <div className="flex grow gap-3 items-center text-[11px] text-white/80">
+                                <Image
+                                  alt="Icono del podcast"
+                                  className="rounded-full w-8 h-8 border border-white/40"
+                                  src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=200&q=80"
+                                />
+                                <div className="flex flex-col">
+                                  <p>Duración: 24 min • Transcripción disponible</p>
+                                  <p className="text-white">Escúchalo ahora ↗</p>
+                                </div>
                               </div>
-                              <p className="post-content">"No me gusta cómo se ven los gráficos técnicos. Parece que viene una corrección fuerte. Vendiendo algunas posiciones. $SPY"</p>
+                              <Button radius="full" size="sm" color="secondary">
+                                Reproducir
+                              </Button>
+                            </CardFooter>
+                          </Card>
                           </div>
                       </div>
                     </div>
