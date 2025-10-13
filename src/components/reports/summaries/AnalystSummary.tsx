@@ -9,7 +9,7 @@ const AnalystSummary: React.FC = () => {
   };
 
   // URL del PDF (puede venir de props o estado)
-  const pdfUrl = "https://files.elfsightcdn.com/_assets/pdf-embed/files/research.pdf";
+  const pdfUrl = "https://tlmdrkthueicqnvbjmie.supabase.co/storage/v1/object/public/portfolio-files/Informes/Reporte.pdf";
 
   return (
     // Contenedor principal que ocupa todo el espacio disponible (h-full, w-full)
