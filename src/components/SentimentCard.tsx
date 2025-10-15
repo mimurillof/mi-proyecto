@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './SentimentCard.css'; // Import the CSS file
+import type { SentimentBucket } from '../services/homeService';
 
 interface SegmentRefs {
   extremeFear: React.RefObject<SVGPathElement>;
@@ -17,11 +18,45 @@ interface SegmentTextRefs {
     extremeGreed: React.RefObject<SVGGElement>;
 }
 
+interface SentimentCardProps {
+  value?: number | null;
+  label?: string | null;
+  bucket?: SentimentBucket | null;
+}
 
-const SentimentCard: React.FC = () => {
-  const [sentimentValue, setSentimentValue] = useState<number>(50); // Initial value (e.g., Neutral)
-  const [activeLabel, setActiveLabel] = useState<string>('Neutral');
-  const [activeDataAttr, setActiveDataAttr] = useState<string>('neutral');
+const bucketToSegment: Record<SentimentBucket, keyof SegmentRefs> = {
+  'extreme-fear': 'extremeFear',
+  fear: 'fear',
+  neutral: 'neutral',
+  greed: 'greed',
+  'extreme-greed': 'extremeGreed',
+};
+
+const clampValue = (val: number): number => Math.max(0, Math.min(100, val));
+
+const mapValueToBucket = (val: number): { bucket: SentimentBucket; label: string; segment: keyof SegmentRefs } => {
+  if (val <= 20) {
+    return { bucket: 'extreme-fear', label: 'Extreme Fear', segment: 'extremeFear' };
+  }
+  if (val <= 40) {
+    return { bucket: 'fear', label: 'Fear', segment: 'fear' };
+  }
+  if (val <= 60) {
+    return { bucket: 'neutral', label: 'Neutral', segment: 'neutral' };
+  }
+  if (val <= 80) {
+    return { bucket: 'greed', label: 'Greed', segment: 'greed' };
+  }
+  return { bucket: 'extreme-greed', label: 'Extreme Greed', segment: 'extremeGreed' };
+};
+
+const SentimentCard: React.FC<SentimentCardProps> = ({ value, label, bucket }) => {
+  const initialValue = clampValue(typeof value === 'number' ? value : 50);
+  const initialMapping = mapValueToBucket(initialValue);
+
+  const [sentimentValue, setSentimentValue] = useState<number>(initialValue);
+  const [activeLabel, setActiveLabel] = useState<string>(label ?? initialMapping.label);
+  const [activeDataAttr, setActiveDataAttr] = useState<SentimentBucket>(bucket ?? initialMapping.bucket);
 
   const sentimentDisplayRef = useRef<HTMLDivElement>(null);
   const sentimentValueDisplayRef = useRef<HTMLDivElement>(null);
@@ -46,59 +81,44 @@ const SentimentCard: React.FC = () => {
    };
 
   useEffect(() => {
-    const value = Math.max(0, Math.min(100, sentimentValue));
-    let currentActiveSegmentId: keyof SegmentRefs = 'neutral';
-    let currentActiveLabel = 'Neutral';
-    let currentDataSentimentAttr = 'neutral';
-
-    if (value <= 20) {
-      currentActiveSegmentId = 'extremeFear';
-      currentActiveLabel = 'Extreme Fear';
-      currentDataSentimentAttr = 'extreme-fear';
-    } else if (value <= 40) {
-      currentActiveSegmentId = 'fear';
-      currentActiveLabel = 'Fear';
-      currentDataSentimentAttr = 'fear';
-    } else if (value <= 60) {
-      currentActiveSegmentId = 'neutral';
-      currentActiveLabel = 'Neutral';
-      currentDataSentimentAttr = 'neutral';
-    } else if (value <= 80) {
-      currentActiveSegmentId = 'greed';
-      currentActiveLabel = 'Greed';
-      currentDataSentimentAttr = 'greed';
+    if (typeof value === 'number') {
+      setSentimentValue(clampValue(value));
     } else {
-      currentActiveSegmentId = 'extremeGreed';
-      currentActiveLabel = 'Extreme Greed';
-      currentDataSentimentAttr = 'extreme-greed';
+      setSentimentValue(50);
     }
+  }, [value]);
 
-    // Update state for label and data attribute (triggers re-render if needed)
-    setActiveLabel(currentActiveLabel);
-    setActiveDataAttr(currentDataSentimentAttr);
+  useEffect(() => {
+    const mapping = mapValueToBucket(sentimentValue);
+    const targetBucket = (bucket ?? mapping.bucket) as SentimentBucket;
+    const targetLabel = label ?? mapping.label;
+    const activeSegmentId = bucketToSegment[targetBucket] ?? mapping.segment;
+    const hasProvidedValue = typeof value === 'number';
+    const displayValue = hasProvidedValue ? clampValue(value) : sentimentValue;
 
-    // Update display text content directly using refs
+    setActiveLabel(targetLabel);
+    setActiveDataAttr(targetBucket);
+
     if (sentimentValueDisplayRef.current) {
-      sentimentValueDisplayRef.current.textContent = String(Math.round(value));
+      sentimentValueDisplayRef.current.textContent = hasProvidedValue
+        ? String(Math.round(displayValue))
+        : '--';
     }
     if (sentimentLabelDisplayRef.current) {
-      sentimentLabelDisplayRef.current.textContent = currentActiveLabel;
+      sentimentLabelDisplayRef.current.textContent = targetLabel;
     }
 
-    // Update data attribute on the display container
     if (sentimentDisplayRef.current) {
-        sentimentDisplayRef.current.dataset.sentiment = currentDataSentimentAttr;
+      sentimentDisplayRef.current.dataset.sentiment = targetBucket;
     }
 
-
-    // Update active classes on SVG elements
     Object.keys(segmentRefs).forEach((key) => {
       const segmentKey = key as keyof SegmentRefs;
       const segmentElement = segmentRefs[segmentKey].current;
       const textGroupElement = segmentTextRefs[segmentKey].current;
 
       if (segmentElement) {
-        if (segmentKey === currentActiveSegmentId) {
+        if (segmentKey === activeSegmentId) {
           segmentElement.classList.add('active');
         } else {
           segmentElement.classList.remove('active');
@@ -107,7 +127,7 @@ const SentimentCard: React.FC = () => {
 
       if (textGroupElement) {
           const letters = textGroupElement.querySelectorAll('.dial-area-letter');
-          if (segmentKey === currentActiveSegmentId) {
+          if (segmentKey === activeSegmentId) {
               letters.forEach(letter => letter.classList.add('active'));
           } else {
               letters.forEach(letter => letter.classList.remove('active'));
@@ -115,15 +135,9 @@ const SentimentCard: React.FC = () => {
       }
     });
 
-  }, [sentimentValue]); // Rerun effect when sentimentValue changes
-
-  // Example function to simulate updates (replace with real data fetching)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSentimentValue(Math.random() * 100);
-    }, 5000); // Update every 5 seconds
-    return () => clearInterval(interval); // Cleanup interval on unmount
-  }, []);
+  // segmentRefs and segmentTextRefs only hold stable ref objects, so dependency lint is intentionally suppressed
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sentimentValue, label, bucket, value]);
 
 
   return (
