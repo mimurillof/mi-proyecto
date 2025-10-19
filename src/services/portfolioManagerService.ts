@@ -1,4 +1,4 @@
-import { API_CONFIG, getApiUrl } from '../config/api';
+import { API_CONFIG, getApiUrl, getAuthHeaders } from '../config/api';
 
 const PORTFOLIO_MANAGER_BASE = API_CONFIG.ENDPOINTS.PORTFOLIO_MANAGER_BASE ?? '/api/portfolio-manager';
 
@@ -130,11 +130,16 @@ export const fetchPortfolioChartHtml = async (chartName: string): Promise<string
 
   const response = await fetch(url, {
     headers: {
+      ...getAuthHeaders(),
       Accept: 'text/html',
     },
   });
 
   if (!response.ok) {
+    if (response.status === 401) {
+      localStorage.removeItem('token');
+      throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+    }
     throw new Error(`No se pudo cargar el gráfico '${chartName}': ${response.status} ${response.statusText}`);
   }
 
@@ -163,8 +168,15 @@ export const fetchPortfolioReport = async (
   const endpoint = `${PORTFOLIO_MANAGER_BASE}/report${queryString ? `?${queryString}` : ''}`;
   const url = getApiUrl(endpoint);
 
-  const response = await fetch(url);
+  const response = await fetch(url, {
+    headers: getAuthHeaders(),
+  });
+  
   if (!response.ok) {
+    if (response.status === 401) {
+      localStorage.removeItem('token');
+      throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+    }
     throw new Error(`Error al obtener el portafolio: ${response.status} ${response.statusText}`);
   }
 
@@ -183,8 +195,15 @@ export const fetchPortfolioMarket = async (): Promise<MarketOverviewResult> => {
   const endpoint = `${PORTFOLIO_MANAGER_BASE}/market`;
   const url = getApiUrl(endpoint);
 
-  const response = await fetch(url);
+  const response = await fetch(url, {
+    headers: getAuthHeaders(),
+  });
+  
   if (!response.ok) {
+    if (response.status === 401) {
+      localStorage.removeItem('token');
+      throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+    }
     throw new Error(`Error al obtener la watchlist de mercado: ${response.status} ${response.statusText}`);
   }
 
@@ -233,8 +252,15 @@ export const fetchPortfolioSummary = async (): Promise<PortfolioSummaryEnvelope>
   const endpoint = `${PORTFOLIO_MANAGER_BASE}/summary`;
   const url = getApiUrl(endpoint);
 
-  const response = await fetch(url);
+  const response = await fetch(url, {
+    headers: getAuthHeaders(),
+  });
+  
   if (!response.ok) {
+    if (response.status === 401) {
+      localStorage.removeItem('token');
+      throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+    }
     throw new Error(`Error al obtener el resumen del portafolio: ${response.status} ${response.statusText}`);
   }
 
@@ -266,11 +292,16 @@ export const pollPortfolioUpdates = async (
 
   const response = await fetch(url, {
     headers: {
+      ...getAuthHeaders(),
       Accept: 'application/json',
     },
   });
 
   if (!response.ok) {
+    if (response.status === 401) {
+      localStorage.removeItem('token');
+      throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+    }
     throw new Error(`Error al consultar actualizaciones del portafolio: ${response.status} ${response.statusText}`);
   }
 

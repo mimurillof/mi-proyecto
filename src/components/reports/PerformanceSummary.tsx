@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { getApiUrl } from '../../config/api';
+import { getAuthenticatedUrl } from '../../config/api';
 
 const PerformanceSummary: React.FC = () => {
-  const iframeSrc = getApiUrl('/api/analizer/file/portfolio_growth_interactive.html');
+  const iframeSrc = getAuthenticatedUrl('/api/analizer/file/portfolio_growth_interactive.html');
 
   // Dimensiones nativas del HTML (definidas en el script): 1000x600
   const BASE_WIDTH = 1000;

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { getApiUrl } from '../../config/api';
+import { getAuthenticatedUrl } from '../../config/api';
 
 // Datos de ejemplo iniciales y para simulación
 const initialData = {
@@ -80,7 +80,7 @@ const chartOptions = {
 
 
 const InteractiveSimulations: React.FC = () => {
-  const iframeSrc = getApiUrl('/api/analizer/file/efficient_frontier_interactive.html');
+  const iframeSrc = getAuthenticatedUrl('/api/analizer/file/efficient_frontier_interactive.html');
   const BASE_WIDTH = 1100;
   const BASE_HEIGHT = 700;
   const containerRef = useRef<HTMLDivElement | null>(null);

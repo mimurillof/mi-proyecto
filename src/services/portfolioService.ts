@@ -3,7 +3,7 @@
  * Proporciona métodos para obtener métricas en vivo y gráficos del backend FastAPI
  */
 
-import { API_CONFIG, getApiUrl } from '../config/api';
+import { API_CONFIG, getApiUrl, getAuthHeaders } from '../config/api';
 
 // Configuración de la API - Usa la configuración centralizada
 const API_URL = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PORTFOLIO_BASE}`;
@@ -105,15 +105,25 @@ export interface HealthCheckResponse {
  */
 export const fetchLiveMetrics = async (): Promise<LiveMetricsResponse> => {
   try {
-    const response = await fetch(`${API_URL}/live-metrics`);
+    const response = await fetch(`${API_URL}/live-metrics`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
     
     if (!response.ok) {
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      }
       throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
     }
     
     const data = await response.json();
     return data;
   } catch (error) {
+    if (error instanceof Error && error.message.includes('Sesión expirada')) {
+      throw error;
+    }
     console.error('Error al obtener métricas en vivo:', error);
     throw error;
   }
@@ -124,15 +134,25 @@ export const fetchLiveMetrics = async (): Promise<LiveMetricsResponse> => {
  */
 export const fetchLatestAnalysisTimestamp = async (): Promise<LatestTimestampResponse> => {
   try {
-    const response = await fetch(`${API_URL}/latest-analysis-timestamp`);
+    const response = await fetch(`${API_URL}/latest-analysis-timestamp`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
     
     if (!response.ok) {
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      }
       throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
     }
     
     const data = await response.json();
     return data;
   } catch (error) {
+    if (error instanceof Error && error.message.includes('Sesión expirada')) {
+      throw error;
+    }
     console.error('Error al obtener timestamp del análisis:', error);
     throw error;
   }
@@ -150,15 +170,25 @@ export const getChartUrl = (chartName: string): string => {
  */
 export const fetchHealthCheck = async (): Promise<HealthCheckResponse> => {
   try {
-    const response = await fetch(`${API_URL}/health`);
+    const response = await fetch(`${API_URL}/health`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
     
     if (!response.ok) {
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      }
       throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
     }
     
     const data = await response.json();
     return data;
   } catch (error) {
+    if (error instanceof Error && error.message.includes('Sesión expirada')) {
+      throw error;
+    }
     console.error('Error al verificar estado de salud:', error);
     throw error;
   }

@@ -39,9 +39,36 @@ export const API_CONFIG = {
     }
 };
 
+// Función helper para obtener headers con autenticación
+export const getAuthHeaders = (): HeadersInit => {
+    const token = localStorage.getItem('token');
+    const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+    };
+    
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    return headers;
+};
+
 // Función helper para construir URLs completas
 export const getApiUrl = (endpoint: string): string => {
     return `${API_CONFIG.BASE_URL}${endpoint}`;
+};
+
+// Función helper para construir URLs autenticadas con token en query string (para iframes)
+export const getAuthenticatedUrl = (endpoint: string): string => {
+    const token = localStorage.getItem('token');
+    const baseUrl = `${API_CONFIG.BASE_URL}${endpoint}`;
+    
+    if (token) {
+        const separator = endpoint.includes('?') ? '&' : '?';
+        return `${baseUrl}${separator}token=${encodeURIComponent(token)}`;
+    }
+    
+    return baseUrl;
 };
 
 // Log de la URL en desarrollo (útil para debugging)

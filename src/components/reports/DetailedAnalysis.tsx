@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { getApiUrl } from '../../config/api';
+import { getAuthenticatedUrl } from '../../config/api';
 
 const DetailedAnalysis: React.FC = () => {
-  const iframeSrc = getApiUrl('/api/analizer/file/msr_portfolio_treemap_original.html');
+  const iframeSrc = getAuthenticatedUrl('/api/analizer/file/msr_portfolio_treemap_original.html');
   // Dimensiones base del HTML exportado por el script
   const BASE_WIDTH = 1000;
   const BASE_HEIGHT = 600;

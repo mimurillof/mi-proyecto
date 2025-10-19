@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { getApiUrl } from '../../config/api';
+import { getAuthenticatedUrl } from '../../config/api';
 
 const PredictiveChart: React.FC = () => {
-  const iframeSrc = getApiUrl('/api/analizer/file/monte_carlo_trajectories.html');
+  const iframeSrc = getAuthenticatedUrl('/api/analizer/file/monte_carlo_trajectories.html');
   // Dimensiones base exportadas por el script
   const BASE_WIDTH = 1000;
   const BASE_HEIGHT = 600;

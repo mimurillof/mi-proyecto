@@ -2,7 +2,7 @@
  * Servicio para obtener la información de la sección de inicio.
  */
 
-import { API_CONFIG } from '../config/api';
+import { API_CONFIG, getAuthHeaders } from '../config/api';
 
 export type SentimentBucket = 'extreme-fear' | 'fear' | 'neutral' | 'greed' | 'extreme-greed';
 
@@ -59,12 +59,31 @@ export interface HomeDashboardResponse {
 const HOME_DASHBOARD_URL = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.HOME_DASHBOARD}`;
 
 export const fetchHomeDashboard = async (): Promise<HomeDashboardResponse> => {
-  const response = await fetch(HOME_DASHBOARD_URL);
+  try {
+    const response = await fetch(HOME_DASHBOARD_URL, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
 
-  if (!response.ok) {
-    throw new Error(`Error al obtener datos de inicio: ${response.status} ${response.statusText}`);
+    if (!response.ok) {
+      // Manejar error de autenticación
+      if (response.status === 401) {
+        // Limpiar token expirado
+        localStorage.removeItem('token');
+        throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      }
+      
+      throw new Error(`Error al obtener datos de inicio: ${response.status} ${response.statusText}`);
+    }
+
+    const data = (await response.json()) as HomeDashboardResponse;
+    return data;
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Sesión expirada')) {
+      // Redirigir a login si es necesario
+      // window.location.href = '/login';
+      throw error;
+    }
+    throw error;
   }
-
-  const data = (await response.json()) as HomeDashboardResponse;
-  return data;
 };
