@@ -15,12 +15,17 @@ const Login: React.FC = () => {
     setLoading(true);
 
     try {
+      // OAuth2 requiere application/x-www-form-urlencoded con campo 'username'
+      const formData = new URLSearchParams();
+      formData.append('username', email);  // OAuth2 usa 'username', no 'email'
+      formData.append('password', password);
+
       const response = await fetch(getApiUrl('/api/auth/login'), {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({ email, password }),
+        body: formData.toString(),
       });
 
       const data = await response.json();
@@ -39,9 +44,9 @@ const Login: React.FC = () => {
       
       // Recargar la página para que todos los componentes usen el nuevo token
       window.location.reload();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('❌ Error en login:', err);
-      setError(err.message || 'Error al iniciar sesión');
+      setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
     } finally {
       setLoading(false);
     }
