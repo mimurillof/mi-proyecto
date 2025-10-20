@@ -135,7 +135,7 @@ function App() {
         console.warn('⚠️ No hay token válido. Redirigiendo a login...');
         setIsAuthenticated(false);
         // Redirigir a la app de login en Next.js
-        window.location.href = 'https://horizon-login.vercel.app/';
+        window.location.href = 'https://mi-proyecto-topaz-omega.vercel.app/';
         return;
       }
       
@@ -153,7 +153,7 @@ function App() {
         console.error('❌ Error de autenticación detectado. Limpiando sesión...');
         localStorage.removeItem('token');
         localStorage.removeItem('token_type');
-        window.location.href = 'https://horizon-login.vercel.app/';
+        window.location.href = 'https://mi-proyecto-topaz-omega.vercel.app/';
       }
     };
     
