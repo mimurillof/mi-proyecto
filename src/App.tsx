@@ -109,6 +109,25 @@ function App() {
   // **Auth Guard: Verificar autenticación al cargar**
   useEffect(() => {
     const checkAuth = () => {
+      // **1. Verificar si hay token en la URL (viene de Next.js login)**
+      const urlParams = new URLSearchParams(window.location.search);
+      const tokenFromUrl = urlParams.get('token');
+      
+      if (tokenFromUrl) {
+        console.log('🔑 Token recibido desde URL de login');
+        // Guardar token en localStorage
+        localStorage.setItem('token', tokenFromUrl);
+        
+        // Limpiar URL (quitar el parámetro ?token=...)
+        const cleanUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+        
+        console.log('✅ Token guardado y URL limpiada');
+        setIsAuthenticated(true);
+        return;
+      }
+      
+      // **2. Verificar si ya hay token en localStorage**
       const rawToken = localStorage.getItem('token');
       const token = rawToken ? rawToken.trim() : '';
       
