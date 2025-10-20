@@ -34,10 +34,18 @@ const Login: React.FC = () => {
         throw new Error(data.detail || 'Error al iniciar sesión');
       }
 
+      // Normalizar la propiedad del token devuelta por el backend
+      const rawToken = data?.access_token ?? data?.token ?? data?.data?.access_token;
+      const token = typeof rawToken === 'string' ? rawToken.trim() : '';
+
+      if (!token) {
+        throw new Error('No se recibió un token de autenticación en la respuesta');
+      }
+
       // Guardar el token JWT en localStorage
-      localStorage.setItem('token', data.access_token);
+      localStorage.setItem('token', token);
       
-      console.log('✅ Login exitoso. Token guardado:', data.access_token.substring(0, 20) + '...');
+      console.log('✅ Login exitoso. Token guardado:', token.substring(0, 20) + '...');
       
       // Redirigir al dashboard
       navigate('/');
