@@ -37,7 +37,10 @@ function App() {
   const tradingViewWidgetContainerRef = useRef<HTMLDivElement>(null);
   const mentionsContainerRef = useRef<HTMLDivElement>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const { data: homeData, loading: homeLoading, error: homeError } = useHomeDashboard();
+  
+  // **CRÍTICO: Solo cargar datos del dashboard DESPUÉS de autenticar**
+  // enabled=true solo cuando isAuthenticated === true
+  const { data: homeData, loading: homeLoading, error: homeError } = useHomeDashboard(isAuthenticated === true);
 
   const portfolioNews = homeData?.portfolio_news ?? [];
   const largeHighlights = homeData?.highlights?.large_cards ?? [];
@@ -108,14 +111,15 @@ function App() {
 
   // **Auth Guard: Verificar autenticación al cargar**
   useEffect(() => {
-    const checkAuth = () => {
+    const checkAuth = async () => {
       // **1. Verificar si hay token en la URL (viene de Next.js login)**
       const urlParams = new URLSearchParams(window.location.search);
       const tokenFromUrl = urlParams.get('token');
       
       if (tokenFromUrl) {
         console.log('🔑 Token recibido desde URL de login');
-        // Guardar token en localStorage
+        
+        // **CRÍTICO: Guardar token INMEDIATAMENTE**
         localStorage.setItem('token', tokenFromUrl);
         
         // Limpiar URL (quitar el parámetro ?token=...)
@@ -123,6 +127,10 @@ function App() {
         window.history.replaceState({}, document.title, cleanUrl);
         
         console.log('✅ Token guardado y URL limpiada');
+        
+        // **IMPORTANTE: Esperar un poco para asegurar que el token esté disponible**
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         setIsAuthenticated(true);
         return;
       }
