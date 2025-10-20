@@ -41,13 +41,17 @@ export const API_CONFIG = {
 
 // Función helper para obtener headers con autenticación
 export const getAuthHeaders = (): HeadersInit => {
-    const token = localStorage.getItem('token');
+    const rawToken = localStorage.getItem('token');
+    const token = rawToken ? rawToken.trim() : '';
     const headers: HeadersInit = {
         'Content-Type': 'application/json',
     };
     
-    if (token) {
+    if (token && token.toLowerCase() !== 'undefined' && token.toLowerCase() !== 'null') {
         headers['Authorization'] = `Bearer ${token}`;
+    } else if (rawToken) {
+        // Valor corrupto, limpiar para forzar nuevo login
+        localStorage.removeItem('token');
     }
     
     return headers;
@@ -60,12 +64,15 @@ export const getApiUrl = (endpoint: string): string => {
 
 // Función helper para construir URLs autenticadas con token en query string (para iframes)
 export const getAuthenticatedUrl = (endpoint: string): string => {
-    const token = localStorage.getItem('token');
+    const rawToken = localStorage.getItem('token');
+    const token = rawToken ? rawToken.trim() : '';
     const baseUrl = `${API_CONFIG.BASE_URL}${endpoint}`;
     
-    if (token) {
+    if (token && token.toLowerCase() !== 'undefined' && token.toLowerCase() !== 'null') {
         const separator = endpoint.includes('?') ? '&' : '?';
         return `${baseUrl}${separator}token=${encodeURIComponent(token)}`;
+    } else if (rawToken) {
+        localStorage.removeItem('token');
     }
     
     return baseUrl;

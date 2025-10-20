@@ -3,7 +3,7 @@
  * Proporciona métodos para obtener métricas en vivo y gráficos del backend FastAPI
  */
 
-import { API_CONFIG, getApiUrl, getAuthHeaders } from '../config/api';
+import { API_CONFIG, getAuthHeaders, getAuthenticatedUrl } from '../config/api';
 
 // Configuración de la API - Usa la configuración centralizada
 const API_URL = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PORTFOLIO_BASE}`;
@@ -162,7 +162,8 @@ export const fetchLatestAnalysisTimestamp = async (): Promise<LatestTimestampRes
  * Obtener la URL del gráfico dinámico
  */
 export const getChartUrl = (chartName: string): string => {
-  return `${API_URL}/charts/${chartName}`;
+  const endpoint = `${API_CONFIG.ENDPOINTS.PORTFOLIO_BASE}/charts/${encodeURIComponent(chartName)}`;
+  return getAuthenticatedUrl(endpoint);
 };
 
 /**

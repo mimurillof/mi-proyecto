@@ -1,4 +1,4 @@
-import { API_CONFIG, getApiUrl, getAuthHeaders } from '../config/api';
+import { API_CONFIG, getApiUrl, getAuthHeaders, getAuthenticatedUrl } from '../config/api';
 
 const PORTFOLIO_MANAGER_BASE = API_CONFIG.ENDPOINTS.PORTFOLIO_MANAGER_BASE ?? '/api/portfolio-manager';
 
@@ -148,7 +148,7 @@ export const fetchPortfolioChartHtml = async (chartName: string): Promise<string
 
 export const getPortfolioManagerChartUrl = (chartName: string): string => {
   const endpoint = `${PORTFOLIO_MANAGER_BASE}/charts/${encodeURIComponent(chartName)}`;
-  return getApiUrl(endpoint);
+  return getAuthenticatedUrl(endpoint);
 };
 
 export const fetchPortfolioReport = async (
