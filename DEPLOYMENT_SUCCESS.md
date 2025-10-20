@@ -237,7 +237,11 @@
 
 ---
 
-**ACCIÓN INMEDIATA:** Prueba el login en https://horizon-login.vercel.app/ y confirma que todo funciona correctamente. 🚀
+## 🎯 Próximos Pasos
+
+**ACCIÓN INMEDIATA:** Prueba el login en https://mi-proyecto-topaz-omega.vercel.app/ y confirma que todo funciona correctamente. 🚀
+
+---
 
 **Fecha de despliegue:** 19 de octubre de 2025
 **Hora:** 23:45 (UTC-5)
