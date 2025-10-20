@@ -67,9 +67,15 @@ export const fetchHomeDashboard = async (): Promise<HomeDashboardResponse> => {
 
     if (!response.ok) {
       // Manejar error de autenticación
-      if (response.status === 401) {
-        // Limpiar token expirado
-        localStorage.removeItem('token');
+      if (response.status === 401 || response.status === 403) {
+        console.error(`❌ Error ${response.status}: No autorizado`);
+        // Emitir evento para que App.tsx lo capture
+        window.dispatchEvent(new CustomEvent('authError', { 
+          detail: { 
+            status: response.status,
+            message: 'Sesión expirada o no autorizada'
+          } 
+        }));
         throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
       }
       
@@ -80,8 +86,6 @@ export const fetchHomeDashboard = async (): Promise<HomeDashboardResponse> => {
     return data;
   } catch (error) {
     if (error instanceof Error && error.message.includes('Sesión expirada')) {
-      // Redirigir a login si es necesario
-      // window.location.href = '/login';
       throw error;
     }
     throw error;

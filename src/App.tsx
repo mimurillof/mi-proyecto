@@ -36,6 +36,7 @@ function App() {
   const [activeItem, setActiveItem] = useState('inicio');
   const tradingViewWidgetContainerRef = useRef<HTMLDivElement>(null);
   const mentionsContainerRef = useRef<HTMLDivElement>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const { data: homeData, loading: homeLoading, error: homeError } = useHomeDashboard();
 
   const portfolioNews = homeData?.portfolio_news ?? [];
@@ -105,6 +106,42 @@ function App() {
     setActiveItem(itemName);
   };
 
+  // **Auth Guard: Verificar autenticación al cargar**
+  useEffect(() => {
+    const checkAuth = () => {
+      const rawToken = localStorage.getItem('token');
+      const token = rawToken ? rawToken.trim() : '';
+      
+      if (!token || token === 'undefined' || token === 'null') {
+        console.warn('⚠️ No hay token válido. Redirigiendo a login...');
+        setIsAuthenticated(false);
+        // Redirigir a la app de login en Next.js
+        window.location.href = 'https://horizon-login.vercel.app/';
+        return;
+      }
+      
+      console.log('✅ Token encontrado, usuario autenticado');
+      setIsAuthenticated(true);
+    };
+    
+    checkAuth();
+  }, []);
+
+  // Interceptar errores 403/401 y redirigir
+  useEffect(() => {
+    const handleAuthError = (event: any) => {
+      if (event.detail?.status === 401 || event.detail?.status === 403) {
+        console.error('❌ Error de autenticación detectado. Limpiando sesión...');
+        localStorage.removeItem('token');
+        localStorage.removeItem('token_type');
+        window.location.href = 'https://horizon-login.vercel.app/';
+      }
+    };
+    
+    window.addEventListener('authError', handleAuthError);
+    return () => window.removeEventListener('authError', handleAuthError);
+  }, []);
+
   useEffect(() => {
     function handleNavigateToReportsAI() {
       setActiveItem('reportes');
@@ -149,6 +186,23 @@ function App() {
       window.removeEventListener('navigateToReportsAI' as any, handleNavigateToReportsAI);
     };
   }, [activeItem]);
+
+  // Mostrar loading mientras se verifica la autenticación
+  if (isAuthenticated === null) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#F5F7FB]">
+        <div className="text-center">
+          <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
+          <p className="mt-4 text-gray-700 font-medium">Verificando autenticación...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Si no está autenticado, no renderizar nada (ya se redirigió)
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <>

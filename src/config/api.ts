@@ -52,9 +52,26 @@ export const getAuthHeaders = (): HeadersInit => {
     } else if (rawToken) {
         // Valor corrupto, limpiar para forzar nuevo login
         localStorage.removeItem('token');
+        // Emitir evento de error de autenticación
+        window.dispatchEvent(new CustomEvent('authError', { detail: { status: 401 } }));
     }
     
     return headers;
+};
+
+// Función helper para manejar respuestas de fetch
+export const handleAuthResponse = async (response: Response): Promise<Response> => {
+    if (response.status === 401 || response.status === 403) {
+        console.error('❌ Error de autenticación:', response.status);
+        // Emitir evento personalizado para que App.tsx lo capture
+        window.dispatchEvent(new CustomEvent('authError', { 
+            detail: { 
+                status: response.status,
+                message: 'No autorizado. Por favor inicia sesión nuevamente.'
+            } 
+        }));
+    }
+    return response;
 };
 
 // Función helper para construir URLs completas
