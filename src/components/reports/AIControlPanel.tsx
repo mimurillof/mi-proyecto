@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Modal from '../Modal';
-import { API_CONFIG, getApiUrl } from '../../config/api';
+import { API_CONFIG, getApiUrl, getAuthHeaders } from '../../config/api';
 
 type RibbonKey = 'summary' | 'performance' | 'forecast' | 'alerts' | 'customReport';
 
@@ -82,15 +82,16 @@ const AIControlPanel: React.FC = () => {
       const startUrl = getApiUrl(API_CONFIG.ENDPOINTS.RIBBON_CUSTOM_REPORT_START);
       const startRes = await fetch(startUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),  // ✅ AGREGADO: Autenticación JWT
         body: JSON.stringify({})
       });
 
       if (!startRes.ok) {
-        throw new Error('Error al iniciar la generación del reporte');
+        const errorText = await startRes.text();
+        throw new Error(`Error al iniciar la generación del reporte: ${startRes.status} - ${errorText}`);
       }
 
-      const { report_id, poll_url } = await startRes.json();
+      const { report_id } = await startRes.json();
       
       // 2. Hacer polling para verificar el estado
       setProgress('⏳ Generando reporte con IA (Gemini 2.5 Pro)...');
@@ -113,7 +114,9 @@ const AIControlPanel: React.FC = () => {
       try {
         attempts++;
         const statusUrl = getApiUrl(`${API_CONFIG.ENDPOINTS.RIBBON_CUSTOM_REPORT_STATUS}/${reportId}`);
-        const statusRes = await fetch(statusUrl);
+        const statusRes = await fetch(statusUrl, {
+          headers: getAuthHeaders()  // ✅ AGREGADO: Autenticación JWT
+        });
 
         if (!statusRes.ok) {
           throw new Error('Error al consultar el estado del reporte');
