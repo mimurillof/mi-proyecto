@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import './AIAgentPage.css'; // Importar estilos específicos
 import { Helmet } from 'react-helmet'; // Necesitamos instalar esta dependencia
-import { API_CONFIG, getApiUrl } from '../config/api';
+import { API_CONFIG, getApiUrl, getAuthHeaders } from '../config/api';
 
 // Interfaces para tipos de datos
 interface ChatMessage {
@@ -101,22 +101,38 @@ const AIAgentPage: React.FC = () => {
                 formData.append('message', message || 'Analiza este archivo');
                 formData.append('file', selectedFile);
                 
+                // ✅ Obtener token para autenticación
+                const token = localStorage.getItem('token');
+                const headers: HeadersInit = {};
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+                
                 response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.CHAT_UPLOAD), {
                     method: 'POST',
+                    headers,  // ✅ Incluir headers con Authorization
                     body: formData
                 });
             } else {
                 // Enviar solo texto
                 response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.CHAT), {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: getAuthHeaders(),  // ✅ Usar getAuthHeaders() para incluir token
                     body: JSON.stringify({ message })
                 });
             }
 
             if (!response.ok) {
+                // ✅ Manejar errores de autenticación
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.removeItem('token');
+                    window.dispatchEvent(new CustomEvent('authError', { 
+                        detail: { 
+                            status: response.status,
+                            message: 'Sesión expirada. Por favor inicia sesión nuevamente.'
+                        } 
+                    }));
+                }
                 throw new Error(`Error del servidor: ${response.status}`);
             }
 
