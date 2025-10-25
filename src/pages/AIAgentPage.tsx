@@ -92,11 +92,22 @@ const AIAgentPage: React.FC = () => {
         setShowChat(true);
         mainChatInputRef.current.value = '';
 
+        // Crear mensaje del agente vacío que iremos llenando con chunks
+        const agentMessageId = (Date.now() + 1).toString();
+        const initialAgentMessage: ChatMessage = {
+            id: agentMessageId,
+            type: 'agent',
+            content: '',
+            timestamp: new Date()
+        };
+        
+        setMessages(prev => [...prev, initialAgentMessage]);
+
         try {
             let response: Response;
             
             if (selectedFile) {
-                // Enviar con archivo
+                // Enviar con archivo (aún no soporta streaming)
                 const formData = new FormData();
                 formData.append('message', message || 'Analiza este archivo');
                 formData.append('file', selectedFile);
@@ -113,56 +124,131 @@ const AIAgentPage: React.FC = () => {
                     headers,  // ✅ Incluir headers con Authorization
                     body: formData
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`Error del servidor: ${response.status}`);
+                }
+                
+                const data: AgentResponse = await response.json();
+                
+                // Actualizar mensaje del agente con respuesta completa
+                setMessages(prev => prev.map(msg => 
+                    msg.id === agentMessageId
+                        ? { ...msg, content: data.response, model_used: data.model_used, tools_used: data.tools_used, session_id: data.session_id }
+                        : msg
+                ));
             } else {
-                // Enviar solo texto
+                // Enviar solo texto con STREAMING SSE
                 response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.CHAT), {
                     method: 'POST',
-                    headers: getAuthHeaders(),  // ✅ Usar getAuthHeaders() para incluir token
+                    headers: {
+                        ...getAuthHeaders(),
+                        'Accept': 'text/event-stream'
+                    },
                     body: JSON.stringify({ message })
                 });
-            }
 
-            if (!response.ok) {
-                // ✅ Manejar errores de autenticación
-                if (response.status === 401 || response.status === 403) {
-                    localStorage.removeItem('token');
-                    window.dispatchEvent(new CustomEvent('authError', { 
-                        detail: { 
-                            status: response.status,
-                            message: 'Sesión expirada. Por favor inicia sesión nuevamente.'
-                        } 
-                    }));
+                if (!response.ok) {
+                    // ✅ Manejar errores de autenticación
+                    if (response.status === 401 || response.status === 403) {
+                        localStorage.removeItem('token');
+                        window.dispatchEvent(new CustomEvent('authError', { 
+                            detail: { 
+                                status: response.status,
+                                message: 'Sesión expirada. Por favor inicia sesión nuevamente.'
+                            } 
+                        }));
+                    }
+                    throw new Error(`Error del servidor: ${response.status}`);
                 }
-                throw new Error(`Error del servidor: ${response.status}`);
-            }
 
-            const data: AgentResponse = await response.json();
-            
-            // Agregar respuesta del agente al chat
-            const agentMessage: ChatMessage = {
-                id: (Date.now() + 1).toString(),
-                type: 'agent',
-                content: data.response,
-                timestamp: new Date(),
-                model_used: data.model_used,
-                tools_used: data.tools_used,
-                session_id: data.session_id
-            };
-            
-            setMessages(prev => [...prev, agentMessage]);
+                // Procesar streaming SSE
+                const reader = response.body?.getReader();
+                const decoder = new TextDecoder();
+                let accumulatedContent = '';
+                let metadata: any = null;
+
+                if (!reader) {
+                    throw new Error('No se pudo obtener el reader del stream');
+                }
+
+                try {
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        
+                        if (done) break;
+                        
+                        const chunk = decoder.decode(value, { stream: true });
+                        const lines = chunk.split('\n');
+                        
+                        for (const line of lines) {
+                            if (line.startsWith('data: ')) {
+                                const dataStr = line.slice(6);
+                                try {
+                                    const data = JSON.parse(dataStr);
+                                    
+                                    // Si hay texto, agregarlo
+                                    if (data.text) {
+                                        accumulatedContent += data.text;
+                                        // Actualizar mensaje en tiempo real
+                                        setMessages(prev => prev.map(msg => 
+                                            msg.id === agentMessageId
+                                                ? { ...msg, content: accumulatedContent }
+                                                : msg
+                                        ));
+                                    }
+                                    
+                                    // Si hay metadata final
+                                    if (data.metadata) {
+                                        metadata = data.metadata;
+                                    }
+                                    
+                                    // Si llega "done", terminar
+                                    if (data.done) {
+                                        // Actualizar con metadata final
+                                        if (metadata) {
+                                            setMessages(prev => prev.map(msg => 
+                                                msg.id === agentMessageId
+                                                    ? { 
+                                                        ...msg, 
+                                                        model_used: metadata.model_used,
+                                                        tools_used: metadata.tools_used,
+                                                        session_id: metadata.session_id
+                                                    }
+                                                    : msg
+                                            ));
+                                        }
+                                        return; // Terminar procesamiento
+                                    }
+                                    
+                                    // Si hay error
+                                    if (data.error) {
+                                        throw new Error(data.error);
+                                    }
+                                } catch (e) {
+                                    // Ignorar líneas que no son JSON válido
+                                    console.debug('Línea no-JSON ignorada:', line);
+                                }
+                            }
+                        }
+                    }
+                } finally {
+                    reader.releaseLock();
+                }
+            }
             
         } catch (error) {
             console.error('Error enviando mensaje:', error);
             
-            // Agregar mensaje de error
-            const errorMessage: ChatMessage = {
-                id: (Date.now() + 1).toString(),
-                type: 'agent',
-                content: `Error: ${error instanceof Error ? error.message : 'Error desconocido'}. Verifica que el backend esté ejecutándose en ${API_CONFIG.BASE_URL}`,
-                timestamp: new Date()
-            };
-            
-            setMessages(prev => [...prev, errorMessage]);
+            // Actualizar mensaje del agente con error
+            setMessages(prev => prev.map(msg => 
+                msg.id === agentMessageId
+                    ? { 
+                        ...msg, 
+                        content: `Error: ${error instanceof Error ? error.message : 'Error desconocido'}. Verifica que el backend esté ejecutándose en ${API_CONFIG.BASE_URL}`
+                    }
+                    : msg
+            ));
         } finally {
             setIsLoading(false);
             setSelectedFile(null);
