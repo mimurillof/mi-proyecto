@@ -41,6 +41,7 @@ const AIControlPanel: React.FC = () => {
     try {
       const url = getApiUrl(endpointFor[key]);
       const isCustomReport = key === 'customReport';
+      const isAlerts = key === 'alerts';
 
       if (isCustomReport) {
         // Abrir modal INMEDIATAMENTE para mostrar progreso
@@ -51,6 +52,15 @@ const AIControlPanel: React.FC = () => {
         
         // Nuevo flujo asíncrono para custom report
         await handleCustomReportAsync();
+      } else if (isAlerts) {
+        // Abrir modal INMEDIATAMENTE para mostrar progreso
+        setTitle('🔍 Analizando Alertas y Oportunidades');
+        setMessage('Espere un momento mientras el agente genera la respuesta...');
+        setProgress('Conectando con el servidor...');
+        setOpen(true);
+        
+        // Nuevo flujo asíncrono para alertas
+        await handleAlertsAsync();
       } else {
         // Flujo normal para otros endpoints
         const res = await fetch(url, { method: 'GET' });
@@ -173,6 +183,105 @@ const AIControlPanel: React.FC = () => {
     await checkStatus();
   }
 
+  async function handleAlertsAsync() {
+    try {
+      // 1. Iniciar análisis de alertas
+      setProgress('📤 Enviando solicitud al backend...');
+      setMessage('Conectando con el servidor...');
+      
+      const startUrl = getApiUrl(API_CONFIG.ENDPOINTS.RIBBON_ALERTS_START);
+      const startRes = await fetch(startUrl, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({})
+      });
+
+      if (!startRes.ok) {
+        const errorText = await startRes.text();
+        throw new Error(`Error al iniciar el análisis: ${startRes.status} - ${errorText}`);
+      }
+
+      const { report_id } = await startRes.json();
+      
+      // 2. Hacer polling para verificar el estado
+      setProgress('⏳ Analizando alertas con IA (Gemini 2.5 Pro)...');
+      setMessage('El agente está analizando tus archivos de análisis. Este proceso puede tomar entre 30 y 90 segundos.');
+      await pollAlertsStatus(report_id);
+
+    } catch (error: any) {
+      setTitle('❌ Error');
+      setMessage(error?.message || 'Error generando el análisis de alertas');
+      setProgress('');
+      setLoading(false);
+    }
+  }
+
+  async function pollAlertsStatus(reportId: string) {
+    const maxAttempts = 60; // 60 intentos * 3 segundos = 3 minutos máximo
+    let attempts = 0;
+
+    const checkStatus = async (): Promise<void> => {
+      try {
+        attempts++;
+        const statusUrl = getApiUrl(`${API_CONFIG.ENDPOINTS.RIBBON_ALERTS_STATUS}/${reportId}`);
+        const statusRes = await fetch(statusUrl, {
+          headers: getAuthHeaders()
+        });
+
+        if (!statusRes.ok) {
+          throw new Error('Error al consultar el estado del análisis');
+        }
+
+        const statusData = await statusRes.json();
+
+        if (statusData.status === 'completed') {
+          // Análisis completado exitosamente
+          setTitle('✅ Análisis de Alertas y Oportunidades');
+          setMessage(statusData.analysis || 'Análisis completado exitosamente.');
+          setProgress('');
+          setLoading(false);
+        } else if (statusData.status === 'error') {
+          // Error en el análisis
+          setTitle('❌ Error en el Análisis');
+          setMessage(statusData.error || 'Error desconocido al generar el análisis');
+          setProgress('');
+          setLoading(false);
+        } else if (statusData.status === 'processing') {
+          // Aún procesando
+          const elapsed = attempts * 3;
+          setProgress(`⏳ Analizando alertas con IA (Gemini 2.5 Pro)... ${elapsed}s transcurridos`);
+          setMessage('El agente está analizando tus archivos de análisis. Esto puede tomar entre 30 y 90 segundos.');
+          
+          if (attempts >= maxAttempts) {
+            throw new Error('Tiempo de espera excedido. El análisis puede estar aún procesándose.');
+          }
+          
+          // Continuar polling después de 3 segundos
+          setTimeout(() => checkStatus(), 3000);
+        } else if (statusData.status === 'pending') {
+          // Pendiente de iniciar
+          setProgress('⏳ Análisis en cola... Iniciando procesamiento.');
+          setMessage('Tu solicitud está siendo procesada...');
+          
+          if (attempts >= maxAttempts) {
+            throw new Error('Tiempo de espera excedido.');
+          }
+          
+          // Continuar polling después de 2 segundos
+          setTimeout(() => checkStatus(), 2000);
+        }
+      } catch (error: any) {
+        setTitle('❌ Error de Conexión');
+        setMessage(error?.message || 'Error consultando el estado del análisis');
+        setProgress('');
+        setLoading(false);
+      }
+    };
+
+    // Iniciar el polling
+    await checkStatus();
+  }
+
   return (
     <div className="w-full h-full bg-white p-4 rounded-lg flex items-center justify-center">
       <div className="flex flex-wrap gap-4 justify-center">
@@ -223,19 +332,29 @@ const AIControlPanel: React.FC = () => {
       </div>
 
       <Modal isOpen={open} onClose={() => setOpen(false)} title={title}>
-        <p className="text-sm leading-6">{message}</p>
-        {reportData && (
-          <pre className="mt-4 max-h-72 overflow-y-auto rounded bg-gray-100 p-3 text-xs text-gray-800">
-{JSON.stringify(reportData, null, 2)}
-          </pre>
-        )}
-        {loading && (
-          <div className="mt-4">
-            <p className="text-blue-500">{progress || 'Cargando...'}</p>
-            <div className="mt-2 w-full bg-gray-200 rounded-full h-2.5">
-              <div className="bg-blue-600 h-2.5 rounded-full animate-pulse" style={{width: '100%'}}></div>
+        {loading ? (
+          <>
+            <p className="text-sm leading-6">{message}</p>
+            <div className="mt-4">
+              <p className="text-blue-500">{progress || 'Cargando...'}</p>
+              <div className="mt-2 w-full bg-gray-200 rounded-full h-2.5">
+                <div className="bg-blue-600 h-2.5 rounded-full animate-pulse" style={{width: '100%'}}></div>
+              </div>
             </div>
-          </div>
+          </>
+        ) : (
+          <>
+            {reportData ? (
+              <pre className="mt-4 max-h-72 overflow-y-auto rounded bg-gray-100 p-3 text-xs text-gray-800">
+{JSON.stringify(reportData, null, 2)}
+              </pre>
+            ) : (
+              <div 
+                className="text-sm leading-6 whitespace-pre-wrap max-h-96 overflow-y-auto prose prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: message.replace(/\n/g, '<br />').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/# (.*?)\n/g, '<h1 class="text-lg font-bold mt-4 mb-2">$1</h1>').replace(/## (.*?)\n/g, '<h2 class="text-base font-semibold mt-3 mb-2">$1</h2>').replace(/### (.*?)\n/g, '<h3 class="text-sm font-semibold mt-2 mb-1">$1</h3>') }}
+              />
+            )}
+          </>
         )}
       </Modal>
     </div>
