@@ -35,7 +35,8 @@ export const API_CONFIG = {
         RIBBON_CUSTOM_REPORT_STATUS: '/api/ribbon/custom-report/status',
         PORTFOLIO_BASE: '/api/portfolio',
         PORTFOLIO_MANAGER_BASE: '/api/portfolio-manager',
-        HOME_DASHBOARD: '/api/home/dashboard'
+        HOME_DASHBOARD: '/api/home/dashboard',
+        DASHBOARD_ALERTS: '/api/dashboard/alerts'
     }
 };
 
