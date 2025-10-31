@@ -42,6 +42,7 @@ const AIControlPanel: React.FC = () => {
       const url = getApiUrl(endpointFor[key]);
       const isCustomReport = key === 'customReport';
       const isAlerts = key === 'alerts';
+      const isProjections = key === 'forecast';
 
       if (isCustomReport) {
         // Abrir modal INMEDIATAMENTE para mostrar progreso
@@ -61,6 +62,15 @@ const AIControlPanel: React.FC = () => {
         
         // Nuevo flujo asíncrono para alertas
         await handleAlertsAsync();
+      } else if (isProjections) {
+        // Abrir modal INMEDIATAMENTE para mostrar progreso
+        setTitle('🔮 Generando Proyecciones Futuras');
+        setMessage('Espere un momento mientras el agente analiza los datos...');
+        setProgress('Conectando con el servidor...');
+        setOpen(true);
+        
+        // Nuevo flujo asíncrono para proyecciones
+        await handleProjectionsAsync();
       } else {
         // Flujo normal para otros endpoints
         const res = await fetch(url, { method: 'GET' });
@@ -273,6 +283,107 @@ const AIControlPanel: React.FC = () => {
       } catch (error: any) {
         setTitle('❌ Error de Conexión');
         setMessage(error?.message || 'Error consultando el estado del análisis');
+        setProgress('');
+        setLoading(false);
+      }
+    };
+
+    // Iniciar el polling
+    await checkStatus();
+  }
+
+  async function handleProjectionsAsync() {
+    try {
+      // 1. Iniciar análisis de proyecciones
+      setProgress('📤 Enviando solicitud al backend...');
+      setMessage('Conectando con el servidor...');
+      
+      const startUrl = getApiUrl(API_CONFIG.ENDPOINTS.RIBBON_PROJECTIONS_START);
+      const startRes = await fetch(startUrl, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({})
+      });
+
+      if (!startRes.ok) {
+        const errorText = await startRes.text();
+        throw new Error(`Error al iniciar el análisis: ${startRes.status} - ${errorText}`);
+      }
+
+      const { task_id } = await startRes.json();
+      
+      // 2. Hacer polling para verificar el estado
+      setProgress('⏳ Generando proyecciones con IA (Gemini 2.5 Pro)...');
+      setMessage('El agente está analizando tus archivos financieros. Este proceso puede tomar entre 30 y 90 segundos.');
+      await pollProjectionsStatus(task_id);
+      
+    } catch (error: any) {
+      console.error('Error en handleProjectionsAsync:', error);
+      setTitle('❌ Error');
+      setMessage(error.message || 'Error al procesar las proyecciones');
+      setProgress('');
+      setLoading(false);
+    }
+  }
+
+  async function pollProjectionsStatus(taskId: string) {
+    const maxAttempts = 60; // 60 intentos * 3 segundos = 3 minutos máximo
+    let attempts = 0;
+
+    const checkStatus = async (): Promise<void> => {
+      try {
+        attempts++;
+        const statusUrl = getApiUrl(`${API_CONFIG.ENDPOINTS.RIBBON_PROJECTIONS_STATUS}/${taskId}`);
+        const statusRes = await fetch(statusUrl, {
+          headers: getAuthHeaders()
+        });
+
+        if (!statusRes.ok) {
+          throw new Error('Error al consultar el estado de las proyecciones');
+        }
+
+        const statusData = await statusRes.json();
+
+        if (statusData.status === 'completed') {
+          // Proyecciones completadas exitosamente
+          setTitle('✅ Proyecciones Futuras Generadas');
+          const projectionsText = statusData.result?.projections || 'Proyecciones completadas';
+          setMessage(projectionsText);
+          setProgress('');
+          setLoading(false);
+        } else if (statusData.status === 'error') {
+          // Error en la generación
+          setTitle('❌ Error en las Proyecciones');
+          setMessage(statusData.error || 'Error desconocido al generar las proyecciones');
+          setProgress('');
+          setLoading(false);
+        } else if (statusData.status === 'processing') {
+          // Aún procesando
+          const elapsed = attempts * 3;
+          setProgress(`⏳ Generando proyecciones con IA (Gemini 2.5 Pro)... ${elapsed}s transcurridos`);
+          setMessage('El agente está procesando y analizando tus datos financieros. Esto puede tomar entre 30 y 90 segundos.');
+          
+          if (attempts >= maxAttempts) {
+            throw new Error('Tiempo de espera excedido. Las proyecciones pueden estar aún procesándose.');
+          }
+          
+          // Continuar polling después de 3 segundos
+          setTimeout(() => checkStatus(), 3000);
+        } else if (statusData.status === 'pending') {
+          // Pendiente de iniciar
+          setProgress('⏳ Proyecciones en cola... Iniciando.');
+          setMessage('Tu solicitud está siendo procesada...');
+          
+          if (attempts >= maxAttempts) {
+            throw new Error('Tiempo de espera excedido.');
+          }
+          
+          // Continuar polling después de 2 segundos
+          setTimeout(() => checkStatus(), 2000);
+        }
+      } catch (error: any) {
+        setTitle('❌ Error de Conexión');
+        setMessage(error?.message || 'Error consultando el estado de las proyecciones');
         setProgress('');
         setLoading(false);
       }
