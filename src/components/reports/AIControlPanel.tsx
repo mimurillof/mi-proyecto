@@ -43,6 +43,7 @@ const AIControlPanel: React.FC = () => {
       const isCustomReport = key === 'customReport';
       const isAlerts = key === 'alerts';
       const isProjections = key === 'forecast';
+      const isPerformance = key === 'performance';
 
       if (isCustomReport) {
         // Abrir modal INMEDIATAMENTE para mostrar progreso
@@ -71,6 +72,15 @@ const AIControlPanel: React.FC = () => {
         
         // Nuevo flujo asíncrono para proyecciones
         await handleProjectionsAsync();
+      } else if (isPerformance) {
+        // Abrir modal INMEDIATAMENTE para mostrar progreso
+        setTitle('📊 Analizando Rendimiento');
+        setMessage('Espere un momento mientras el agente analiza el rendimiento del portafolio...');
+        setProgress('Conectando con el servidor...');
+        setOpen(true);
+        
+        // Nuevo flujo asíncrono para análisis de rendimiento
+        await handlePerformanceAsync();
       } else {
         // Flujo normal para otros endpoints
         const res = await fetch(url, { method: 'GET' });
@@ -384,6 +394,107 @@ const AIControlPanel: React.FC = () => {
       } catch (error: any) {
         setTitle('❌ Error de Conexión');
         setMessage(error?.message || 'Error consultando el estado de las proyecciones');
+        setProgress('');
+        setLoading(false);
+      }
+    };
+
+    // Iniciar el polling
+    await checkStatus();
+  }
+
+  async function handlePerformanceAsync() {
+    try {
+      // 1. Iniciar análisis de rendimiento
+      setProgress('📤 Enviando solicitud al backend...');
+      setMessage('Conectando con el servidor...');
+      
+      const startUrl = getApiUrl(API_CONFIG.ENDPOINTS.RIBBON_PERFORMANCE_START);
+      const startRes = await fetch(startUrl, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({})
+      });
+
+      if (!startRes.ok) {
+        const errorText = await startRes.text();
+        throw new Error(`Error al iniciar el análisis: ${startRes.status} - ${errorText}`);
+      }
+
+      const { task_id } = await startRes.json();
+      
+      // 2. Hacer polling para verificar el estado
+      setProgress('⏳ Analizando rendimiento con IA (Gemini 2.5 Pro)...');
+      setMessage('El agente está analizando el rendimiento de tu portafolio. Este proceso puede tomar entre 30 y 90 segundos.');
+      await pollPerformanceStatus(task_id);
+
+    } catch (error: any) {
+      console.error('Error en handlePerformanceAsync:', error);
+      setTitle('❌ Error');
+      setMessage(error.message || 'Error al procesar el análisis de rendimiento');
+      setProgress('');
+      setLoading(false);
+    }
+  }
+
+  async function pollPerformanceStatus(taskId: string) {
+    const maxAttempts = 60; // 60 intentos * 3 segundos = 3 minutos máximo
+    let attempts = 0;
+
+    const checkStatus = async (): Promise<void> => {
+      try {
+        attempts++;
+        const statusUrl = getApiUrl(`${API_CONFIG.ENDPOINTS.RIBBON_PERFORMANCE_STATUS}/${taskId}`);
+        const statusRes = await fetch(statusUrl, {
+          headers: getAuthHeaders()
+        });
+
+        if (!statusRes.ok) {
+          throw new Error('Error al consultar el estado del análisis');
+        }
+
+        const statusData = await statusRes.json();
+
+        if (statusData.status === 'completed') {
+          // Análisis completado exitosamente
+          setTitle('✅ Análisis de Rendimiento Completado');
+          const analysisText = statusData.result?.analysis || 'Análisis completado exitosamente.';
+          setMessage(analysisText);
+          setProgress('');
+          setLoading(false);
+        } else if (statusData.status === 'error') {
+          // Error en la generación
+          setTitle('❌ Error en el Análisis');
+          setMessage(statusData.error || 'Error desconocido al generar el análisis de rendimiento');
+          setProgress('');
+          setLoading(false);
+        } else if (statusData.status === 'processing') {
+          // Aún procesando
+          const elapsed = attempts * 3;
+          setProgress(`⏳ Analizando rendimiento con IA (Gemini 2.5 Pro)... ${elapsed}s transcurridos`);
+          setMessage('El agente está procesando y analizando el rendimiento de tu portafolio. Esto puede tomar entre 30 y 90 segundos.');
+          
+          if (attempts >= maxAttempts) {
+            throw new Error('Tiempo de espera excedido. El análisis puede estar aún procesándose.');
+          }
+          
+          // Continuar polling después de 3 segundos
+          setTimeout(() => checkStatus(), 3000);
+        } else if (statusData.status === 'pending') {
+          // Pendiente de iniciar
+          setProgress('⏳ Análisis en cola... Iniciando procesamiento.');
+          setMessage('Tu solicitud está siendo procesada...');
+          
+          if (attempts >= maxAttempts) {
+            throw new Error('Tiempo de espera excedido.');
+          }
+          
+          // Continuar polling después de 2 segundos
+          setTimeout(() => checkStatus(), 2000);
+        }
+      } catch (error: any) {
+        setTitle('❌ Error de Conexión');
+        setMessage(error?.message || 'Error consultando el estado del análisis de rendimiento');
         setProgress('');
         setLoading(false);
       }

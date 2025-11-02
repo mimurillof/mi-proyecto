@@ -34,6 +34,8 @@ export const API_CONFIG = {
         RIBBON_ALERTS_STATUS: '/api/ribbon/alerts/status',
         RIBBON_PROJECTIONS_START: '/api/ribbon/projections/start',
         RIBBON_PROJECTIONS_STATUS: '/api/ribbon/projections/status',
+        RIBBON_PERFORMANCE_START: '/api/ribbon/performance/start',
+        RIBBON_PERFORMANCE_STATUS: '/api/ribbon/performance/status',
         RIBBON_CUSTOM_REPORT: '/api/ribbon/custom-report',
         RIBBON_CUSTOM_REPORT_START: '/api/ribbon/custom-report/start',
         RIBBON_CUSTOM_REPORT_STATUS: '/api/ribbon/custom-report/status',
