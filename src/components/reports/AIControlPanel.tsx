@@ -44,6 +44,7 @@ const AIControlPanel: React.FC = () => {
       const isAlerts = key === 'alerts';
       const isProjections = key === 'forecast';
       const isPerformance = key === 'performance';
+      const isSummary = key === 'summary';
 
       if (isCustomReport) {
         // Abrir modal INMEDIATAMENTE para mostrar progreso
@@ -81,6 +82,15 @@ const AIControlPanel: React.FC = () => {
         
         // Nuevo flujo asíncrono para análisis de rendimiento
         await handlePerformanceAsync();
+      } else if (isSummary) {
+        // Abrir modal INMEDIATAMENTE para mostrar progreso
+        setTitle('📋 Generando Resumen Diario/Semanal');
+        setMessage('Espere un momento mientras el agente genera el resumen del portafolio...');
+        setProgress('Conectando con el servidor...');
+        setOpen(true);
+        
+        // Nuevo flujo asíncrono para resumen diario/semanal
+        await handleSummaryAsync();
       } else {
         // Flujo normal para otros endpoints
         const res = await fetch(url, { method: 'GET' });
@@ -495,6 +505,107 @@ const AIControlPanel: React.FC = () => {
       } catch (error: any) {
         setTitle('❌ Error de Conexión');
         setMessage(error?.message || 'Error consultando el estado del análisis de rendimiento');
+        setProgress('');
+        setLoading(false);
+      }
+    };
+
+    // Iniciar el polling
+    await checkStatus();
+  }
+
+  async function handleSummaryAsync() {
+    try {
+      // 1. Iniciar resumen diario/semanal
+      setProgress('📤 Enviando solicitud al backend...');
+      setMessage('Conectando con el servidor...');
+      
+      const startUrl = getApiUrl(API_CONFIG.ENDPOINTS.RIBBON_SUMMARY_START);
+      const startRes = await fetch(startUrl, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({})
+      });
+
+      if (!startRes.ok) {
+        const errorText = await startRes.text();
+        throw new Error(`Error al iniciar el resumen: ${startRes.status} - ${errorText}`);
+      }
+
+      const { task_id } = await startRes.json();
+      
+      // 2. Hacer polling para verificar el estado
+      setProgress('⏳ Generando resumen con IA (Gemini 2.5 Pro)...');
+      setMessage('El agente está analizando tu portafolio y generando el resumen. Este proceso puede tomar entre 30 y 90 segundos.');
+      await pollSummaryStatus(task_id);
+
+    } catch (error: any) {
+      console.error('Error en handleSummaryAsync:', error);
+      setTitle('❌ Error');
+      setMessage(error.message || 'Error al procesar el resumen diario/semanal');
+      setProgress('');
+      setLoading(false);
+    }
+  }
+
+  async function pollSummaryStatus(taskId: string) {
+    const maxAttempts = 60; // 60 intentos * 3 segundos = 3 minutos máximo
+    let attempts = 0;
+
+    const checkStatus = async (): Promise<void> => {
+      try {
+        attempts++;
+        const statusUrl = getApiUrl(`${API_CONFIG.ENDPOINTS.RIBBON_SUMMARY_STATUS}/${taskId}`);
+        const statusRes = await fetch(statusUrl, {
+          headers: getAuthHeaders()
+        });
+
+        if (!statusRes.ok) {
+          throw new Error('Error al consultar el estado del resumen');
+        }
+
+        const statusData = await statusRes.json();
+
+        if (statusData.status === 'completed') {
+          // Resumen completado exitosamente
+          setTitle('✅ Resumen Diario/Semanal Generado');
+          const summaryText = statusData.result?.summary || 'Resumen completado exitosamente.';
+          setMessage(summaryText);
+          setProgress('');
+          setLoading(false);
+        } else if (statusData.status === 'error') {
+          // Error en la generación
+          setTitle('❌ Error en el Resumen');
+          setMessage(statusData.error || 'Error desconocido al generar el resumen diario/semanal');
+          setProgress('');
+          setLoading(false);
+        } else if (statusData.status === 'processing') {
+          // Aún procesando
+          const elapsed = attempts * 3;
+          setProgress(`⏳ Generando resumen con IA (Gemini 2.5 Pro)... ${elapsed}s transcurridos`);
+          setMessage('El agente está procesando y analizando tu portafolio. Esto puede tomar entre 30 y 90 segundos.');
+          
+          if (attempts >= maxAttempts) {
+            throw new Error('Tiempo de espera excedido. El resumen puede estar aún procesándose.');
+          }
+          
+          // Continuar polling después de 3 segundos
+          setTimeout(() => checkStatus(), 3000);
+        } else if (statusData.status === 'pending') {
+          // Pendiente de iniciar
+          setProgress('⏳ Resumen en cola... Iniciando procesamiento.');
+          setMessage('Tu solicitud está siendo procesada...');
+          
+          if (attempts >= maxAttempts) {
+            throw new Error('Tiempo de espera excedido.');
+          }
+          
+          // Continuar polling después de 2 segundos
+          setTimeout(() => checkStatus(), 2000);
+        }
+      } catch (error: any) {
+        setTitle('❌ Error de Conexión');
+        setMessage(error?.message || 'Error consultando el estado del resumen diario/semanal');
         setProgress('');
         setLoading(false);
       }

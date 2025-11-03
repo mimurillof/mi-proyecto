@@ -27,6 +27,8 @@ export const API_CONFIG = {
         STATUS: '/api/ai/status',
         HEALTH: '/api/ai/health',
         RIBBON_SUMMARY: '/api/ribbon/summary',
+        RIBBON_SUMMARY_START: '/api/ribbon/summary/start',
+        RIBBON_SUMMARY_STATUS: '/api/ribbon/summary/status',
         RIBBON_PERFORMANCE: '/api/ribbon/performance',
         RIBBON_FORECAST: '/api/ribbon/forecast',
         RIBBON_ALERTS: '/api/ribbon/alerts',
