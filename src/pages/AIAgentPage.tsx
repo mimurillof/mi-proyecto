@@ -278,7 +278,7 @@ const AIAgentPage: React.FC = () => {
     }
 
     return (
-        <div className="w-full h-full flex flex-col items-center justify-start bg-white text-gray-800 p-4 sm:p-6 overflow-hidden">
+        <div className="w-full h-full min-h-0 flex flex-col items-center justify-start bg-white text-gray-800 p-4 sm:p-6 overflow-hidden">
             <Helmet>
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
                 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />

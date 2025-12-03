@@ -472,7 +472,7 @@ function App() {
         </aside>
 
         {/* Main Content */}
-  <div className="flex-1 flex flex-col overflow-x-hidden"> 
+  <div className="flex-1 flex flex-col overflow-x-hidden min-h-0"> 
           {/* Top Navigation */}
           <nav className="flex items-center justify-between p-4 bg-white shadow-sm flex-shrink-0">
             <div className="flex-1"></div>
@@ -551,7 +551,7 @@ function App() {
           )}
 
           {/* Main Content Area */}
-          <div className="px-6 pb-6 pt-1.5 flex-1 overflow-auto"> 
+          <div className="px-6 pb-6 pt-1.5 flex-1 min-h-0 overflow-auto"> 
             {/* Renderizado condicional del contenido principal */}
             {activeItem === 'inicio' && (
               <> 
