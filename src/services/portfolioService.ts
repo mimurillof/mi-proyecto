@@ -419,3 +419,100 @@ export const useAdvancedMetrics = () => {
     refreshMetrics
   };
 };
+
+// ============================================
+// Interfaces y funciones para Resumen del Agente
+// ============================================
+
+export interface AgentSummaryContent {
+  summary: string;
+  report_type: string;
+  generated_at: string;
+  model_used: string;
+  files_processed: string[];
+}
+
+export interface AgentSummaryResponse {
+  status: string;
+  user_id: string;
+  has_summary: boolean;
+  summary: AgentSummaryContent | null;
+  last_updated: string | null;
+  retrieved_at: string;
+}
+
+/**
+ * Obtener el resumen diario/semanal del agente
+ * Lee la sección resumen_diario_semanal del archivo agente.json del usuario
+ */
+export const fetchAgentSummary = async (): Promise<AgentSummaryResponse> => {
+  try {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/api/storage/agent-summary`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    
+    if (!response.ok) {
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      }
+      throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Sesión expirada')) {
+      throw error;
+    }
+    console.error('Error al obtener resumen del agente:', error);
+    throw error;
+  }
+};
+
+/**
+ * Hook para obtener y manejar el resumen del agente
+ */
+export const useAgentSummary = (autoRefresh: boolean = false, refreshIntervalMs: number = 60000) => {
+  const [summary, setSummary] = useState<AgentSummaryResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const refreshSummary = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await fetchAgentSummary();
+      setSummary(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Cargar resumen al montar el componente
+    refreshSummary();
+  }, [refreshSummary]);
+
+  useEffect(() => {
+    if (!autoRefresh) return;
+
+    const interval = setInterval(() => {
+      refreshSummary();
+    }, refreshIntervalMs);
+
+    return () => clearInterval(interval);
+  }, [autoRefresh, refreshIntervalMs, refreshSummary]);
+
+  return {
+    summary,
+    hasSummary: summary?.has_summary ?? false,
+    summaryContent: summary?.summary ?? null,
+    loading,
+    error,
+    refreshSummary
+  };
+};
