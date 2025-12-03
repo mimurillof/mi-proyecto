@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
-import { Bell, Sun, Search, HelpCircle } from 'lucide-react';
+import { Bell, Sun, Search, HelpCircle, User, Settings, LogOut, ChevronDown } from 'lucide-react';
 
 
 
@@ -34,6 +34,8 @@ const HIGHLIGHT_PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-152173760
 function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeItem, setActiveItem] = useState('inicio');
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const tradingViewWidgetContainerRef = useRef<HTMLDivElement>(null);
   const mentionsContainerRef = useRef<HTMLDivElement>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -108,6 +110,24 @@ function App() {
   const handleMenuClick = (itemName: string) => {
     setActiveItem(itemName);
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('token_type');
+    setUserMenuOpen(false);
+    window.location.href = 'https://horizon-next-app.vercel.app/';
+  };
+
+  // Cerrar menú al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // **Auth Guard: Verificar autenticación al cargar**
   useEffect(() => {
@@ -390,11 +410,47 @@ function App() {
               <button className="p-2 hover:bg-gray-100 rounded-lg">
                 <Sun className="w-5 h-5 text-gray-500" />
               </button>
-              <img
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=faces"
-                alt="Profile"
-                className="w-8 h-8 rounded-full"
-              />
+              
+              {/* User Profile Dropdown */}
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-1.5 p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=faces"
+                    alt="Profile"
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {userMenuOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                    <button
+                      onClick={() => { handleMenuClick('perfil'); setUserMenuOpen(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      <User className="w-4 h-4 text-gray-500" />
+                      Perfil
+                    </button>
+                    <button
+                      onClick={() => { handleMenuClick('configuracion'); setUserMenuOpen(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      <Settings className="w-4 h-4 text-gray-500" />
+                      Configuración
+                    </button>
+                    <div className="border-t border-gray-100 my-1"></div>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4 text-red-500" />
+                      Cerrar Sesión
+                    </button>
+                  </div>
+                )}
             </div>
           </nav>
 
