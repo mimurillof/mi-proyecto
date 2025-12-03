@@ -392,15 +392,22 @@ const AIAgentPage: React.FC = () => {
                                                 const links = extractLinks(message.content || '');
 
                                                 return (links.length > 0) ? (
-                                                    <div className="mt-2 text-xs text-gray-500 message-sources">
-                                                        <div className="font-medium text-gray-600 mb-1">Fuente(s):</div>
-                                                        <ol className="list-decimal ml-4 space-y-1">
+                                                    <div className="mt-3 pt-2 border-t border-gray-200 message-sources">
+                                                        <span className="text-xs font-medium text-gray-500 mr-2">Fuentes:</span>
+                                                        <span className="inline-flex flex-wrap gap-1">
                                                             {links.map((l, i) => (
-                                                                <li key={`source-${i}`}>
-                                                                    <a href={l} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline break-words">{l}</a>
-                                                                </li>
+                                                                <a 
+                                                                    key={`source-${i}`}
+                                                                    href={l} 
+                                                                    target="_blank" 
+                                                                    rel="noopener noreferrer" 
+                                                                    className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium text-blue-700 bg-blue-100 rounded hover:bg-blue-200 transition-colors"
+                                                                    title={l}
+                                                                >
+                                                                    [{i + 1}]
+                                                                </a>
                                                             ))}
-                                                        </ol>
+                                                        </span>
                                                     </div>
                                                 ) : null;
                                             })()
