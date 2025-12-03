@@ -632,7 +632,13 @@ function App() {
                                 : null;
 
                               return (
-                                <Card key={cardItem.id ?? `${cardItem.type}-large-${index}`} isFooterBlurred className="relative col-span-12 xl:col-span-6">
+                                <Card 
+                                  key={cardItem.id ?? `${cardItem.type}-large-${index}`} 
+                                  isFooterBlurred 
+                                  isPressable={!!cardItem.url}
+                                  className="relative col-span-12 xl:col-span-6 cursor-pointer hover:scale-[1.02] transition-transform"
+                                  onPress={() => cardItem.url && window.open(cardItem.url, '_blank', 'noopener,noreferrer')}
+                                >
                                   <span className={`absolute inset-0 z-[1] bg-gradient-to-t ${overlay}`} aria-hidden="true" />
                                   <CardHeader className="absolute z-10 top-2 flex-col items-start gap-1">
                                     <span className={`inline-flex items-center gap-1 rounded-full px-2 py-[2px] text-[10px] font-semibold uppercase tracking-wide ${badgeStyle}`}>
@@ -691,7 +697,12 @@ function App() {
                                 : null;
 
                               return (
-                                <Card key={cardItem.id ?? `${cardItem.type}-small-${index}`} className="relative col-span-12 md:col-span-6 xl:col-span-4">
+                                <Card 
+                                  key={cardItem.id ?? `${cardItem.type}-small-${index}`} 
+                                  isPressable={!!cardItem.url}
+                                  className="relative col-span-12 md:col-span-6 xl:col-span-4 cursor-pointer hover:scale-[1.02] transition-transform"
+                                  onPress={() => cardItem.url && window.open(cardItem.url, '_blank', 'noopener,noreferrer')}
+                                >
                                   <span className={`absolute inset-0 z-[1] bg-gradient-to-t ${overlay}`} aria-hidden="true" />
                                   <CardHeader className="absolute z-10 top-2 flex-col items-start gap-1">
                                     <span className={`inline-flex items-center gap-1 rounded-full px-2 py-[2px] text-[10px] font-semibold uppercase tracking-wide ${badgeStyle}`}>
