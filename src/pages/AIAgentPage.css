@@ -44,6 +44,18 @@ body, .ai-agent-page {
     'opsz' 40;
 }
 
+/* Estilos para el contenido de markdown en el chat */
+.message-content {
+    font-size: 0.95rem;
+    color: #1f2937; /* gray-800 */
+}
+.message-content p { margin: 0.25rem 0; }
+.message-content ul, .message-content ol { margin-left: 1rem; }
+.message-content a { color: #2563eb; text-decoration: underline; }
+.message-sources .list-decimal { margin-left: 0.5rem; }
+.message-sources a { color: #2563eb; text-decoration: underline; }
+.message-sources ol { padding-left: 1rem; }
+
 /* Estilos de scrollbar personalizados para tema claro */
 ::-webkit-scrollbar {
     width: 8px;

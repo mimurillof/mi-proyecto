@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import './AIAgentPage.css'; // Importar estilos específicos
 import { Helmet } from 'react-helmet'; // Necesitamos instalar esta dependencia
 import { API_CONFIG, getApiUrl, getAuthHeaders } from '../config/api';
@@ -355,7 +357,54 @@ const AIAgentPage: React.FC = () => {
                                             ? 'bg-blue-600 text-white rounded-br-none' 
                                             : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none'
                                     }`}>
-                                        <div className="whitespace-pre-wrap">{message.content}</div>
+                                        <div className="message-content">
+                                            {message.type === 'agent' ? (
+                                                <>
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
+                                                        a: ({node, ...props}) => (
+                                                            <a {...props} className="text-blue-600 underline" target="_blank" rel="noopener noreferrer"></a>
+                                                        )
+                                                    }}>{message.content}</ReactMarkdown>
+                                                </>
+                                            ) : (
+                                                <div className="whitespace-pre-wrap">{message.content}</div>
+                                            )}
+                                        </div>
+                                        {message.type === 'agent' && (
+                                            (() => {
+                                                const extractLinks = (text: string) => {
+                                                    const linkMdRegex = /\[[^\]]*\]\((https?:\/\/[^)\s]+)\)/g;
+                                                    const urlRegex = /(https?:\/\/[^\s)]+)/g;
+                                                    const matches: string[] = [];
+                                                    let m: RegExpExecArray | null;
+
+                                                    while ((m = linkMdRegex.exec(text)) !== null) {
+                                                        matches.push(m[1]);
+                                                    }
+                                                    // Also match raw URLs
+                                                    while ((m = urlRegex.exec(text)) !== null) {
+                                                        // If not already included
+                                                        if (!matches.includes(m[1])) matches.push(m[1]);
+                                                    }
+                                                    return matches;
+                                                };
+
+                                                const links = extractLinks(message.content || '');
+
+                                                return (links.length > 0) ? (
+                                                    <div className="mt-2 text-xs text-gray-500 message-sources">
+                                                        <div className="font-medium text-gray-600 mb-1">Fuente(s):</div>
+                                                        <ol className="list-decimal ml-4 space-y-1">
+                                                            {links.map((l, i) => (
+                                                                <li key={`source-${i}`}>
+                                                                    <a href={l} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline break-words">{l}</a>
+                                                                </li>
+                                                            ))}
+                                                        </ol>
+                                                    </div>
+                                                ) : null;
+                                            })()
+                                        )}
                                         {message.type === 'agent' && message.model_used && (
                                             <div className="mt-2 text-xs text-gray-500">
                                                 Modelo: {message.model_used} | Herramientas: {message.tools_used?.join(', ') || 'Ninguna'}

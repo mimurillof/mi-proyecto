@@ -36,6 +36,8 @@
     "react-dom": "^18.3.1",
     "react-helmet": "^6.1.0",
     "react-plotly.js": "^2.6.0",
+    "react-markdown": "^8.0.3",
+    "remark-gfm": "^3.0.1",
     "react-router-dom": "^7.6.0",
     "tabulator-tables": "^6.3.1",
     "vite-react-typescript-starter": "file:"
