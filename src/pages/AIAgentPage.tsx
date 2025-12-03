@@ -278,13 +278,13 @@ const AIAgentPage: React.FC = () => {
     }
 
     return (
-        <div className="w-full h-full flex flex-col items-center justify-start bg-white text-gray-800 p-4 sm:p-6 overflow-auto">
+        <div className="w-full h-full flex flex-col items-center justify-start bg-white text-gray-800 p-4 sm:p-6 overflow-hidden">
             <Helmet>
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
                 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
             </Helmet>
             
-            <main className="w-full max-w-4xl mx-auto flex flex-col items-center flex-grow">
+            <main className="w-full max-w-4xl mx-auto flex flex-col items-center flex-1 min-h-0">
                 {/* Header - solo visible si no hay chat */}
                 {!showChat && (
                     <div className="w-full">
@@ -333,8 +333,8 @@ const AIAgentPage: React.FC = () => {
 
                 {/* Chat Area - visible cuando hay mensajes */}
                 {showChat && (
-                    <div className="w-full flex-grow flex flex-col">
-                        <div className="flex justify-between items-center mb-4">
+                    <div className="w-full flex-1 flex flex-col min-h-0">
+                        <div className="flex justify-between items-center mb-4 flex-shrink-0">
                             <h2 className="text-2xl font-bold text-gray-900">Chat con Horizon Agent</h2>
                             <button
                                 onClick={clearChat}
@@ -346,8 +346,7 @@ const AIAgentPage: React.FC = () => {
                         
                         <div 
                             ref={chatContainerRef}
-                            className="flex-grow bg-gray-50 rounded-xl p-4 overflow-y-auto mb-4 border border-gray-200"
-                            style={{ maxHeight: '400px' }}
+                            className="flex-1 bg-gray-50 rounded-xl p-4 overflow-y-auto mb-4 border border-gray-200 min-h-0"
                         >
                             {messages.map((message) => (
                                 <div key={message.id} className={`mb-4 ${message.type === 'user' ? 'text-right' : 'text-left'}`}>
@@ -384,7 +383,7 @@ const AIAgentPage: React.FC = () => {
                 )}
 
                 {/* Input Area */}
-                <div className="w-full mt-auto">
+                <div className="w-full flex-shrink-0">
                     {!showChat && (
                         <section className="flex flex-wrap justify-center gap-2 mb-8 ai-suggestion-buttons">
                             <button className="bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-medium py-2 px-3 rounded-lg transition-colors border border-gray-200">
