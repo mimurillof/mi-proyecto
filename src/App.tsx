@@ -31,6 +31,49 @@ import './pages/UserProfilePage/UserProfilePage.css';
 const NEWS_PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=800&q=80';
 const HIGHLIGHT_PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80';
 
+/**
+ * Decodifica entidades HTML y extrae el texto plano del contenido.
+ * Maneja casos donde el contenido viene con etiquetas HTML escapadas.
+ * @param htmlString - String con HTML potencialmente escapado
+ * @param maxLength - Longitud máxima del texto resultante
+ * @returns Texto plano decodificado y truncado
+ */
+const decodeAndExtractText = (htmlString: string | null | undefined, maxLength = 200): string => {
+  if (!htmlString) {
+    return 'Sin contenido disponible.';
+  }
+
+  try {
+    // Crear un elemento temporal para decodificar entidades HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlString;
+    
+    // Obtener el texto decodificado
+    let decodedHtml = tempDiv.textContent || tempDiv.innerText || '';
+    
+    // Si aún contiene etiquetas HTML, hacer una segunda pasada
+    if (decodedHtml.includes('<') && decodedHtml.includes('>')) {
+      tempDiv.innerHTML = decodedHtml;
+      decodedHtml = tempDiv.textContent || tempDiv.innerText || '';
+    }
+    
+    // Limpiar espacios en blanco excesivos
+    const cleanText = decodedHtml
+      .replace(/\s+/g, ' ')
+      .trim();
+    
+    // Truncar si es necesario
+    if (cleanText.length > maxLength) {
+      return cleanText.substring(0, maxLength).trim() + '...';
+    }
+    
+    return cleanText || 'Sin contenido disponible.';
+  } catch (error) {
+    console.error('Error al decodificar HTML:', error);
+    return 'Error al procesar el contenido.';
+  }
+};
+
 function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeItem, setActiveItem] = useState('inicio');
@@ -502,9 +545,17 @@ function App() {
                               portfolioNews.map((newsItem, index) => {
                                 const newsKey = newsItem.uuid ?? `${newsItem.title ?? 'noticia'}-${index}`;
                                 const publishedAt = formatDateTime(newsItem.published_at);
-                                const summary = newsItem.summary ?? newsItem.subtitle ?? 'Sin resumen disponible.';
+                                
+                                // Decodificar y extraer texto plano del summary
+                                const rawSummary = newsItem.summary ?? newsItem.subtitle ?? '';
+                                const summary = decodeAndExtractText(rawSummary, 200);
+                                
                                 const imageSrc = newsItem.image_url ?? NEWS_PLACEHOLDER_IMAGE;
-                                const subtitle = newsItem.subtitle ?? newsItem.type ?? '';
+                                
+                                // Decodificar subtitle también
+                                const rawSubtitle = newsItem.subtitle ?? newsItem.type ?? '';
+                                const subtitle = decodeAndExtractText(rawSubtitle, 100);
+                                
                                 const sourceElements = [newsItem.source, publishedAt].filter(Boolean).join(' • ');
 
                                 return (
@@ -571,6 +622,14 @@ function App() {
                                 ? `${cardItem.secondary_stat_label} • ${cardItem.secondary_stat_value}`
                                 : null;
                               const publishedAt = formatDateTime(cardItem.published_at);
+                              
+                              // Decodificar contenido HTML
+                              const decodedDescription = cardItem.description 
+                                ? decodeAndExtractText(cardItem.description, 150) 
+                                : null;
+                              const decodedBody = cardItem.body 
+                                ? decodeAndExtractText(cardItem.body, 150) 
+                                : null;
 
                               return (
                                 <Card key={cardItem.id ?? `${cardItem.type}-large-${index}`} isFooterBlurred className="relative col-span-12 xl:col-span-6">
@@ -580,9 +639,9 @@ function App() {
                                       {formatBadge(cardItem.type, cardItem.badge)}
                                     </span>
                                     <h4 className="text-white text-sm font-semibold">{cardItem.title}</h4>
-                                    {(cardItem.description || cardItem.body) && (
+                                    {(decodedDescription || decodedBody) && (
                                       <p className="text-[11px] text-white/80">
-                                        {cardItem.description ?? cardItem.body}
+                                        {decodedDescription ?? decodedBody}
                                       </p>
                                     )}
                                   </CardHeader>
@@ -625,6 +684,11 @@ function App() {
                                 ? `${cardItem.secondary_stat_label} • ${cardItem.secondary_stat_value}`
                                 : null;
                               const publishedAt = formatDateTime(cardItem.published_at);
+                              
+                              // Decodificar contenido HTML
+                              const decodedDescription = cardItem.description 
+                                ? decodeAndExtractText(cardItem.description, 100) 
+                                : null;
 
                               return (
                                 <Card key={cardItem.id ?? `${cardItem.type}-small-${index}`} className="relative col-span-12 md:col-span-6 xl:col-span-4">
@@ -634,9 +698,9 @@ function App() {
                                       {formatBadge(cardItem.type, cardItem.badge)}
                                     </span>
                                     <h4 className="text-white text-xs font-semibold">{cardItem.title}</h4>
-                                    {cardItem.description && (
+                                    {decodedDescription && (
                                       <p className="text-[11px] text-white/80 line-clamp-3">
-                                        {cardItem.description}
+                                        {decodedDescription}
                                       </p>
                                     )}
                                   </CardHeader>
