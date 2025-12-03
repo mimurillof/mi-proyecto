@@ -342,9 +342,9 @@ function App() {
 
   return (
     <>
-  <div className="flex min-h-screen bg-[#F5F7FB] text-white overflow-x-hidden">
+  <div className="flex h-screen bg-[#F5F7FB] text-white overflow-hidden">
         {/* Sidebar */}
-        <aside className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-[#1a1d24] border-r border-gray-800 flex flex-col transition-all duration-300 ease-in-out overflow-y-auto`}>
+        <aside className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-[#1a1d24] border-r border-gray-800 flex flex-col transition-all duration-300 ease-in-out overflow-y-auto flex-shrink-0`}>
           <div className="p-4 flex-1">
             <div className={`flex ${sidebarCollapsed ? 'justify-center' : 'items-center space-x-2'} mb-8`}>
               <img src="/favicon.ico" alt="Horizon" className="w-8 h-8" />
@@ -551,7 +551,7 @@ function App() {
           )}
 
           {/* Main Content Area */}
-          <div className="px-6 pb-6 pt-1.5 flex-1 min-h-0 overflow-auto"> 
+          <div className={`px-6 pb-6 pt-1.5 flex-1 min-h-0 ${activeItem === 'ai' ? 'overflow-hidden flex flex-col' : 'overflow-auto'}`}> 
             {/* Renderizado condicional del contenido principal */}
             {activeItem === 'inicio' && (
               <> 
@@ -841,7 +841,9 @@ function App() {
             )}
 
             {activeItem === 'ai' && ( // <-- Nueva condición para AI Agent
-              <AIAgentPage />
+              <div className="flex-1 min-h-0 w-full">
+                <AIAgentPage />
+              </div>
             )}
 
             {activeItem === 'perfil' && ( // <-- Nueva condición para Perfil
