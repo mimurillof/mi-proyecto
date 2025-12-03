@@ -641,7 +641,7 @@ function App() {
                     <div ref={mentionsContainerRef} className="bg-white rounded-lg shadow text-black overflow-hidden flex-grow p-4">
                       <div className="flex h-full flex-col gap-3">
                         {homeLoading ? (
-                          <div className="grid flex-1 min-h-0 grid-cols-12 gap-3 auto-rows-[160px] sm:auto-rows-[180px]">
+                          <div className="grid flex-1 min-h-0 grid-cols-12 gap-3 auto-rows-[200px] sm:auto-rows-[220px] lg:auto-rows-[240px]">
                             {Array.from({ length: 3 }).map((_, index) => (
                               <Card key={`highlight-skeleton-${index}`} className="relative col-span-12 md:col-span-6 xl:col-span-4 animate-pulse">
                                 <div className="absolute inset-0 bg-gray-200" />
@@ -657,7 +657,7 @@ function App() {
                             No hay menciones destacadas por ahora.
                           </div>
                         ) : (
-                          <div className="grid flex-1 min-h-0 grid-cols-12 gap-3 auto-rows-[160px] sm:auto-rows-[180px]">
+                          <div className="grid flex-1 min-h-0 grid-cols-12 gap-3 auto-rows-[200px] sm:auto-rows-[220px] lg:auto-rows-[240px]">
                             {largeHighlights.map((cardItem, index) => {
                               const overlay = getOverlayGradient(cardItem.type);
                               const badgeStyle = getBadgeStyle(cardItem.type);
