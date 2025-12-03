@@ -46,11 +46,11 @@ const AIReportView: React.FC = () => {
         </div>
       </div>
 
-      <div style={{ display: 'flex', marginTop: '20px' }}>
+      <div style={{ display: 'flex', marginTop: '20px', position: 'relative', zIndex: 2 }}>
         <div
           style={{
             width: '1200px',
-            height: '398px',
+            minHeight: '560px',
             backgroundColor: '#FFFFFF',
             color: 'black',
             padding: '0px'
@@ -62,7 +62,7 @@ const AIReportView: React.FC = () => {
         <div
           style={{
             width: '520px',
-            height: '398px',
+            minHeight: '560px',
             backgroundColor: '#FFFFFF',
             marginLeft: '20px',
             color: 'black',
@@ -73,7 +73,7 @@ const AIReportView: React.FC = () => {
         </div>
       </div>
 
-      <div style={{ display: 'flex', marginTop: '20px' }}>
+      <div style={{ display: 'flex', marginTop: '20px', position: 'relative', zIndex: 1 }}>
         <div
           style={{
             flex: '1',
