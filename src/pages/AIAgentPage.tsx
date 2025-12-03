@@ -12,6 +12,13 @@ interface ChatMessage {
     model_used?: string;
     tools_used?: string[];
     session_id?: string;
+    files?: string[]; // Nombres de archivos adjuntos
+}
+
+interface InlineFile {
+    filename: string;
+    content_type: string;
+    data: string; // Base64
 }
 
 interface AgentResponse {
@@ -23,6 +30,21 @@ interface AgentResponse {
     token_usage: Record<string, number>;
     session_id: string;
 }
+
+// Función helper para convertir archivo a base64
+const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            // El resultado incluye el prefijo "data:mime/type;base64,", lo removemos
+            const result = reader.result as string;
+            const base64Data = result.split(',')[1];
+            resolve(base64Data);
+        };
+        reader.onerror = error => reject(error);
+    });
+};
 
 const AIAgentPage: React.FC = () => {
     const mainChatInputRef = useRef<HTMLInputElement>(null);
@@ -84,8 +106,9 @@ const AIAgentPage: React.FC = () => {
         const userMessage: ChatMessage = {
             id: Date.now().toString(),
             type: 'user',
-            content: message || 'Archivo adjunto',
-            timestamp: new Date()
+            content: message || 'Archivo adjunto para análisis',
+            timestamp: new Date(),
+            files: selectedFile ? [selectedFile.name] : undefined
         };
         
         setMessages(prev => [...prev, userMessage]);
@@ -104,137 +127,119 @@ const AIAgentPage: React.FC = () => {
         setMessages(prev => [...prev, initialAgentMessage]);
 
         try {
-            let response: Response;
+            // ✅ Preparar archivos inline (base64) si hay archivo seleccionado
+            let inlineFiles: InlineFile[] | undefined;
             
             if (selectedFile) {
-                // Enviar con archivo (aún no soporta streaming)
-                const formData = new FormData();
-                formData.append('message', message || 'Analiza este archivo');
-                formData.append('file', selectedFile);
-                
-                // ✅ Obtener token para autenticación
-                const token = localStorage.getItem('token');
-                const headers: HeadersInit = {};
-                if (token) {
-                    headers['Authorization'] = `Bearer ${token}`;
-                }
-                
-                response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.CHAT_UPLOAD), {
-                    method: 'POST',
-                    headers,  // ✅ Incluir headers con Authorization
-                    body: formData
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`Error del servidor: ${response.status}`);
-                }
-                
-                const data: AgentResponse = await response.json();
-                
-                // Actualizar mensaje del agente con respuesta completa
-                setMessages(prev => prev.map(msg => 
-                    msg.id === agentMessageId
-                        ? { ...msg, content: data.response, model_used: data.model_used, tools_used: data.tools_used, session_id: data.session_id }
-                        : msg
-                ));
-            } else {
-                // Enviar solo texto con STREAMING SSE
-                response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.CHAT), {
-                    method: 'POST',
-                    headers: {
-                        ...getAuthHeaders(),
-                        'Accept': 'text/event-stream'
-                    },
-                    body: JSON.stringify({ message })
-                });
+                const base64Data = await fileToBase64(selectedFile);
+                inlineFiles = [{
+                    filename: selectedFile.name,
+                    content_type: selectedFile.type || 'application/octet-stream',
+                    data: base64Data
+                }];
+            }
+            
+            // ✅ Usar streaming SSE para TODOS los casos (con o sin archivo)
+            const requestBody = {
+                message: message || 'Analiza este archivo y describe su contenido',
+                files: inlineFiles // Puede ser undefined si no hay archivos
+            };
+            
+            const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.CHAT), {
+                method: 'POST',
+                headers: {
+                    ...getAuthHeaders(),
+                    'Accept': 'text/event-stream'
+                },
+                body: JSON.stringify(requestBody)
+            });
 
-                if (!response.ok) {
-                    // ✅ Manejar errores de autenticación
-                    if (response.status === 401 || response.status === 403) {
-                        localStorage.removeItem('token');
-                        window.dispatchEvent(new CustomEvent('authError', { 
-                            detail: { 
-                                status: response.status,
-                                message: 'Sesión expirada. Por favor inicia sesión nuevamente.'
-                            } 
-                        }));
-                    }
-                    throw new Error(`Error del servidor: ${response.status}`);
+            if (!response.ok) {
+                // ✅ Manejar errores de autenticación
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.removeItem('token');
+                    window.dispatchEvent(new CustomEvent('authError', { 
+                        detail: { 
+                            status: response.status,
+                            message: 'Sesión expirada. Por favor inicia sesión nuevamente.'
+                        } 
+                    }));
                 }
+                throw new Error(`Error del servidor: ${response.status}`);
+            }
 
-                // Procesar streaming SSE
-                const reader = response.body?.getReader();
-                const decoder = new TextDecoder();
-                let accumulatedContent = '';
-                let metadata: any = null;
+            // Procesar streaming SSE
+            const reader = response.body?.getReader();
+            const decoder = new TextDecoder();
+            let accumulatedContent = '';
+            let metadata: Record<string, unknown> | null = null;
 
-                if (!reader) {
-                    throw new Error('No se pudo obtener el reader del stream');
-                }
+            if (!reader) {
+                throw new Error('No se pudo obtener el reader del stream');
+            }
 
-                try {
-                    while (true) {
-                        const { done, value } = await reader.read();
-                        
-                        if (done) break;
-                        
-                        const chunk = decoder.decode(value, { stream: true });
-                        const lines = chunk.split('\n');
-                        
-                        for (const line of lines) {
-                            if (line.startsWith('data: ')) {
-                                const dataStr = line.slice(6);
-                                try {
-                                    const data = JSON.parse(dataStr);
-                                    
-                                    // Si hay texto, agregarlo
-                                    if (data.text) {
-                                        accumulatedContent += data.text;
-                                        // Actualizar mensaje en tiempo real
+            try {
+                while (true) {
+                    const { done, value } = await reader.read();
+                    
+                    if (done) break;
+                    
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n');
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const dataStr = line.slice(6);
+                            try {
+                                const data = JSON.parse(dataStr);
+                                
+                                // Si hay texto, agregarlo
+                                if (data.text) {
+                                    accumulatedContent += data.text;
+                                    // Actualizar mensaje en tiempo real
+                                    setMessages(prev => prev.map(msg => 
+                                        msg.id === agentMessageId
+                                            ? { ...msg, content: accumulatedContent }
+                                            : msg
+                                    ));
+                                }
+                                
+                                // Si hay metadata final
+                                if (data.metadata) {
+                                    metadata = data.metadata;
+                                }
+                                
+                                // Si llega "done", terminar
+                                if (data.done) {
+                                    // Actualizar con metadata final
+                                    if (metadata) {
                                         setMessages(prev => prev.map(msg => 
                                             msg.id === agentMessageId
-                                                ? { ...msg, content: accumulatedContent }
+                                                ? { 
+                                                    ...msg, 
+                                                    model_used: metadata?.model_used as string,
+                                                    tools_used: metadata?.tools_used as string[],
+                                                    session_id: metadata?.session_id as string
+                                                }
                                                 : msg
                                         ));
                                     }
-                                    
-                                    // Si hay metadata final
-                                    if (data.metadata) {
-                                        metadata = data.metadata;
-                                    }
-                                    
-                                    // Si llega "done", terminar
-                                    if (data.done) {
-                                        // Actualizar con metadata final
-                                        if (metadata) {
-                                            setMessages(prev => prev.map(msg => 
-                                                msg.id === agentMessageId
-                                                    ? { 
-                                                        ...msg, 
-                                                        model_used: metadata.model_used,
-                                                        tools_used: metadata.tools_used,
-                                                        session_id: metadata.session_id
-                                                    }
-                                                    : msg
-                                            ));
-                                        }
-                                        return; // Terminar procesamiento
-                                    }
-                                    
-                                    // Si hay error
-                                    if (data.error) {
-                                        throw new Error(data.error);
-                                    }
-                                } catch (e) {
-                                    // Ignorar líneas que no son JSON válido
-                                    console.debug('Línea no-JSON ignorada:', line);
+                                    return; // Terminar procesamiento
                                 }
+                                
+                                // Si hay error
+                                if (data.error) {
+                                    throw new Error(data.error);
+                                }
+                            } catch (e) {
+                                // Ignorar líneas que no son JSON válido
+                                console.debug('Línea no-JSON ignorada:', line);
                             }
                         }
                     }
-                } finally {
-                    reader.releaseLock();
                 }
+            } finally {
+                reader.releaseLock();
             }
             
         } catch (error) {
@@ -399,13 +404,26 @@ const AIAgentPage: React.FC = () => {
 
                     <section className="w-full pt-6">
                         {selectedFile && (
-                            <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
-                                <span className="text-sm text-blue-800">📎 {selectedFile.name}</span>
+                            <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                    <span className="material-symbols-sharp text-blue-600">
+                                        {selectedFile.type.startsWith('image/') ? 'image' : 
+                                         selectedFile.type === 'application/pdf' ? 'picture_as_pdf' : 
+                                         'description'}
+                                    </span>
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-medium text-blue-800">{selectedFile.name}</span>
+                                        <span className="text-xs text-blue-600">
+                                            {(selectedFile.size / 1024).toFixed(1)} KB • {selectedFile.type || 'Desconocido'}
+                                        </span>
+                                    </div>
+                                </div>
                                 <button 
                                     onClick={() => setSelectedFile(null)}
-                                    className="text-blue-600 hover:text-blue-800 text-sm"
+                                    className="text-blue-600 hover:text-blue-800 p-1 rounded-full hover:bg-blue-100 transition-colors"
+                                    aria-label="Eliminar archivo"
                                 >
-                                    ✕
+                                    <span className="material-symbols-sharp">close</span>
                                 </button>
                             </div>
                         )}
@@ -425,7 +443,7 @@ const AIAgentPage: React.FC = () => {
                                     type="file"
                                     onChange={handleFileSelect}
                                     className="hidden"
-                                    accept=".txt,.pdf,.doc,.docx,.csv,.json"
+                                    accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.txt,.csv,.json,.md"
                                 />
                                 <button
                                     onClick={() => fileInputRef.current?.click()}
