@@ -100,6 +100,42 @@ export interface HealthCheckResponse {
   error?: string;
 }
 
+// Interfaces para Métricas Avanzadas
+export interface MetricItem {
+  value: number;
+  label: string;
+  unit: string;
+}
+
+export interface TrackingErrorMetric extends MetricItem {
+  benchmark: number;
+}
+
+export interface CVaRMetric extends MetricItem {
+  period: string;
+}
+
+export interface SharpeRatioMetric extends MetricItem {
+  peer_group: number;
+}
+
+export interface CorrelationMetric extends MetricItem {}
+
+export interface ValueFactorMetric extends MetricItem {
+  benchmark_deviation: number;
+}
+
+export interface AdvancedMetricsResponse {
+  tracking_error: TrackingErrorMetric;
+  cvar_95: CVaRMetric;
+  sharpe_ratio: SharpeRatioMetric;
+  correlation_msci: CorrelationMetric;
+  value_factor_exposure: ValueFactorMetric;
+  source: string;
+  user_id: string;
+  retrieved_at: string;
+}
+
 /**
  * Obtener las métricas en vivo del portfolio
  */
@@ -191,6 +227,36 @@ export const fetchHealthCheck = async (): Promise<HealthCheckResponse> => {
       throw error;
     }
     console.error('Error al verificar estado de salud:', error);
+    throw error;
+  }
+};
+
+/**
+ * Obtener las métricas avanzadas del portfolio
+ * Lee la sección analizer_info del archivo api_response_B.json del usuario
+ */
+export const fetchAdvancedMetrics = async (): Promise<AdvancedMetricsResponse> => {
+  try {
+    const response = await fetch(`${API_URL}/advanced-metrics`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    
+    if (!response.ok) {
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      }
+      throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Sesión expirada')) {
+      throw error;
+    }
+    console.error('Error al obtener métricas avanzadas:', error);
     throw error;
   }
 };
@@ -318,4 +384,38 @@ export const formatCurrency = (value: number, currency: string = 'USD'): string 
 
 export const formatNumber = (value: number, decimals: number = 2): string => {
   return value.toFixed(decimals);
+};
+
+/**
+ * Hook para obtener y manejar las métricas avanzadas
+ */
+export const useAdvancedMetrics = () => {
+  const [metrics, setMetrics] = useState<AdvancedMetricsResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const refreshMetrics = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await fetchAdvancedMetrics();
+      setMetrics(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Cargar métricas al montar el componente
+    refreshMetrics();
+  }, [refreshMetrics]);
+
+  return {
+    metrics,
+    loading,
+    error,
+    refreshMetrics
+  };
 };
