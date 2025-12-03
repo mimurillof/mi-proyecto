@@ -23,6 +23,9 @@ export interface UserProfile {
     identification_number: string | null;
     bio: string | null;
     profile_image_url: string | null;
+    tax_id_number: string | null;
+    tax_id_country: string | null;
+    residential_address: string | null;
     created_at: string;
     has_completed_onboarding: boolean;
 }
@@ -36,6 +39,9 @@ export interface UserProfileUpdate {
     country?: string | null;
     identification_number?: string | null;
     bio?: string | null;
+    tax_id_number?: string | null;
+    tax_id_country?: string | null;
+    residential_address?: string | null;
 }
 
 export interface UserAvatar {
@@ -193,6 +199,41 @@ export const completeOnboarding = async (): Promise<ApiResponse> => {
     if (!response.ok) {
         const error = await response.json().catch(() => ({ detail: 'Error al completar onboarding' }));
         throw new Error(error.detail || 'Error al completar onboarding');
+    }
+
+    return response.json();
+};
+
+// ============================================================
+// Cambio de Contraseña
+// ============================================================
+
+export interface PasswordChangeRequest {
+    current_password: string;
+    new_password: string;
+    confirm_password: string;
+}
+
+export interface PasswordChangeResponse {
+    success: boolean;
+    message: string;
+}
+
+/**
+ * Cambia la contraseña del usuario autenticado
+ */
+export const changePassword = async (data: PasswordChangeRequest): Promise<PasswordChangeResponse> => {
+    const response = await fetch(getApiUrl('/api/users/change-password'), {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data),
+    });
+
+    await handleAuthResponse(response);
+
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({ detail: 'Error al cambiar contraseña' }));
+        throw new Error(error.detail || 'Error al cambiar contraseña');
     }
 
     return response.json();
