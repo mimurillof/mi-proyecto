@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import { Bell, Sun, Search, HelpCircle, User, Settings, LogOut, ChevronDown } from 'lucide-react';
 
+// Importar servicio de usuario
+import { getUserAvatar, UserAvatar } from './services/userService';
+
 
 
 // Importaciones de iconos
@@ -82,6 +85,9 @@ function App() {
   const tradingViewWidgetContainerRef = useRef<HTMLDivElement>(null);
   const mentionsContainerRef = useRef<HTMLDivElement>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  
+  // Estado para el avatar del usuario
+  const [userAvatar, setUserAvatar] = useState<UserAvatar | null>(null);
   
   // **CRÍTICO: Solo cargar datos del dashboard DESPUÉS de autenticar**
   // enabled=true solo cuando isAuthenticated === true
@@ -230,6 +236,46 @@ function App() {
     
     window.addEventListener('authError', handleAuthError);
     return () => window.removeEventListener('authError', handleAuthError);
+  }, []);
+
+  // Cargar avatar del usuario cuando está autenticado
+  useEffect(() => {
+    const loadUserAvatar = async () => {
+      if (!isAuthenticated) return;
+      
+      try {
+        const avatar = await getUserAvatar();
+        setUserAvatar(avatar);
+      } catch (error) {
+        console.warn('No se pudo cargar el avatar del usuario:', error);
+        // Usar avatar por defecto si hay error
+        setUserAvatar({
+          avatar_url: 'https://api.dicebear.com/7.x/initials/svg?seed=U&backgroundColor=94a3b8',
+          is_default: true,
+          gender: null
+        });
+      }
+    };
+    
+    loadUserAvatar();
+  }, [isAuthenticated]);
+
+  // Función para recargar avatar (llamada desde perfil al actualizar imagen)
+  const reloadUserAvatar = async () => {
+    try {
+      const avatar = await getUserAvatar();
+      setUserAvatar(avatar);
+    } catch (error) {
+      console.warn('Error recargando avatar:', error);
+    }
+  };
+
+  // Exponer función de recarga para otros componentes
+  useEffect(() => {
+    (window as any).reloadUserAvatar = reloadUserAvatar;
+    return () => {
+      delete (window as any).reloadUserAvatar;
+    };
   }, []);
 
   useEffect(() => {
@@ -461,9 +507,9 @@ function App() {
                   className="flex items-center gap-1.5 p-1 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <img
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=faces"
+                    src={userAvatar?.avatar_url || 'https://api.dicebear.com/7.x/initials/svg?seed=U&backgroundColor=94a3b8'}
                     alt="Profile"
-                    className="w-8 h-8 rounded-full"
+                    className="w-8 h-8 rounded-full object-cover"
                   />
                   <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
