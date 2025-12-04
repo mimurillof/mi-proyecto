@@ -75,7 +75,7 @@ function App() {
   
   const [userAvatar, setUserAvatar] = useState<UserAvatar | null>(null);
   
-  const { data: homeData, loading: homeLoading, error: homeError } = useHomeDashboard(isAuthenticated === true);
+  const { data: homeData, loading: homeLoading, error: homeError, isBuilding } = useHomeDashboard(isAuthenticated === true);
 
   const portfolioNews = homeData?.portfolio_news ?? [];
   const largeHighlights = homeData?.highlights?.large_cards ?? [];
@@ -304,8 +304,8 @@ function App() {
   }
 
   // Si el backend está construyendo el portafolio (usuario nuevo)
-  if (homeData?.status === 'building') {
-    return <SetupLoadingScreen steps={homeData.steps} />;
+  if (isBuilding || homeData?.status === 'building') {
+    return <SetupLoadingScreen steps={homeData?.steps} />;
   }
 
   return (
