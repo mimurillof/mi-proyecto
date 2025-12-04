@@ -5,8 +5,6 @@ import { Bell, Sun, Search, HelpCircle, User, Settings, LogOut, ChevronDown } fr
 // Importar servicio de usuario
 import { getUserAvatar, UserAvatar } from './services/userService';
 
-
-
 // Importaciones de iconos
 import iconoHome from './images/icons/home.svg';
 import iconoReportes from './images/icons/Reportes.svg';
@@ -20,13 +18,14 @@ import iconoBarCollapse from './images/icons/Bar Collapse.svg';
 // Importaciones de componentes
 import SentimentCard from './components/SentimentCard';
 import DashboardGrid from './components/dashboard/DashboardGrid';
-import ReportsPage from './pages/ReportsPage'; // <-- Importar ReportsPage
-import MarketPage from './pages/MarketPage'; // <-- Importar MarketPage
-import AIAgentPage from './pages/AIAgentPage'; // <-- Nueva importación
-import UserProfilePage from './pages/UserProfilePage/UserProfilePage'; // <-- Importar UserProfilePage
-import AccountSettingsPage from './pages/AccountSettingsPage/AccountSettingsPage'; // <-- Nueva importación
+import ReportsPage from './pages/ReportsPage';
+import MarketPage from './pages/MarketPage';
+import AIAgentPage from './pages/AIAgentPage';
+import UserProfilePage from './pages/UserProfilePage/UserProfilePage';
+import AccountSettingsPage from './pages/AccountSettingsPage/AccountSettingsPage';
 import { Card, CardHeader, CardFooter, Button } from '@heroui/react';
 import { useHomeDashboard } from './hooks/useHomeDashboard';
+import SetupLoadingScreen from './components/Onboarding/SetupLoadingScreen';
 
 // Importar CSS de UserProfilePage
 import './pages/UserProfilePage/UserProfilePage.css';
@@ -34,38 +33,26 @@ import './pages/UserProfilePage/UserProfilePage.css';
 const NEWS_PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=800&q=80';
 const HIGHLIGHT_PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80';
 
-/**
- * Decodifica entidades HTML y extrae el texto plano del contenido.
- * Maneja casos donde el contenido viene con etiquetas HTML escapadas.
- * @param htmlString - String con HTML potencialmente escapado
- * @param maxLength - Longitud máxima del texto resultante
- * @returns Texto plano decodificado y truncado
- */
 const decodeAndExtractText = (htmlString: string | null | undefined, maxLength = 200): string => {
   if (!htmlString) {
     return 'Sin contenido disponible.';
   }
 
   try {
-    // Crear un elemento temporal para decodificar entidades HTML
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = htmlString;
     
-    // Obtener el texto decodificado
     let decodedHtml = tempDiv.textContent || tempDiv.innerText || '';
     
-    // Si aún contiene etiquetas HTML, hacer una segunda pasada
     if (decodedHtml.includes('<') && decodedHtml.includes('>')) {
       tempDiv.innerHTML = decodedHtml;
       decodedHtml = tempDiv.textContent || tempDiv.innerText || '';
     }
     
-    // Limpiar espacios en blanco excesivos
     const cleanText = decodedHtml
       .replace(/\s+/g, ' ')
       .trim();
     
-    // Truncar si es necesario
     if (cleanText.length > maxLength) {
       return cleanText.substring(0, maxLength).trim() + '...';
     }
@@ -86,11 +73,8 @@ function App() {
   const mentionsContainerRef = useRef<HTMLDivElement>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   
-  // Estado para el avatar del usuario
   const [userAvatar, setUserAvatar] = useState<UserAvatar | null>(null);
   
-  // **CRÍTICO: Solo cargar datos del dashboard DESPUÉS de autenticar**
-  // enabled=true solo cuando isAuthenticated === true
   const { data: homeData, loading: homeLoading, error: homeError } = useHomeDashboard(isAuthenticated === true);
 
   const portfolioNews = homeData?.portfolio_news ?? [];
@@ -167,7 +151,6 @@ function App() {
     window.location.href = 'https://horizon-next-app.vercel.app/';
   };
 
-  // Cerrar menú al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
@@ -178,40 +161,28 @@ function App() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // **Auth Guard: Verificar autenticación al cargar**
   useEffect(() => {
     const checkAuth = async () => {
-      // **1. Verificar si hay token en la URL (viene de Next.js login)**
       const urlParams = new URLSearchParams(window.location.search);
       const tokenFromUrl = urlParams.get('token');
       
       if (tokenFromUrl) {
         console.log('🔑 Token recibido desde URL de login');
-        
-        // **CRÍTICO: Guardar token INMEDIATAMENTE**
         localStorage.setItem('token', tokenFromUrl);
-        
-        // Limpiar URL (quitar el parámetro ?token=...)
         const cleanUrl = window.location.pathname;
         window.history.replaceState({}, document.title, cleanUrl);
-        
         console.log('✅ Token guardado y URL limpiada');
-        
-        // **IMPORTANTE: Esperar un poco para asegurar que el token esté disponible**
         await new Promise(resolve => setTimeout(resolve, 100));
-        
         setIsAuthenticated(true);
         return;
       }
       
-      // **2. Verificar si ya hay token en localStorage**
       const rawToken = localStorage.getItem('token');
       const token = rawToken ? rawToken.trim() : '';
       
       if (!token || token === 'undefined' || token === 'null') {
         console.warn('⚠️ No hay token válido. Redirigiendo a login...');
         setIsAuthenticated(false);
-        // Redirigir a la app de login en Next.js
         window.location.href = 'https://horizon-next-app.vercel.app/';
         return;
       }
@@ -223,7 +194,6 @@ function App() {
     checkAuth();
   }, []);
 
-  // Interceptar errores 403/401 y redirigir
   useEffect(() => {
     const handleAuthError = (event: any) => {
       if (event.detail?.status === 401 || event.detail?.status === 403) {
@@ -238,7 +208,6 @@ function App() {
     return () => window.removeEventListener('authError', handleAuthError);
   }, []);
 
-  // Cargar avatar del usuario cuando está autenticado
   useEffect(() => {
     const loadUserAvatar = async () => {
       if (!isAuthenticated) return;
@@ -248,7 +217,6 @@ function App() {
         setUserAvatar(avatar);
       } catch (error) {
         console.warn('No se pudo cargar el avatar del usuario:', error);
-        // Usar avatar por defecto si hay error
         setUserAvatar({
           avatar_url: 'https://api.dicebear.com/7.x/initials/svg?seed=U&backgroundColor=94a3b8',
           is_default: true,
@@ -260,7 +228,6 @@ function App() {
     loadUserAvatar();
   }, [isAuthenticated]);
 
-  // Función para recargar avatar (llamada desde perfil al actualizar imagen)
   const reloadUserAvatar = async () => {
     try {
       const avatar = await getUserAvatar();
@@ -270,7 +237,6 @@ function App() {
     }
   };
 
-  // Exponer función de recarga para otros componentes
   useEffect(() => {
     (window as any).reloadUserAvatar = reloadUserAvatar;
     return () => {
@@ -281,7 +247,6 @@ function App() {
   useEffect(() => {
     function handleNavigateToReportsAI() {
       setActiveItem('reportes');
-      // ReportsPage leerá sessionStorage y abrirá la pestaña AI
     }
 
     window.addEventListener('navigateToReportsAI' as any, handleNavigateToReportsAI);
@@ -323,7 +288,6 @@ function App() {
     };
   }, [activeItem]);
 
-  // Mostrar loading mientras se verifica la autenticación
   if (isAuthenticated === null) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#F5F7FB]">
@@ -335,14 +299,18 @@ function App() {
     );
   }
 
-  // Si no está autenticado, no renderizar nada (ya se redirigió)
   if (!isAuthenticated) {
     return null;
   }
 
+  // Si el backend está construyendo el portafolio (usuario nuevo)
+  if (homeData?.status === 'building') {
+    return <SetupLoadingScreen steps={homeData.steps} />;
+  }
+
   return (
     <>
-  <div className="flex h-screen bg-[#F5F7FB] text-white overflow-hidden">
+      <div className="flex h-screen bg-[#F5F7FB] text-white overflow-hidden">
         {/* Sidebar */}
         <aside className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-[#1a1d24] border-r border-gray-800 flex flex-col transition-all duration-300 ease-in-out overflow-y-auto flex-shrink-0`}>
           <div className="p-4 flex-1">

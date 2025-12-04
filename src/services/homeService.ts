@@ -51,6 +51,9 @@ export interface Highlights {
 export interface HomeDashboardResponse {
   updated_at: string;
   source?: string;
+  status?: 'ready' | 'building' | 'error';
+  message?: string;
+  steps?: string[];
   market_sentiment: MarketSentiment;
   portfolio_news: NewsItem[];
   highlights: Highlights;

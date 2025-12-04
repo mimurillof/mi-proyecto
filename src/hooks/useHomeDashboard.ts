@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { fetchHomeDashboard, HomeDashboardResponse } from '../services/homeService';
 
+
+
 interface UseHomeDashboardResult {
   data: HomeDashboardResponse | null;
   loading: boolean;
@@ -20,6 +22,7 @@ export const useHomeDashboard = (enabled: boolean = true): UseHomeDashboardResul
     }
     
     let isMounted = true;
+    let pollInterval: NodeJS.Timeout | null = null;
 
     const loadHomeDashboard = async () => {
       // **CRÍTICO: Verificar que hay token ANTES de hacer la petición**
@@ -35,7 +38,11 @@ export const useHomeDashboard = (enabled: boolean = true): UseHomeDashboardResul
       }
       
       try {
-        setLoading(true);
+        // Solo mostrar loading la primera vez o si no hay datos previos
+        if (!data) {
+            setLoading(true);
+        }
+        
         const response = await fetchHomeDashboard();
 
         if (!isMounted) {
@@ -44,6 +51,15 @@ export const useHomeDashboard = (enabled: boolean = true): UseHomeDashboardResul
 
         setData(response);
         setError(null);
+
+        // Si el estado es 'building', configurar polling
+        if (response.status === 'building') {
+            console.log('🏗️ Dashboard en construcción. Reintentando en 10s...');
+            if (!pollInterval) {
+                pollInterval = setTimeout(loadHomeDashboard, 10000);
+            }
+        }
+
       } catch (err) {
         if (!isMounted) {
           return;
@@ -62,6 +78,9 @@ export const useHomeDashboard = (enabled: boolean = true): UseHomeDashboardResul
 
     return () => {
       isMounted = false;
+      if (pollInterval) {
+        clearTimeout(pollInterval);
+      }
     };
   }, [enabled]); // Re-ejecutar cuando enabled cambie
 
